@@ -1,0 +1,24 @@
+# --- node (runtime build) ---
+node_modules/
+dist/
+*.log
+
+# --- rust (cli) ---
+/target/
+crates/**/target/
+
+# --- os / editor ---
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+.env
+.env.*
+
+# --- artefatos compilados do runtime: buildados, mas o minificado é
+# commitado de propósito — o build da CLI Rust roda sem node. ---
+runtime/dist/*
+!runtime/dist/runtime.min.js
+!runtime/dist/theme.css
+!runtime/dist/fonts/

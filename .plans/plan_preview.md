@@ -257,7 +257,7 @@ md.html/
     test/fixtures/*.md
   skills/mdhtml-author/SKILL.md
   examples/{resume,memo,spec,recipe,chapter}.md
-  docs/plan_preview.md
+  .plans/plan_preview.md        # plano de implementação (este arquivo)
   install.sh
   .github/workflows/release.yml
 ```
