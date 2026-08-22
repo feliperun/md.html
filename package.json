@@ -1,0 +1,20 @@
+{
+  "name": "mdhtml",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "mdhtml 1.0 conformance fixtures and runtime build harness.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test runtime/test/*.test.mjs",
+    "check": "node runtime/build.mjs check",
+    "check:fonts": "node fonts/check.mjs",
+    "test:e2e": "node e2e/e2e.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "playwright": "1.61.1"
+  }
+}
