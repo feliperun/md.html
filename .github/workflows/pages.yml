@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "examples/**"
+      - "showcase/**"
       - "site/**"
       - "crates/**"
       - "runtime/**"
@@ -36,10 +37,11 @@ jobs:
       - name: Build example documents
         run: |
           set -euo pipefail
-          mkdir -p _site/examples
+          mkdir -p _site/examples _site/showcase
           for f in resume memo spec recipe chapter; do
             ./target/release/mdhtml build "examples/${f}.md" -o "_site/examples/${f}.html"
           done
+          ./target/release/mdhtml build showcase/felipe-cv.md -o _site/showcase/felipe-cv.html
 
       - name: Assemble site
         run: cp site/index.html _site/index.html

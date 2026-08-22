@@ -1,0 +1,91 @@
+/* "Blueprint" — a cool, technical theme for an engineering CV: a faint
+   grid backdrop, electric-blue accent, crisp monospace labels.
+   The runtime re-injects base.css's own rules (colors, spacing, component
+   selectors) after mount, landing after this stylesheet with matching
+   specificity for any plain-class rule. #mdhtml-app-prefixed selectors
+   outrank base.css's class-only selectors regardless of source order;
+   :root custom properties still need !important, since there is no
+   higher-specificity form of :root to borrow. */
+:root {
+  --md-bg: #f1f5f9 !important;
+  --md-text: #0f1f33 !important;
+  --md-muted: #51677e !important;
+  --md-surface: #ffffff !important;
+  --md-border: #c7d5e3 !important;
+  --md-accent: #2563eb !important;
+  --md-focus: #2563eb !important;
+  --md-font-body: "Instrument Sans", system-ui, sans-serif !important;
+  --md-font-mono: "Geist Mono", ui-monospace, monospace !important;
+  --md-measure: 46rem !important;
+  --md-density: 0.92 !important;
+  --md-heading-scale: 1.1 !important;
+  --md-radius: 0.35rem !important;
+  --md-shadow: 0 1px 0 rgb(37 99 235 / 0.08) !important;
+}
+
+html {
+  background-image:
+    linear-gradient(rgb(37 99 235 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(37 99 235 / 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+#mdhtml-app h1 {
+  font-family: var(--md-font-mono);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+#mdhtml-app h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+#mdhtml-app h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--md-border);
+}
+#mdhtml-app h3 { font-family: var(--md-font-mono); font-size: 1.05rem; color: var(--md-text); }
+
+#mdhtml-app a { text-decoration-style: dotted; }
+#mdhtml-app code { background: #e6edf7; border-color: var(--md-border); color: #1d4ed8; }
+
+#mdhtml-app .md-callout, #mdhtml-app .md-quote, #mdhtml-app .md-details, #mdhtml-app .md-stats,
+#mdhtml-app .md-kv, #mdhtml-app .md-cards, #mdhtml-app .md-grid-item {
+  border-color: var(--md-border);
+}
+#mdhtml-app .md-callout { border-left-width: 3px; }
+
+#mdhtml-app .md-stats td:last-child, #mdhtml-app .md-stats th:last-child {
+  text-align: right;
+  font-family: var(--md-font-mono);
+  font-weight: 700;
+  color: var(--md-accent);
+}
+
+#mdhtml-app .md-cards { grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+#mdhtml-app .md-cards > section {
+  border-top: 2px solid var(--md-accent);
+  border-radius: var(--md-radius);
+  padding: 1rem 1.15rem;
+  background: var(--md-surface);
+  box-shadow: var(--md-shadow);
+}
+
+#mdhtml-app .md-kv dt {
+  font-family: var(--md-font-mono);
+  font-size: 0.78rem;
+  color: var(--md-accent);
+}
+
+#mdhtml-app blockquote {
+  font-family: var(--md-font-mono);
+  font-size: 0.95em;
+  border-left-color: var(--md-accent);
+}
+
+html #mdhtml-toolbar, html #mdhtml-toc { background: var(--md-surface); border-color: var(--md-border); }

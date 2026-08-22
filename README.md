@@ -25,6 +25,20 @@ directory to your `PATH` to use `mdhtml` directly.
 Open the built `intro.md.html` in any browser via `file://` — rendering,
 copying, and downloading all work offline.
 
+## Examples
+
+Live at **[feliperun.github.io/md.html](https://feliperun.github.io/md.html/)** —
+five canonical documents, each with its own custom theme, proving mdhtml's
+per-document styling has no built-in ceiling:
+
+- [Meridian API specification](https://feliperun.github.io/md.html/examples/spec.html) — technical spec, "Terminal" theme
+- [2026 Q3 OKR review](https://feliperun.github.io/md.html/examples/memo.html) — presentation, "Beacon" theme
+- [The bell that did not ring](https://feliperun.github.io/md.html/examples/chapter.html) — fiction, "Folio" theme
+- [Alex Rivera — Product Engineer](https://feliperun.github.io/md.html/examples/resume.html) — résumé, "Ledger" theme
+- [Weeknight chickpea curry](https://feliperun.github.io/md.html/examples/recipe.html) — recipe, "Hearth" theme
+
+Plus one real one — [the author's own CV](https://feliperun.github.io/md.html/showcase/felipe-cv.html), "Blueprint" theme.
+
 ## Install from source
 
 ```bash
