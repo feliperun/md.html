@@ -1,0 +1,17 @@
+{
+  "id": "markdown-inline-links-images",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "Visit [**site**](https://example.com \"Example\") and ![logo](img/logo.png \"Logo\").",
+  "expect": {
+    "inline": [
+      { "type": "text", "value": "Visit " },
+      { "type": "link", "url": "https://example.com", "title": "Example", "children": [
+        { "type": "strong", "children": [{ "type": "text", "value": "site" }] }
+      ] },
+      { "type": "text", "value": " and " },
+      { "type": "image", "src": "img/logo.png", "title": "Logo", "alt": "logo" },
+      { "type": "text", "value": "." }
+    ]
+  }
+}

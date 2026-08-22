@@ -1,0 +1,23 @@
+{
+  "id": "frontmatter-valid-scalars",
+  "requirement": "PARSE-01",
+  "status": "valid",
+  "source": "---\ntitle: Plain title\nsingle: 'It''s quoted'\ndouble: \"Double \\\"quoted\\\"\"\ntabbed: \"a\\tb\"\nescaped: \"line\\nbreak\"\nint: 42\nnegative: -7\nfloat: 3.14\nexponent: 1.5e3\nsci: 1e-2\ntrue_flag: true\nfalse_flag: false\nempty: null\n---\n",
+  "expect": {
+    "frontMatter": {
+      "title": "Plain title",
+      "single": "It's quoted",
+      "double": "Double \"quoted\"",
+      "tabbed": "a\tb",
+      "escaped": "line\nbreak",
+      "int": 42,
+      "negative": -7,
+      "float": 3.14,
+      "exponent": 1500,
+      "sci": 0.01,
+      "true_flag": true,
+      "false_flag": false,
+      "empty": null
+    }
+  }
+}

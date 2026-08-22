@@ -1,0 +1,11 @@
+{
+  "id": "copy-modes",
+  "requirement": "UI-01",
+  "status": "valid",
+  "source": "---\ntitle: Projection\ntheme: technical\nunknown: [one, 2, true, null, {nested: value}]\nsections: {target: {component: cards}}\n\"2\": two\n---\n# Heading\n\nText <\\\u002fscript.\n",
+  "expect": {
+    "full": "---\ntitle: Projection\ntheme: technical\nunknown: [one, 2, true, null, {nested: value}]\nsections: {target: {component: cards}}\n\"2\": two\n---\n# Heading\n\nText <\\\u002fscript.\n",
+    "body": "# Heading\n\nText <\u002fscript.\n",
+    "smart": "---\n\"title\": \"Projection\"\n\"unknown\": [\"one\", 2, true, null, {\"nested\": \"value\"}]\n\"2\": \"two\"\n---\n# Heading\n\nText <\u002fscript.\n"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "markdown-inline-references",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "[Docs][A  B] and ![mark][IMG].\n\n[A B]: /docs \"Docs title\"\n[img]: /mark.png\n",
+  "expect": {
+    "blocks": [
+      { "type": "paragraph", "text": "[Docs][A  B] and ![mark][IMG].", "children": [
+        { "type": "link", "url": "/docs", "title": "Docs title", "children": [{ "type": "text", "value": "Docs" }] },
+        { "type": "text", "value": " and " },
+        { "type": "image", "src": "/mark.png", "title": null, "alt": "mark" },
+        { "type": "text", "value": "." }
+      ] }
+    ],
+    "references": {
+      "a b": { "url": "/docs", "title": "Docs title" },
+      "img": { "url": "/mark.png", "title": null }
+    }
+  }
+}

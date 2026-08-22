@@ -1,0 +1,11 @@
+{
+  "id": "render-footnotes",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "First[^one] and missing[^absent]. Second[^two] and again[^one].\n\n[^one]: One **note**.\n\n[^two]: Two note.\n",
+  "expect": {
+    "html": "<p>First<sup><a href=\"#fn-one\">[one]</a></sup> and missing<sup><a href=\"#fn-absent\">[absent]</a></sup>. Second<sup><a href=\"#fn-two\">[two]</a></sup> and again<sup><a href=\"#fn-one\">[one]</a></sup>.</p><section class=\"footnotes\" data-md-footnotes><ol><li id=\"fn-one\"><p>One <strong>note</strong>.</p></li><li id=\"fn-two\"><p>Two note.</p></li></ol></section>",
+    "headings": [],
+    "warnings": []
+  }
+}

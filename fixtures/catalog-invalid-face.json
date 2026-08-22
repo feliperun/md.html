@@ -1,0 +1,135 @@
+{
+  "format": "mdhtml/fonts/1.0",
+  "presets": {
+    "technical": { "body": "instrument-sans", "mono": "geist-mono" },
+    "editorial": { "body": "newsreader", "mono": "geist-mono" },
+    "system": { "body": null, "mono": null }
+  },
+  "families": {
+    "instrument-sans": {
+      "name": "Instrument Sans",
+      "role": "body",
+      "license": "OFL-1.1",
+      "licenseFile": "InstrumentSans-OFL.txt",
+      "notice": "NOTICE.md",
+      "provenance": {
+        "source": "https://registry.npmjs.org/@fontsource-variable/instrument-sans/-/instrument-sans-5.3.0.tgz",
+        "version": "5.3.0",
+        "package": "@fontsource-variable/instrument-sans",
+        "integrity": "sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw=="
+      },
+      "faces": {
+        "normal": {
+          "style": "normal",
+          "axes": { "wght": { "min": 400, "max": 700 } },
+          "file": "../fonts/InstrumentSans-latin-wght-normal.woff2",
+          "bytes": 30092,
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "license": "OFL-1.1",
+          "licenseFile": "InstrumentSans-OFL.txt",
+          "notice": "NOTICE.md",
+          "provenance": {
+            "source": "https://registry.npmjs.org/@fontsource-variable/instrument-sans/-/instrument-sans-5.3.0.tgz",
+            "version": "5.3.0",
+            "package": "@fontsource-variable/instrument-sans",
+            "integrity": "sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw=="
+          }
+        },
+        "italic": {
+          "style": "italic",
+          "axes": { "wght": { "min": 400, "max": 700 } },
+          "file": "../fonts/InstrumentSans-latin-wght-italic.woff2",
+          "bytes": 31828,
+          "sha256": "77210cdde0281b5ecb0d592e063a98656f1bc36993a3b98f506eb91ff4a433a5",
+          "license": "OFL-1.1",
+          "licenseFile": "InstrumentSans-OFL.txt",
+          "notice": "NOTICE.md",
+          "provenance": {
+            "source": "https://registry.npmjs.org/@fontsource-variable/instrument-sans/-/instrument-sans-5.3.0.tgz",
+            "version": "5.3.0",
+            "package": "@fontsource-variable/instrument-sans",
+            "integrity": "sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw=="
+          }
+        }
+      }
+    },
+    "newsreader": {
+      "name": "Newsreader",
+      "role": "body",
+      "license": "OFL-1.1",
+      "licenseFile": "Newsreader-OFL.txt",
+      "notice": "NOTICE.md",
+      "provenance": {
+        "source": "https://registry.npmjs.org/@fontsource-variable/newsreader/-/newsreader-5.3.0.tgz",
+        "version": "5.3.0",
+        "package": "@fontsource-variable/newsreader",
+        "integrity": "sha512-rrzYi43qMpbzwuFtf9OkWH8sxAPVPcQQQEwXpPtwaKYeJ8yVg5aLs5kawmo1f2Q1t1M38TLmEKCkGVDsYwgdFw=="
+      },
+      "faces": {
+        "normal": {
+          "style": "normal",
+          "axes": { "wght": { "min": 200, "max": 800 } },
+          "file": "../fonts/Newsreader-latin-wght-normal.woff2",
+          "bytes": 58083,
+          "sha256": "62981321d9a3cc7a61a73792729043703fd6112da86e8ec848bb57f088578757",
+          "license": "OFL-1.1",
+          "licenseFile": "Newsreader-OFL.txt",
+          "notice": "NOTICE.md",
+          "provenance": {
+            "source": "https://registry.npmjs.org/@fontsource-variable/newsreader/-/newsreader-5.3.0.tgz",
+            "version": "5.3.0",
+            "package": "@fontsource-variable/newsreader",
+            "integrity": "sha512-rrzYi43qMpbzwuFtf9OkWH8sxAPVPcQQQEwXpPtwaKYeJ8yVg5aLs5kawmo1f2Q1t1M38TLmEKCkGVDsYwgdFw=="
+          }
+        },
+        "italic": {
+          "style": "italic",
+          "axes": { "wght": { "min": 200, "max": 800 } },
+          "file": "../fonts/Newsreader-latin-wght-italic.woff2",
+          "bytes": 64520,
+          "sha256": "48bc8861b9b2ca9300747cad4fd6a3b4ac3028d364df00bd1b72097baa75e509",
+          "license": "OFL-1.1",
+          "licenseFile": "Newsreader-OFL.txt",
+          "notice": "NOTICE.md",
+          "provenance": {
+            "source": "https://registry.npmjs.org/@fontsource-variable/newsreader/-/newsreader-5.3.0.tgz",
+            "version": "5.3.0",
+            "package": "@fontsource-variable/newsreader",
+            "integrity": "sha512-rrzYi43qMpbzwuFtf9OkWH8sxAPVPcQQQEwXpPtwaKYeJ8yVg5aLs5kawmo1f2Q1t1M38TLmEKCkGVDsYwgdFw=="
+          }
+        }
+      }
+    },
+    "geist-mono": {
+      "name": "Geist Mono",
+      "role": "mono",
+      "license": "OFL-1.1",
+      "licenseFile": "GeistMono-OFL.txt",
+      "notice": "NOTICE.md",
+      "provenance": {
+        "source": "https://raw.githubusercontent.com/vercel/geist-font/v1.7.1/fonts/GeistMono/webfonts/GeistMono%5Bwght%5D.woff2",
+        "version": "v1.7.1",
+        "commit": "8b8b75fa63e339db10a3cd52fb28536615b5cc63",
+        "integrity": "commit:8b8b75fa63e339db10a3cd52fb28536615b5cc63"
+      },
+      "faces": {
+        "normal": {
+          "style": "normal",
+          "axes": { "wght": { "min": 100, "max": 900 } },
+          "file": "../fonts/GeistMono-wght-normal.woff2",
+          "bytes": 71596,
+          "sha256": "afaacc4c5fbba89d2ebf7a02dc4070208540874592a5504d57175782fe893101",
+          "license": "OFL-1.1",
+          "licenseFile": "GeistMono-OFL.txt",
+          "notice": "NOTICE.md",
+          "provenance": {
+            "source": "https://raw.githubusercontent.com/vercel/geist-font/v1.7.1/fonts/GeistMono/webfonts/GeistMono%5Bwght%5D.woff2",
+            "version": "v1.7.1",
+            "commit": "8b8b75fa63e339db10a3cd52fb28536615b5cc63",
+            "integrity": "commit:8b8b75fa63e339db10a3cd52fb28536615b5cc63"
+          }
+        }
+      }
+    }
+  }
+}

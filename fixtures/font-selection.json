@@ -1,0 +1,103 @@
+{
+  "id": "font-selection",
+  "format": "mdhtml/fonts/selection/1.0",
+  "source": "",
+  "cases": [
+    {
+      "name": "technical-none",
+      "preset": "technical",
+      "emphasis": false,
+      "code": false,
+      "files": ["InstrumentSans-latin-wght-normal.woff2"],
+      "bytes": 30092
+    },
+    {
+      "name": "technical-emphasis",
+      "preset": "technical",
+      "emphasis": true,
+      "code": false,
+      "files": ["InstrumentSans-latin-wght-normal.woff2", "InstrumentSans-latin-wght-italic.woff2"],
+      "bytes": 61920
+    },
+    {
+      "name": "technical-code",
+      "preset": "technical",
+      "emphasis": false,
+      "code": true,
+      "files": ["InstrumentSans-latin-wght-normal.woff2", "GeistMono-wght-normal.woff2"],
+      "bytes": 101688
+    },
+    {
+      "name": "technical-both",
+      "preset": "technical",
+      "emphasis": true,
+      "code": true,
+      "files": ["InstrumentSans-latin-wght-normal.woff2", "InstrumentSans-latin-wght-italic.woff2", "GeistMono-wght-normal.woff2"],
+      "bytes": 133516
+    },
+    {
+      "name": "editorial-none",
+      "preset": "editorial",
+      "emphasis": false,
+      "code": false,
+      "files": ["Newsreader-latin-wght-normal.woff2"],
+      "bytes": 58084
+    },
+    {
+      "name": "editorial-emphasis",
+      "preset": "editorial",
+      "emphasis": true,
+      "code": false,
+      "files": ["Newsreader-latin-wght-normal.woff2", "Newsreader-latin-wght-italic.woff2"],
+      "bytes": 122604
+    },
+    {
+      "name": "editorial-code",
+      "preset": "editorial",
+      "emphasis": false,
+      "code": true,
+      "files": ["Newsreader-latin-wght-normal.woff2", "GeistMono-wght-normal.woff2"],
+      "bytes": 129680
+    },
+    {
+      "name": "editorial-both",
+      "preset": "editorial",
+      "emphasis": true,
+      "code": true,
+      "files": ["Newsreader-latin-wght-normal.woff2", "Newsreader-latin-wght-italic.woff2", "GeistMono-wght-normal.woff2"],
+      "bytes": 194200
+    },
+    {
+      "name": "system-none",
+      "preset": "system",
+      "emphasis": false,
+      "code": false,
+      "files": [],
+      "bytes": 0
+    },
+    {
+      "name": "system-emphasis",
+      "preset": "system",
+      "emphasis": true,
+      "code": false,
+      "files": [],
+      "bytes": 0
+    },
+    {
+      "name": "system-code",
+      "preset": "system",
+      "emphasis": false,
+      "code": true,
+      "files": [],
+      "bytes": 0
+    },
+    {
+      "name": "system-both",
+      "preset": "system",
+      "emphasis": true,
+      "code": true,
+      "files": [],
+      "bytes": 0
+    }
+  ]
+}

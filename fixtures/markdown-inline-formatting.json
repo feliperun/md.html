@@ -1,0 +1,26 @@
+{
+  "id": "markdown-inline-formatting",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "Plain **bold** and *em* and __under__ and _italics_ and ~~gone~~.\nNested **bold *inside***.\nUnmatched *mark ~~ stays.",
+  "expect": {
+    "inline": [
+      { "type": "text", "value": "Plain " },
+      { "type": "strong", "children": [{ "type": "text", "value": "bold" }] },
+      { "type": "text", "value": " and " },
+      { "type": "emphasis", "children": [{ "type": "text", "value": "em" }] },
+      { "type": "text", "value": " and " },
+      { "type": "strong", "children": [{ "type": "text", "value": "under" }] },
+      { "type": "text", "value": " and " },
+      { "type": "emphasis", "children": [{ "type": "text", "value": "italics" }] },
+      { "type": "text", "value": " and " },
+      { "type": "strike", "children": [{ "type": "text", "value": "gone" }] },
+      { "type": "text", "value": ".\nNested " },
+      { "type": "strong", "children": [
+        { "type": "text", "value": "bold " },
+        { "type": "emphasis", "children": [{ "type": "text", "value": "inside" }] }
+      ] },
+      { "type": "text", "value": ".\nUnmatched *mark ~~ stays." }
+    ]
+  }
+}

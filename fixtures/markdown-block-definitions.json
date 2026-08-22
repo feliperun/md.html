@@ -1,0 +1,23 @@
+{
+  "id": "markdown-block-definitions",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "[ref]: https://example.com \"Example Title\"\n[Ref With  Spaces]: /path 'single title'\n[plain]: <https://example.org>\n\nText with [ref] and [plain].\n\n[^note]: Footnote body with **markup left raw**.\n\n    Continued footnote paragraph.\n\n[^note]: Duplicate footnote.\n[ref]: /duplicate\n\nThis is not a definition:\n[not-a-def]: /nope \"title\"\n",
+  "expect": {
+    "blocks": [
+      { "type": "paragraph", "text": "Text with [ref] and [plain]." },
+      { "type": "paragraph", "text": "This is not a definition:\n[not-a-def]: /nope \"title\"" }
+    ],
+    "references": {
+      "ref": { "url": "https://example.com", "title": "Example Title" },
+      "ref with spaces": { "url": "/path", "title": "single title" },
+      "plain": { "url": "https://example.org", "title": null }
+    },
+    "footnotes": {
+      "note": [
+        { "type": "paragraph", "text": "Footnote body with **markup left raw**." },
+        { "type": "paragraph", "text": "Continued footnote paragraph." }
+      ]
+    }
+  }
+}

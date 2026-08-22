@@ -1,0 +1,100 @@
+{
+  "id": "container-structured",
+  "requirement": "COMP-01",
+  "status": "valid",
+  "source": "::: stats\n| *Metric* | **Result** |\n| --- | --- |\n| Count | [3](#three) |\n:::\n\n::: bars\n| Label | Value |\n| --- | --- |\n| Zero | 0 |\n| Large | 12.50 |\n:::\n\n::: kv\n- **Mode**: *Safe*\n  - nested\n- **Owner**: Team[^note]\n:::\n\n::: steps\n3. [ ] First\n4. Second\n\n   > Nested quote\n:::\n\n::: grid\n### Card A {#card}\nAlpha.\n\n### Card A\nBeta.\n:::\n\n[^note]: Note.\n",
+  "expect": {
+    "html": "<div class=\"md-stats\"><table><thead><tr><th><em>Metric</em></th><th><strong>Result</strong></th></tr></thead><tbody><tr><td>Count</td><td><a href=\"#three\">3</a></td></tr></tbody></table></div><div class=\"md-bars\"><table><thead><tr><th>Label</th><th>Value</th></tr></thead><tbody><tr><td>Zero</td><td><meter min=\"0\" max=\"12.5\" value=\"0\">0</meter></td></tr><tr><td>Large</td><td><meter min=\"0\" max=\"12.5\" value=\"12.5\">12.5</meter></td></tr></tbody></table></div><dl class=\"md-kv\"><dt>Mode</dt><dd><em>Safe</em><ul><li><p>nested</p></li></ul></dd><dt>Owner</dt><dd>Team<sup><a href=\"#fn-note\">[note]</a></sup></dd></dl><ol class=\"md-steps\" start=\"3\"><li><input type=\"checkbox\" disabled> First</li><li><p>Second</p><blockquote><p>Nested quote</p></blockquote></li></ol><div class=\"md-grid\"><section class=\"md-grid-item\" data-md-section=\"card\"><h3 id=\"card\">Card A</h3><p>Alpha.</p></section><section class=\"md-grid-item\" data-md-section=\"card-a\"><h3 id=\"card-a\">Card A</h3><p>Beta.</p></section></div><section class=\"footnotes\" data-md-footnotes><ol><li id=\"fn-note\"><p>Note.</p></li></ol></section>",
+    "headings": [
+      { "level": 3, "id": "card", "text": "Card A" },
+      { "level": 3, "id": "card-a", "text": "Card A" }
+    ],
+    "warnings": []
+  },
+  "cases": [
+    {
+      "name": "hostile-bar-numbers",
+      "source": "::: bars\n| Label | Value |\n| --- | --- |\n| NaN | NaN |\n| Infinity | Infinity |\n| Negative | -1 |\n| Mixed | 1,000 |\n| Text | 2px |\n:::\n",
+      "expect": {
+        "html": "<table><thead><tr><th>Label</th><th>Value</th></tr></thead><tbody><tr><td>NaN</td><td>NaN</td></tr><tr><td>Infinity</td><td>Infinity</td></tr><tr><td>Negative</td><td>-1</td></tr><tr><td>Mixed</td><td>1,000</td></tr><tr><td>Text</td><td>2px</td></tr></tbody></table>",
+        "headings": [],
+        "warnings": [{ "code": "W-COMP-02", "name": "bars", "target": null }]
+      }
+    },
+    {
+      "name": "zero-bar-maximum",
+      "source": "::: bars\n| Label | Value |\n| --- | --- |\n| A | 0 |\n| B | 0.0 |\n:::\n",
+      "expect": {
+        "html": "<div class=\"md-bars\"><table><thead><tr><th>Label</th><th>Value</th></tr></thead><tbody><tr><td>A</td><td><meter min=\"0\" max=\"1\" value=\"0\">0</meter></td></tr><tr><td>B</td><td><meter min=\"0\" max=\"1\" value=\"0\">0</meter></td></tr></tbody></table></div>",
+        "headings": [],
+        "warnings": []
+      }
+    },
+    {
+      "name": "source-cell-counts-degrade",
+      "source": "::: stats\n| Key | Value |\n| --- | --- |\n| Missing |\n| Extra | cell | another |\n:::\n",
+      "expect": {
+        "html": "<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>Missing</td><td></td></tr><tr><td>Extra</td><td>cell</td></tr></tbody></table>",
+        "headings": [],
+        "warnings": [{ "code": "W-COMP-02", "name": "stats", "target": null }]
+      }
+    },
+    {
+      "name": "table-with-extra-top-level-block-degrade",
+      "source": "::: stats\n| Key | Value |\n| --- | --- |\n| A | 1 |\n\nOther.\n:::\n",
+      "expect": {
+        "html": "<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>A</td><td>1</td></tr></tbody></table><p>Other.</p>",
+        "headings": [],
+        "warnings": [{ "code": "W-COMP-02", "name": "stats", "target": null }]
+      }
+    },
+    {
+      "name": "kv-ordered-list-degrade",
+      "source": "::: kv\n1. Key\n2. Value\n:::\n",
+      "expect": {
+        "html": "<ol><li><p>Key</p></li><li><p>Value</p></li></ol>",
+        "headings": [],
+        "warnings": [{ "code": "W-COMP-02", "name": "kv", "target": null }]
+      }
+    },
+    {
+      "name": "nested-degradation-warning-order",
+      "source": "::: stats\n::: mystery\nInner.\n:::\n:::\n",
+      "expect": {
+        "html": "<p>Inner.</p>",
+        "headings": [],
+        "warnings": [
+          { "code": "W-COMP-02", "name": "stats", "target": null },
+          { "code": "W-COMP-02", "name": "mystery", "target": null }
+        ]
+      }
+    },
+    {
+      "name": "kv-malformed-prefix-degrade",
+      "source": "::: kv\n- **Key** : value\n:::\n",
+      "expect": {
+        "html": "<ul><li><p><strong>Key</strong> : value</p></li></ul>",
+        "headings": [],
+        "warnings": [{ "code": "W-COMP-02", "name": "kv", "target": null }]
+      }
+    },
+    {
+      "name": "grid-leading-content-degrade",
+      "source": "::: grid\nLead.\n\n### Card\nBody.\n:::\n",
+      "expect": {
+        "html": "<p>Lead.</p><section data-md-section=\"card\"><h3 id=\"card\">Card</h3><p>Body.</p></section>",
+        "headings": [{ "level": 3, "id": "card", "text": "Card" }],
+        "warnings": [{ "code": "W-COMP-02", "name": "grid", "target": null }]
+      }
+    },
+    {
+      "name": "grid-wrong-level-degrade",
+      "source": "::: grid\n## Card\nBody.\n:::\n",
+      "expect": {
+        "html": "<section data-md-section=\"card\"><h2 id=\"card\">Card</h2><p>Body.</p></section>",
+        "headings": [{ "level": 2, "id": "card", "text": "Card" }],
+        "warnings": [{ "code": "W-COMP-02", "name": "grid", "target": null }]
+      }
+    }
+  ]
+}

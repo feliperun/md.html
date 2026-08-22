@@ -1,0 +1,33 @@
+{
+  "id": "manifest-invalid-schema",
+  "source": "",
+  "format": "mdhtml/manifest/9.9",
+  "fragments": [
+    {
+      "id": "core",
+      "file": "core.min.js",
+      "size": 50847,
+      "sha256": "nope",
+      "requires": [
+        "lightbox"
+      ]
+    },
+    {
+      "id": "copy",
+      "file": "copy.min.js",
+      "size": 2535,
+      "sha256": "75d22ae784810a456a6e3254b52c0e634161acddabc611e12c1a822a9b85fc37",
+      "requires": [
+        "core"
+      ],
+      "minified": true
+    },
+    {
+      "id": "highlight",
+      "file": "highlight.min.js",
+      "size": 1,
+      "sha256": "222cffdcad98e281a5360c841e7937fea958cf89abe5fb89550fef62b7b56154",
+      "requires": []
+    }
+  ]
+}

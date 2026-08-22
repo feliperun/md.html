@@ -1,0 +1,66 @@
+{
+  "id": "markdown-block-blockquote",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "> quoted paragraph\n> second line\n\n> - quote list\n>   - nested\n\n> outer\n> > inner\n\n> lazy\ncontinued\n\n> blank\n>\n> separated\n\n> split one\n\n> split two\n",
+  "expect": {
+    "blocks": [
+      {
+        "type": "blockquote",
+        "children": [ { "type": "paragraph", "text": "quoted paragraph\nsecond line" } ]
+      },
+      {
+        "type": "blockquote",
+        "children": [
+          {
+            "type": "list",
+            "ordered": false,
+            "start": 1,
+            "items": [
+              {
+                "checked": null,
+                "children": [
+                  { "type": "paragraph", "text": "quote list" },
+                  {
+                    "type": "list",
+                    "ordered": false,
+                    "start": 1,
+                    "items": [
+                      { "checked": null, "children": [ { "type": "paragraph", "text": "nested" } ] }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "blockquote",
+        "children": [
+          { "type": "paragraph", "text": "outer" },
+          { "type": "blockquote", "children": [ { "type": "paragraph", "text": "inner" } ] }
+        ]
+      },
+      {
+        "type": "blockquote",
+        "children": [ { "type": "paragraph", "text": "lazy\ncontinued" } ]
+      },
+      {
+        "type": "blockquote",
+        "children": [
+          { "type": "paragraph", "text": "blank" },
+          { "type": "paragraph", "text": "separated" }
+        ]
+      },
+      {
+        "type": "blockquote",
+        "children": [ { "type": "paragraph", "text": "split one" } ]
+      },
+      {
+        "type": "blockquote",
+        "children": [ { "type": "paragraph", "text": "split two" } ]
+      }
+    ]
+  }
+}

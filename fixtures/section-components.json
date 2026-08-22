@@ -1,0 +1,67 @@
+{
+  "id": "section-components",
+  "requirement": "COMP-02",
+  "status": "invalid",
+  "diagnostic": "E-SECT-01",
+  "source": "---\nsections:\n  intro:\n    component: hero\n    class: \"landing featured\"\n  events:\n    component: timeline\n  broken:\n    component: hero\n    class: \"bad class!\"\n  missing:\n    component: cards\n---\n# Intro\nText.\n\n![Cover](cover.png)\n\n# Events\n- First\n- Second\n\n# Broken\nContent.\n",
+  "expect": {
+    "bindings": [
+      { "slug": "intro", "component": "hero", "class": "landing featured", "valid": true, "sectionClass": "landing featured" },
+      { "slug": "events", "component": "timeline", "class": null, "valid": true, "sectionClass": null },
+      { "slug": "broken", "component": "hero", "class": "bad class!", "valid": false, "warning": { "code": "W-COMP-02", "name": "hero", "target": "broken" } },
+      { "slug": "missing", "component": "cards", "valid": false, "error": { "code": "E-SECT-01", "target": "missing" }, "runtimeTarget": null }
+    ],
+    "html": {
+      "intro": "<section data-md-section=\"intro\" class=\"landing featured\"><h1 id=\"intro\">Intro</h1><div class=\"md-hero\"><div class=\"md-hero-content\"><p>Text.</p></div><div class=\"md-hero-media\"><p><img data-md-asset-path=\"cover.png\" alt=\"Cover\"></p></div></div></section>",
+      "events": "<section data-md-section=\"events\"><h1 id=\"events\">Events</h1><div class=\"md-timeline\"><ul><li>First</li><li>Second</li></ul></div></section>",
+      "broken": "<section data-md-section=\"broken\"><h1 id=\"broken\">Broken</h1><p>Content.</p></section>"
+    },
+    "warnings": [
+      { "code": "W-COMP-02", "name": "hero", "target": "broken" }
+    ],
+    "errors": [
+      { "code": "E-SECT-01", "target": "missing" }
+    ]
+  },
+  "cases": [
+    {
+      "name": "remaining-components-and-fallbacks",
+      "source": "---\nsections:\n  intro:\n    component: hero\n    class: \"landing featured\"\n  events:\n    component: timeline\n  broken:\n    component: hero\n    class: \"bad class!\"\n  cards:\n    component: cards\n  meters:\n    component: meters\n  gallery:\n    component: gallery\n  data:\n    component: kv\n  split:\n    component: columns\n  unknown:\n    component: mystery\n  badcards:\n    component: cards\n  missing:\n    component: cards\n---\n# Intro\nText.\n\n![Cover](cover.png)\n\n# Events\n- First\n- Second\n\n# Broken\nContent.\n\n# Cards\n## Alpha\nA.\n\n## Beta\nB.\n\n# Meters\n| Label | Value |\n| --- | --- |\n| CPU | 80 |\n| Disk | 0 |\n\n# Gallery\n![First](first.png)\n\n![Second](second.png)\n\n# Data\n- **Mode**: Safe\n- **Owner**: Team\n\n# Split\nLeft.\n\nRight.\n\n# Unknown\nOriginal.\n\n# Badcards\nOriginal.\n",
+      "expect": {
+        "bindings": [
+          { "slug": "intro", "component": "hero", "class": "landing featured", "valid": true, "sectionClass": "landing featured" },
+          { "slug": "events", "component": "timeline", "class": null, "valid": true, "sectionClass": null },
+          { "slug": "broken", "component": "hero", "class": "bad class!", "valid": false, "warning": { "code": "W-COMP-02", "name": "hero", "target": "broken" } },
+          { "slug": "cards", "component": "cards", "class": null, "valid": true, "sectionClass": null },
+          { "slug": "meters", "component": "meters", "class": null, "valid": true, "sectionClass": null },
+          { "slug": "gallery", "component": "gallery", "class": null, "valid": true, "sectionClass": null },
+          { "slug": "data", "component": "kv", "class": null, "valid": true, "sectionClass": null },
+          { "slug": "split", "component": "columns", "class": null, "valid": true, "sectionClass": null },
+          { "slug": "unknown", "component": "mystery", "class": null, "valid": false, "warning": { "code": "W-COMP-02", "name": "mystery", "target": "unknown" } },
+          { "slug": "badcards", "component": "cards", "class": null, "valid": false, "warning": { "code": "W-COMP-02", "name": "cards", "target": "badcards" } },
+          { "slug": "missing", "component": "cards", "valid": false, "error": { "code": "E-SECT-01", "target": "missing" }, "runtimeTarget": null }
+        ],
+        "html": {
+          "intro": "<section data-md-section=\"intro\" class=\"landing featured\"><h1 id=\"intro\">Intro</h1><div class=\"md-hero\"><div class=\"md-hero-content\"><p>Text.</p></div><div class=\"md-hero-media\"><p><img data-md-asset-path=\"cover.png\" alt=\"Cover\"></p></div></div></section>",
+          "events": "<section data-md-section=\"events\"><h1 id=\"events\">Events</h1><div class=\"md-timeline\"><ul><li>First</li><li>Second</li></ul></div></section>",
+          "broken": "<section data-md-section=\"broken\"><h1 id=\"broken\">Broken</h1><p>Content.</p></section>",
+          "cards": "<section data-md-section=\"cards\"><h1 id=\"cards\">Cards</h1><div class=\"md-cards\"><section data-md-section=\"alpha\"><h2 id=\"alpha\">Alpha</h2><p>A.</p></section><section data-md-section=\"beta\"><h2 id=\"beta\">Beta</h2><p>B.</p></section></div></section>",
+          "meters": "<section data-md-section=\"meters\"><h1 id=\"meters\">Meters</h1><div class=\"md-meters\"><table><thead><tr><th>Label</th><th>Value</th></tr></thead><tbody><tr><td>CPU</td><td><meter min=\"0\" max=\"100\" value=\"80\">80</meter></td></tr><tr><td>Disk</td><td><meter min=\"0\" max=\"100\" value=\"0\">0</meter></td></tr></tbody></table></div></section>",
+          "gallery": "<section data-md-section=\"gallery\"><h1 id=\"gallery\">Gallery</h1><div class=\"md-gallery\"><figure class=\"md-gallery-item\"><p><img data-md-asset-path=\"first.png\" alt=\"First\"></p></figure><figure class=\"md-gallery-item\"><p><img data-md-asset-path=\"second.png\" alt=\"Second\"></p></figure></div></section>",
+          "data": "<section data-md-section=\"data\"><h1 id=\"data\">Data</h1><dl class=\"md-kv\"><dt>Mode</dt><dd>Safe</dd><dt>Owner</dt><dd>Team</dd></dl></section>",
+          "split": "<section data-md-section=\"split\"><h1 id=\"split\">Split</h1><div class=\"md-columns\"><div class=\"md-column\"><p>Left.</p></div><div class=\"md-column\"><p>Right.</p></div></div></section>",
+          "unknown": "<section data-md-section=\"unknown\"><h1 id=\"unknown\">Unknown</h1><p>Original.</p></section>",
+          "badcards": "<section data-md-section=\"badcards\"><h1 id=\"badcards\">Badcards</h1><p>Original.</p></section>"
+        },
+        "warnings": [
+          { "code": "W-COMP-02", "name": "hero", "target": "broken" },
+          { "code": "W-COMP-02", "name": "mystery", "target": "unknown" },
+          { "code": "W-COMP-02", "name": "cards", "target": "badcards" }
+        ],
+        "errors": [
+          { "code": "E-SECT-01", "target": "missing" }
+        ]
+      }
+    }
+  ]
+}

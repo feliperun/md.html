@@ -1,0 +1,17 @@
+{
+  "id": "markdown-block-fenced-code",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "```js\nconst x = 1;\n```\n\n~~~txt\ntilde fence\n~~~\n\n```\nplain\n```\n\n```\n    keep indentation\n  partial\n```\n\n  ```\n  two-space fence\n  ```\n\nUnclosed:\n\n```\nalpha\nbeta\n",
+  "expect": {
+    "blocks": [
+      { "type": "codeBlock", "language": "js", "value": "const x = 1;\n" },
+      { "type": "codeBlock", "language": "txt", "value": "tilde fence\n" },
+      { "type": "codeBlock", "language": null, "value": "plain\n" },
+      { "type": "codeBlock", "language": null, "value": "    keep indentation\n  partial\n" },
+      { "type": "codeBlock", "language": null, "value": "two-space fence\n" },
+      { "type": "paragraph", "text": "Unclosed:" },
+      { "type": "codeBlock", "language": null, "value": "alpha\nbeta\n" }
+    ]
+  }
+}

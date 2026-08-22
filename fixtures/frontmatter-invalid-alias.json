@@ -1,0 +1,7 @@
+{
+  "id": "frontmatter-invalid-alias",
+  "requirement": "PARSE-01",
+  "status": "invalid",
+  "diagnostic": "E-PARSE-01",
+  "source": "---\ntitle: Quarterly report\nanchor: &shared\n  name: hidden\ncopy: *shared\n---\n\n# Results\n"
+}

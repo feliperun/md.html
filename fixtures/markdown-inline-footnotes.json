@@ -1,0 +1,24 @@
+{
+  "id": "markdown-inline-footnotes",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "A note[^n].\n\n[^n]: Footnote **body**.\n",
+  "expect": {
+    "blocks": [
+      { "type": "paragraph", "text": "A note[^n].", "children": [
+        { "type": "text", "value": "A note" },
+        { "type": "footnoteReference", "id": "n" },
+        { "type": "text", "value": "." }
+      ] }
+    ],
+    "footnotes": {
+      "n": [
+        { "type": "paragraph", "text": "Footnote **body**.", "children": [
+          { "type": "text", "value": "Footnote " },
+          { "type": "strong", "children": [{ "type": "text", "value": "body" }] },
+          { "type": "text", "value": "." }
+        ] }
+      ]
+    }
+  }
+}

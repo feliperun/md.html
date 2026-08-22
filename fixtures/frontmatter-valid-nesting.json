@@ -1,0 +1,39 @@
+{
+  "id": "frontmatter-valid-nesting",
+  "requirement": "PARSE-01",
+  "status": "valid",
+  "source": "---\nserver:\n  host: localhost\n  ports:\n    http: 80\n    https: 443\n  flags: [verbose, strict]\nmatrix:\n  - { name: a, values: [1, 2] }\n  - name: b\n    values: [3, { deep: true }]\n---\n",
+  "expect": {
+    "frontMatter": {
+      "server": {
+        "host": "localhost",
+        "ports": {
+          "http": 80,
+          "https": 443
+        },
+        "flags": [
+          "verbose",
+          "strict"
+        ]
+      },
+      "matrix": [
+        {
+          "name": "a",
+          "values": [
+            1,
+            2
+          ]
+        },
+        {
+          "name": "b",
+          "values": [
+            3,
+            {
+              "deep": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

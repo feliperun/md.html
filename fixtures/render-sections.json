@@ -1,0 +1,19 @@
+{
+  "id": "render-sections",
+  "requirement": "SECT-01",
+  "status": "valid",
+  "source": "# Résumé\n\n## Child {#Custom ID}\n\n### Deep\n\n## Child\n\n> ### Nested\n>\n> ### Nested\n\n- ### Item heading\n",
+  "expect": {
+    "html": "<section data-md-section=\"resume\"><h1 id=\"resume\">Résumé</h1><section data-md-section=\"custom-id\"><h2 id=\"custom-id\">Child</h2><section data-md-section=\"deep\"><h3 id=\"deep\">Deep</h3></section></section><section data-md-section=\"child\"><h2 id=\"child\">Child</h2><blockquote><section data-md-section=\"nested\"><h3 id=\"nested\">Nested</h3></section><section data-md-section=\"nested-2\"><h3 id=\"nested-2\">Nested</h3></section></blockquote><ul><li><section data-md-section=\"item-heading\"><h3 id=\"item-heading\">Item heading</h3></section></li></ul></section></section>",
+    "headings": [
+      { "level": 1, "id": "resume", "text": "Résumé" },
+      { "level": 2, "id": "custom-id", "text": "Child" },
+      { "level": 3, "id": "deep", "text": "Deep" },
+      { "level": 2, "id": "child", "text": "Child" },
+      { "level": 3, "id": "nested", "text": "Nested" },
+      { "level": 3, "id": "nested-2", "text": "Nested" },
+      { "level": 3, "id": "item-heading", "text": "Item heading" }
+    ],
+    "warnings": []
+  }
+}

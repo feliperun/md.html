@@ -1,0 +1,22 @@
+{
+  "id": "container-degradation",
+  "requirement": "COMP-02",
+  "status": "valid",
+  "warnings": ["W-COMP-02", "W-COMP-02", "W-COMP-02", "W-COMP-02"],
+  "source": "::: mystery\nUnknown.\n:::\n\n::: note | wrong\nBad argument.\n:::\n\n::: stats\n| Key | Value |\n| --- | --- |\n| Missing |\n:::\n\n::: stats\n| Key | Value |\n| --- | --- |\n| Extra | cell | another |\n:::\n",
+  "expect": {
+    "ast": [
+      { "type": "container", "name": "mystery", "argument": null, "children": [{ "type": "paragraph", "text": "Unknown." }] },
+      { "type": "container", "name": "note", "argument": "wrong", "children": [{ "type": "paragraph", "text": "Bad argument." }] },
+      { "type": "container", "name": "stats", "argument": null, "children": [{ "type": "table", "align": [null, null], "header": ["Key", "Value"], "rows": [["Missing", ""]], "sourceCellCounts": { "header": 2, "rows": [1] } }] },
+      { "type": "container", "name": "stats", "argument": null, "children": [{ "type": "table", "align": [null, null], "header": ["Key", "Value"], "rows": [["Extra", "cell"]], "sourceCellCounts": { "header": 2, "rows": [3] } }] }
+    ],
+    "warnings": [
+      { "code": "W-COMP-02", "name": "mystery", "target": null },
+      { "code": "W-COMP-02", "name": "note", "target": null },
+      { "code": "W-COMP-02", "name": "stats", "target": null },
+      { "code": "W-COMP-02", "name": "stats", "target": null }
+    ],
+    "wrappers": [null, null, null, null]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": "frontmatter-invalid-indent",
+  "requirement": "PARSE-01",
+  "status": "invalid",
+  "diagnostic": "E-PARSE-01",
+  "source": "---\na:\n  b: 1\n c: 2\n---\n"
+}

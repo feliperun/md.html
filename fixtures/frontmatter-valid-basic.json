@@ -1,0 +1,19 @@
+{
+  "id": "frontmatter-valid-basic",
+  "requirement": "PARSE-01",
+  "status": "valid",
+  "source": "---\ntitle: Quarterly report\nsummary: A synthetic example document.\nlang: en\ndate: 2026-08-20\nauthors: [Ada, Grace]\ntags: [reports, synthetic]\ntheme: technical\ntoc: { depth: 2, position: side }\nsections:\n  results: { component: cards }\n---\n\n# Results\n\nSynthetic body.\n",
+  "expect": {
+    "frontMatter": {
+      "title": "Quarterly report",
+      "summary": "A synthetic example document.",
+      "lang": "en",
+      "date": "2026-08-20",
+      "authors": ["Ada", "Grace"],
+      "tags": ["reports", "synthetic"],
+      "theme": "technical",
+      "toc": { "depth": 2, "position": "side" },
+      "sections": { "results": { "component": "cards" } }
+    }
+  }
+}

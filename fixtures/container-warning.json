@@ -1,0 +1,10 @@
+{
+  "id": "container-warning",
+  "requirement": "COMP-02",
+  "status": "valid",
+  "warnings": ["W-COMP-02"],
+  "source": "::: bars\n| not-a-table\n:::\n\n::: unknown-name\nProse is preserved without loss.\n:::\n",
+  "expect": {
+    "rendersAs": "prose"
+  }
+}

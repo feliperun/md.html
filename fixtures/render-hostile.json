@@ -1,0 +1,11 @@
+{
+  "id": "render-hostile",
+  "requirement": "PARSE-03",
+  "status": "valid",
+  "source": "# <script>alert(\"x\")</script>\n\nText <span>& \"quote\" 'apostrophe'</span>.\n\n`<b>& \" '</b>`\n",
+  "expect": {
+    "html": "<section data-md-section=\"scriptalertxscript\"><h1 id=\"scriptalertxscript\">&lt;script&gt;alert(\"x\")&lt;/script&gt;</h1><p>Text &lt;span&gt;&amp; \"quote\" 'apostrophe'&lt;/span&gt;.</p><p><code>&lt;b&gt;&amp; \" '&lt;/b&gt;</code></p></section>",
+    "headings": [{ "level": 1, "id": "scriptalertxscript", "text": "<script>alert(\"x\")</script>" }],
+    "warnings": []
+  }
+}

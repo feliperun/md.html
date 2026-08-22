@@ -1,0 +1,13 @@
+{
+  "id": "markdown-inline-breaks-escapes",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "first   \nsecond \\*literal\\* \\[x\\] \\q. \\`code\\`",
+  "expect": {
+    "inline": [
+      { "type": "text", "value": "first " },
+      { "type": "hardBreak" },
+      { "type": "text", "value": "second *literal* [x] \\q. `code`" }
+    ]
+  }
+}

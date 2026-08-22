@@ -1,0 +1,19 @@
+{
+  "id": "frontmatter-valid-comments-quotes",
+  "requirement": "PARSE-01",
+  "status": "valid",
+  "source": "---\n# header comment\ntitle: A title # trailing comment\n'quoted key': single\n\"double key\": \"value with # inside\"\nlist:\n  - first # item comment\n  - \"second\"\n  # comment between items\n  - third\nplain: value#not-comment\n---\n",
+  "expect": {
+    "frontMatter": {
+      "title": "A title",
+      "quoted key": "single",
+      "double key": "value with # inside",
+      "list": [
+        "first",
+        "second",
+        "third"
+      ],
+      "plain": "value#not-comment"
+    }
+  }
+}

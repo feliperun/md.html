@@ -1,0 +1,29 @@
+{
+  "id": "runtime-fragments",
+  "requirement": "RUNTIME-17",
+  "status": "valid",
+  "source": "# Runtime fragments\n",
+  "expect": {},
+  "cases": [
+    {
+      "id": "default-no-images",
+      "analysis": { "headings": [{ "level": 1 }], "config": {}, "hasImages": false },
+      "selected": ["core", "copy", "toc"]
+    },
+    {
+      "id": "toc-disabled",
+      "analysis": { "headings": [{ "level": 1 }], "config": false, "hasImages": false },
+      "selected": ["core", "copy"]
+    },
+    {
+      "id": "invalid-depth",
+      "analysis": { "headings": [{ "level": 4 }], "config": { "depth": 2 }, "hasImages": true },
+      "selected": ["core", "copy", "lightbox"]
+    },
+    {
+      "id": "images-only",
+      "analysis": { "headings": [], "config": { "depth": 6 }, "hasImages": true },
+      "selected": ["core", "copy", "lightbox"]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "id": "forbidden-script-terminator",
+  "requirement": "FMT-02",
+  "status": "invalid",
+  "diagnostic": "E-FMT-02",
+  "source": "---\ntitle: Terminator\n---\n\nThe sequence </SCRIPT> is forbidden regardless of case.\n"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "slug-collision-override",
+  "requirement": "SECT-01",
+  "status": "valid",
+  "source": "## Quarterly results {#results}\n\nFirst section.\n\n## Quarterly results\n\nSecond section.\n\n## Quarterly results\n\nThird section.\n\n## Quarterly results {#quarterly-results}\n\nFourth section: the explicit override collides with an earlier computed slug.\n",
+  "expect": {
+    "slugs": ["results", "quarterly-results", "quarterly-results-2", "quarterly-results-3"]
+  }
+}

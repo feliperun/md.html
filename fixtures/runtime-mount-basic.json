@@ -1,0 +1,18 @@
+{
+  "id": "runtime-mount-basic",
+  "requirement": "FMT-01",
+  "status": "valid",
+  "source": "---\ntitle: Runtime mount\nsummary: A synthetic browser mount.\n---\n\n# Visible heading\n\nRendered body with <\\/script preserved safely.\n",
+  "expect": {
+    "ok": true,
+    "frontMatter": {
+      "title": "Runtime mount",
+      "summary": "A synthetic browser mount."
+    },
+    "html": "<section data-md-section=\"visible-heading\"><h1 id=\"visible-heading\">Visible heading</h1><p>Rendered body with &lt;/script preserved safely.</p></section>",
+    "headings": [
+      { "level": 1, "id": "visible-heading", "text": "Visible heading" }
+    ],
+    "warnings": []
+  }
+}

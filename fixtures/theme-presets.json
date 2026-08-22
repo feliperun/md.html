@@ -1,0 +1,50 @@
+{
+  "id": "theme-presets",
+  "requirement": "UI-06",
+  "status": "valid",
+  "source": "---\ntheme: technical\n---\n# Preset tokens\n",
+  "presets": {
+    "technical": {
+      "tokens": [
+        ["--md-font-body", "\"Instrument Sans\", system-ui, sans-serif"],
+        ["--md-font-mono", "\"Geist Mono\", ui-monospace, monospace"],
+        ["--md-measure", "78ch"],
+        ["--md-density", "0.88"],
+        ["--md-heading-scale", "1.18"],
+        ["--md-radius", "0.5rem"],
+        ["--md-shadow", "0 1px 2px rgb(15 23 42 / 0.08)"]
+      ]
+    },
+    "editorial": {
+      "tokens": [
+        ["--md-font-body", "\"Newsreader\", Georgia, serif"],
+        ["--md-font-mono", "\"Geist Mono\", ui-monospace, monospace"],
+        ["--md-measure", "68ch"],
+        ["--md-density", "1"],
+        ["--md-heading-scale", "1.25"],
+        ["--md-radius", "0.25rem"],
+        ["--md-shadow", "0 2px 10px rgb(57 45 35 / 0.12)"]
+      ]
+    }
+  },
+  "requiredSelectors": [
+    "#mdhtml-app",
+    "#mdhtml-toolbar",
+    "#mdhtml-toc",
+    "#mdhtml-source-view",
+    "#mdhtml-lightbox",
+    ".md-callout",
+    ".md-quote",
+    ".md-columns",
+    ".md-details",
+    ".md-stats",
+    ".md-bars",
+    ".md-kv",
+    ".md-steps",
+    ".md-timeline",
+    ".md-grid",
+    ".md-cards",
+    ".md-gallery",
+    ".md-hero"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "browser-lightbox",
+  "requirement": "UI-05",
+  "status": "valid",
+  "source": "![First](first.png \"First\")\n\n![Second](second.png)\n",
+  "assets": [
+    { "path": "first.png", "mime": "image/png", "base64": "AQID" },
+    { "path": "second.png", "mime": "image/png", "base64": "BAUG" }
+  ],
+  "expect": {
+    "dialog": true,
+    "counter": "1 / 2"
+  }
+}

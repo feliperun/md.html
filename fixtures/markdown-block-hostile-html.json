@@ -1,0 +1,19 @@
+{
+  "id": "markdown-block-hostile-html",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "<div class=\"x\">\n<span>raw html</span>\n</div>\n\n<!-- comment -->\n\n<script>alert('x')</script>\n\n| broken | table |\n| --- |\n\n```a`b\n\nnormal text **still raw** [link](url) `code`\n\n    indented paragraph line\n\nSetext\n===\n\n>\n",
+  "expect": {
+    "blocks": [
+      { "type": "paragraph", "text": "<div class=\"x\">\n<span>raw html</span>\n</div>" },
+      { "type": "paragraph", "text": "<!-- comment -->" },
+      { "type": "paragraph", "text": "<script>alert('x')</script>" },
+      { "type": "paragraph", "text": "| broken | table |\n| --- |" },
+      { "type": "paragraph", "text": "```a`b" },
+      { "type": "paragraph", "text": "normal text **still raw** [link](url) `code`" },
+      { "type": "paragraph", "text": "indented paragraph line" },
+      { "type": "paragraph", "text": "Setext\n===" },
+      { "type": "blockquote", "children": [] }
+    ]
+  }
+}

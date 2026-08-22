@@ -1,0 +1,40 @@
+{
+  "id": "section-bindings",
+  "requirement": "COMP-02",
+  "status": "invalid",
+  "diagnostic": "E-SECT-01",
+  "source": "---\nsections:\n  nested:\n    component: timeline\n  orphan:\n    component: cards\n  bad-shape: []\n  missing-component:\n    class: good\n  non-string-component:\n    component: [timeline]\n  bad-class:\n    component: timeline\n    class: \"good!\"\n  target:\n    component: timeline\n    class: \"one two\"\n  unknown:\n    component: mystery\n---\n# Parent\n## Nested\n- One\n\n# Target\n- First\n- Second\n\n# Bad Shape\nContent.\n\n# Missing Component\nContent.\n\n# Non String Component\nContent.\n\n# Bad Class\n- Only\n\n# Unknown\nContent.\n",
+  "expect": {
+    "html": "<section data-md-section=\"parent\"><h1 id=\"parent\">Parent</h1><section data-md-section=\"nested\"><h2 id=\"nested\">Nested</h2><div class=\"md-timeline\"><ul><li>One</li></ul></div></section></section><section data-md-section=\"target\" class=\"one two\"><h1 id=\"target\">Target</h1><div class=\"md-timeline\"><ul><li>First</li><li>Second</li></ul></div></section><section data-md-section=\"bad-shape\"><h1 id=\"bad-shape\">Bad Shape</h1><p>Content.</p></section><section data-md-section=\"missing-component\"><h1 id=\"missing-component\">Missing Component</h1><p>Content.</p></section><section data-md-section=\"non-string-component\"><h1 id=\"non-string-component\">Non String Component</h1><p>Content.</p></section><section data-md-section=\"bad-class\"><h1 id=\"bad-class\">Bad Class</h1><ul><li><p>Only</p></li></ul></section><section data-md-section=\"unknown\"><h1 id=\"unknown\">Unknown</h1><p>Content.</p></section>",
+    "headings": [
+      { "level": 1, "id": "parent", "text": "Parent" },
+      { "level": 2, "id": "nested", "text": "Nested" },
+      { "level": 1, "id": "target", "text": "Target" },
+      { "level": 1, "id": "bad-shape", "text": "Bad Shape" },
+      { "level": 1, "id": "missing-component", "text": "Missing Component" },
+      { "level": 1, "id": "non-string-component", "text": "Non String Component" },
+      { "level": 1, "id": "bad-class", "text": "Bad Class" },
+      { "level": 1, "id": "unknown", "text": "Unknown" }
+    ],
+    "warnings": [
+      { "code": "W-COMP-02", "name": "", "target": "bad-shape" },
+      { "code": "W-COMP-02", "name": "", "target": "missing-component" },
+      { "code": "W-COMP-02", "name": "", "target": "non-string-component" },
+      { "code": "W-COMP-02", "name": "timeline", "target": "bad-class" },
+      { "code": "W-COMP-02", "name": "mystery", "target": "unknown" }
+    ],
+    "errors": [
+      { "code": "E-SECT-01", "target": "orphan" }
+    ],
+    "bindings": [
+      { "slug": "nested", "component": "timeline", "class": null, "valid": true, "sectionClass": null },
+      { "slug": "orphan", "component": "cards", "valid": false, "error": { "code": "E-SECT-01", "target": "orphan" }, "runtimeTarget": null },
+      { "slug": "bad-shape", "component": "", "class": null, "valid": false, "warning": { "code": "W-COMP-02", "name": "", "target": "bad-shape" } },
+      { "slug": "missing-component", "component": "", "class": "good", "valid": false, "warning": { "code": "W-COMP-02", "name": "", "target": "missing-component" } },
+      { "slug": "non-string-component", "component": "", "class": null, "valid": false, "warning": { "code": "W-COMP-02", "name": "", "target": "non-string-component" } },
+      { "slug": "bad-class", "component": "timeline", "class": "good!", "valid": false, "warning": { "code": "W-COMP-02", "name": "timeline", "target": "bad-class" } },
+      { "slug": "target", "component": "timeline", "class": "one two", "valid": true, "sectionClass": "one two" },
+      { "slug": "unknown", "component": "mystery", "class": null, "valid": false, "warning": { "code": "W-COMP-02", "name": "mystery", "target": "unknown" } }
+    ]
+  }
+}

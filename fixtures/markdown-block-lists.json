@@ -1,0 +1,193 @@
+{
+  "id": "markdown-block-lists",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "- alpha\n- beta\n  - beta one\n  - beta two\n1. first\n2. second\n3) third\n- [ ] task open\n- [x] task done\n- [X] task upper\n- lazy\ncontinuation\n- item\n\n  second paragraph\n\nmixed:\n1. one\n   - nested\n",
+  "expect": {
+    "blocks": [
+      {
+        "type": "list",
+        "ordered": false,
+        "start": 1,
+        "items": [
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "alpha"
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "beta"
+              },
+              {
+                "type": "list",
+                "ordered": false,
+                "start": 1,
+                "items": [
+                  {
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "text": "beta one"
+                      }
+                    ]
+                  },
+                  {
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "text": "beta two"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "start": 1,
+        "items": [
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "first"
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "second"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "start": 3,
+        "items": [
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "third"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "ordered": false,
+        "start": 1,
+        "items": [
+          {
+            "checked": false,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "task open"
+              }
+            ]
+          },
+          {
+            "checked": true,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "task done"
+              }
+            ]
+          },
+          {
+            "checked": true,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "task upper"
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "lazy\ncontinuation"
+              }
+            ]
+          },
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "item"
+              },
+              {
+                "type": "paragraph",
+                "text": "second paragraph"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "mixed:"
+      },
+      {
+        "type": "list",
+        "ordered": true,
+        "start": 1,
+        "items": [
+          {
+            "checked": null,
+            "children": [
+              {
+                "type": "paragraph",
+                "text": "one"
+              },
+              {
+                "type": "list",
+                "ordered": false,
+                "start": 1,
+                "items": [
+                  {
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "text": "nested"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": "frontmatter-invalid-flow",
+  "requirement": "PARSE-01",
+  "status": "invalid",
+  "diagnostic": "E-PARSE-01",
+  "source": "---\na: [1, 2\n---\n"
+}

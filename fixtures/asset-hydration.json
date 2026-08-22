@@ -1,0 +1,14 @@
+{
+  "id": "asset-hydration",
+  "requirement": "UI-04",
+  "status": "valid",
+  "source": "![Logo](logo.png \"Logo\")\n",
+  "assets": [
+    { "path": "logo.png", "mime": "image/png", "base64": "AQID" }
+  ],
+  "expect": {
+    "src": "data:image/png;base64,AQID",
+    "ready": true,
+    "warnings": []
+  }
+}

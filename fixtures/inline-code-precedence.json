@@ -1,0 +1,9 @@
+{
+  "id": "inline-code-precedence",
+  "requirement": "PARSE-03",
+  "status": "valid",
+  "source": "Code span shields inline markup: `a**b**c` stays literal.\n",
+  "expect": {
+    "html": "<p>Code span shields inline markup: <code>a**b**c</code> stays literal.</p>"
+  }
+}

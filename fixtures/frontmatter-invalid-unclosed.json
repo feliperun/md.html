@@ -1,0 +1,7 @@
+{
+  "id": "frontmatter-invalid-unclosed",
+  "requirement": "PARSE-01",
+  "status": "invalid",
+  "diagnostic": "E-PARSE-01",
+  "source": "---\ntitle: x\n"
+}

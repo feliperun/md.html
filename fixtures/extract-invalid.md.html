@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-mdhtml="1.0" data-mdhtml-portable="true">
+<head>
+  <meta charset="utf-8">
+  <title>Invalid extract fixture</title>
+</head>
+<body>
+  <script id="mdhtml-source" type="text/markdown">---
+title: Invalid
+---
+
+# Body
+</script>
+  <script type="application/octet-stream" data-path="images/broken.png" data-type="image/png">!!not-base64!!</script>
+  <script type="application/octet-stream" data-path="../escape.png" data-type="image/png">aW1hZ2U=</script>
+  <script type="application/octet-stream" data-path="images/dup.png" data-type="image/png">aW1hZ2U=</script>
+  <script type="application/octet-stream" data-path="images/dup.png" data-type="image/png">aW1hZ2U=</script>
+  <script type="application/octet-stream" data-path="/absolute.png" data-type="image/png">aW1hZ2U=</script>
+  <script type="application/octet-stream" data-path="https://example.test/a.png" data-type="image/png">aW1hZ2U=</script>
+  <script type="application/octet-stream" data-path="images/no-type.png">aW1hZ2U=</script>
+</body>
+</html>

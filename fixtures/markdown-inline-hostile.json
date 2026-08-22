@@ -1,0 +1,12 @@
+{
+  "id": "markdown-inline-hostile",
+  "requirement": "PARSE-03",
+  "status": "valid",
+  "source": "`a**b**c` <span>raw</span> [broken](url \"unterminated) [missing][nope]",
+  "expect": {
+    "inline": [
+      { "type": "code", "value": "a**b**c" },
+      { "type": "text", "value": " <span>raw</span> [broken](url \"unterminated) [missing][nope]" }
+    ]
+  }
+}

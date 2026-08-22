@@ -1,0 +1,32 @@
+{
+  "id": "container-conventions",
+  "requirement": "COMP-01",
+  "status": "valid",
+  "source": "::: note\nNotice.\n:::\n\n::: quote | Ada\nA claim.\n:::\n\n::: details | More\nHidden.\n:::\n\n::: columns\nLeft.\n\nRight.\n:::\n\n::: stats\n| Metric | Result |\n| --- | --- |\n| Count | 3 |\n:::\n\n::: bars\n| Label | Value |\n| --- | --- |\n| One | 2 |\n| Two | 0 |\n:::\n\n::: kv\n- **Mode**: Safe\n- **Owner**: Team\n:::\n\n::: steps\n1. First\n2. Second\n:::\n\n::: grid\n### One\nAlpha.\n\n### Two\nBeta.\n:::\n",
+  "expect": {
+    "html": "<aside class=\"md-callout md-note\"><span class=\"md-callout-badge\">Note</span><p>Notice.</p></aside><figure class=\"md-quote\"><blockquote><p>A claim.</p></blockquote><figcaption>Ada</figcaption></figure><details class=\"md-details\"><summary>More</summary><p>Hidden.</p></details><div class=\"md-columns\"><div class=\"md-column\"><p>Left.</p></div><div class=\"md-column\"><p>Right.</p></div></div><div class=\"md-stats\"><table><thead><tr><th>Metric</th><th>Result</th></tr></thead><tbody><tr><td>Count</td><td>3</td></tr></tbody></table></div><div class=\"md-bars\"><table><thead><tr><th>Label</th><th>Value</th></tr></thead><tbody><tr><td>One</td><td><meter min=\"0\" max=\"2\" value=\"2\">2</meter></td></tr><tr><td>Two</td><td><meter min=\"0\" max=\"2\" value=\"0\">0</meter></td></tr></tbody></table></div><dl class=\"md-kv\"><dt>Mode</dt><dd>Safe</dd><dt>Owner</dt><dd>Team</dd></dl><ol class=\"md-steps\"><li>First</li><li>Second</li></ol><div class=\"md-grid\"><section class=\"md-grid-item\" data-md-section=\"one\"><h3 id=\"one\">One</h3><p>Alpha.</p></section><section class=\"md-grid-item\" data-md-section=\"two\"><h3 id=\"two\">Two</h3><p>Beta.</p></section></div>",
+    "warnings": [],
+    "cases": [
+      {
+        "name": "warning",
+        "source": "::: warning\nCaution.\n:::\n",
+        "expect": { "html": "<aside class=\"md-callout md-warning\"><span class=\"md-callout-badge\">Warning</span><p>Caution.</p></aside>", "warnings": [] }
+      },
+      {
+        "name": "critical",
+        "source": "::: critical\nFailure.\n:::\n",
+        "expect": { "html": "<aside class=\"md-callout md-critical\"><span class=\"md-callout-badge\">Critical</span><p>Failure.</p></aside>", "warnings": [] }
+      },
+      {
+        "name": "success",
+        "source": "::: success\nComplete.\n:::\n",
+        "expect": { "html": "<aside class=\"md-callout md-success\"><span class=\"md-callout-badge\">Success</span><p>Complete.</p></aside>", "warnings": [] }
+      },
+      {
+        "name": "decision",
+        "source": "::: decision\nChoose.\n:::\n",
+        "expect": { "html": "<aside class=\"md-callout md-decision\"><span class=\"md-callout-badge\">Decision</span><p>Choose.</p></aside>", "warnings": [] }
+      }
+    ]
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "id": "container-nesting",
+  "requirement": "COMP-02",
+  "status": "valid",
+  "warnings": ["W-COMP-02"],
+  "source": "::: note\nOuter.\n\n::: mystery\nInner.\n:::\n:::\n",
+  "expect": {
+    "ast": {
+      "type": "container",
+      "name": "note",
+      "argument": null,
+      "children": [
+        { "type": "paragraph", "text": "Outer." },
+        {
+          "type": "container",
+          "name": "mystery",
+          "argument": null,
+          "children": [{ "type": "paragraph", "text": "Inner." }]
+        }
+      ]
+    },
+    "html": "<aside class=\"md-callout md-note\"><span class=\"md-callout-badge\">Note</span><p>Outer.</p><p>Inner.</p></aside>",
+    "warnings": [
+      { "code": "W-COMP-02", "name": "mystery", "target": null }
+    ],
+    "cases": [
+      {
+        "name": "braced-nested-mismatched-fence",
+        "source": "::: note\nOuter.\n\n:::: {.mystery}\nInner.\n:::\n:::\n",
+        "expect": {
+          "ast": {
+            "type": "container",
+            "name": "note",
+            "argument": null,
+            "children": [
+              { "type": "paragraph", "text": "Outer." },
+              {
+                "type": "container",
+                "name": "mystery",
+                "argument": null,
+                "children": [{ "type": "paragraph", "text": "Inner." }]
+              }
+            ]
+          },
+          "html": "<aside class=\"md-callout md-note\"><span class=\"md-callout-badge\">Note</span><p>Outer.</p><p>Inner.</p></aside>",
+          "warnings": [
+            { "code": "W-COMP-02", "name": "mystery", "target": null }
+          ]
+        }
+      },
+      {
+        "name": "unclosed-opener",
+        "source": "::: warning\n",
+        "expect": {
+          "ast": { "type": "paragraph", "text": "::: warning" },
+          "html": "<p>::: warning</p>",
+          "warnings": []
+        }
+      },
+      {
+        "name": "fenced-code-content",
+        "source": "::: note\n```md\n:::\n::: mystery\n```\nbody\n:::\n",
+        "expect": {
+          "ast": {
+            "type": "container",
+            "name": "note",
+            "argument": null,
+            "children": [
+              { "type": "codeBlock", "language": "md", "value": ":::\n::: mystery\n" },
+              { "type": "paragraph", "text": "body" }
+            ]
+          }
+        }
+      },
+      {
+        "name": "list-marker-prefixed-nested-container",
+        "source": "::: note\n- ::: mystery\n  Inner.\n  :::\n:::\n",
+        "expect": {
+          "ast": {
+            "type": "container",
+            "name": "note",
+            "argument": null,
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": 1,
+                "items": [
+                  {
+                    "checked": null,
+                    "children": [
+                      {
+                        "type": "container",
+                        "name": "mystery",
+                        "argument": null,
+                        "children": [{ "type": "paragraph", "text": "Inner." }]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "blockquote-prefixed-nested-container",
+        "source": "::: note\n> - ::: mystery\n>   Inner.\n>   :::\n:::\n",
+        "expect": {
+          "ast": {
+            "type": "container",
+            "name": "note",
+            "argument": null,
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  {
+                    "type": "list",
+                    "ordered": false,
+                    "start": 1,
+                    "items": [
+                      {
+                        "checked": null,
+                        "children": [
+                          {
+                            "type": "container",
+                            "name": "mystery",
+                            "argument": null,
+                            "children": [{ "type": "paragraph", "text": "Inner." }]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "list-prefixed-fenced-code",
+        "source": "::: note\n- ```md\n  ::: mystery\n  ```\n:::\n",
+        "expect": {
+          "ast": {
+            "type": "container",
+            "name": "note",
+            "argument": null,
+            "children": [
+              {
+                "type": "list",
+                "ordered": false,
+                "start": 1,
+                "items": [
+                  {
+                    "checked": null,
+                    "children": [
+                      { "type": "codeBlock", "language": "md", "value": "::: mystery\n" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "blockquote-prefixed-fenced-code",
+        "source": "::: note\n> ```md\n> ::: mystery\n> ```\n:::\n",
+        "expect": {
+          "ast": {
+            "type": "container",
+            "name": "note",
+            "argument": null,
+            "children": [
+              {
+                "type": "blockquote",
+                "children": [
+                  { "type": "codeBlock", "language": "md", "value": "::: mystery\n" }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

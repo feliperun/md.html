@@ -1,0 +1,38 @@
+{
+  "id": "container-simple",
+  "requirement": "COMP-01",
+  "status": "valid",
+  "source": "::: note\nNotice *now*.\n:::\n\n::: warning\nCaution.\n:::\n\n::: critical\nFailure.\n:::\n\n::: success\nDone.\n:::\n\n::: decision\nChoose.\n:::\n\n::: quote | Ada *Lovelace*\nA **claim**.\n:::\n\n::: columns\nLeft.\n\n- Right\n:::\n\n::: details\nHidden.\n:::\n",
+  "expect": {
+    "html": "<aside class=\"md-callout md-note\"><span class=\"md-callout-badge\">Note</span><p>Notice <em>now</em>.</p></aside><aside class=\"md-callout md-warning\"><span class=\"md-callout-badge\">Warning</span><p>Caution.</p></aside><aside class=\"md-callout md-critical\"><span class=\"md-callout-badge\">Critical</span><p>Failure.</p></aside><aside class=\"md-callout md-success\"><span class=\"md-callout-badge\">Success</span><p>Done.</p></aside><aside class=\"md-callout md-decision\"><span class=\"md-callout-badge\">Decision</span><p>Choose.</p></aside><figure class=\"md-quote\"><blockquote><p>A <strong>claim</strong>.</p></blockquote><figcaption>Ada <em>Lovelace</em></figcaption></figure><div class=\"md-columns\"><div class=\"md-column\"><p>Left.</p></div><div class=\"md-column\"><ul><li><p>Right</p></li></ul></div></div><details class=\"md-details\"><summary>Details</summary><p>Hidden.</p></details>",
+    "headings": [],
+    "warnings": []
+  },
+  "cases": [
+    {
+      "name": "ordered-nested-degradation",
+      "source": "::: note\nOuter.\n\n::: mystery\nInner.\n:::\n:::\n\n::: stats\n| Key | Value |\n| --- | --- |\n| A | 1 |\n:::\n\n::: stats | wrong\nDeferred with an invalid argument.\n:::\n",
+      "expect": {
+        "html": "<aside class=\"md-callout md-note\"><span class=\"md-callout-badge\">Note</span><p>Outer.</p><p>Inner.</p></aside><div class=\"md-stats\"><table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>A</td><td>1</td></tr></tbody></table></div><p>Deferred with an invalid argument.</p>",
+        "headings": [],
+        "warnings": [
+          { "code": "W-COMP-02", "name": "mystery", "target": null },
+          { "code": "W-COMP-02", "name": "stats", "target": null }
+        ]
+      }
+    },
+    {
+      "name": "invalid-simple-shapes",
+      "source": "::: note\n:::\n\n::: quote\n:::\n\n::: columns\nOnly one.\n:::\n\n::: details | <More>\nHidden.\n:::\n",
+      "expect": {
+        "html": "<p>Only one.</p><details class=\"md-details\"><summary>&lt;More&gt;</summary><p>Hidden.</p></details>",
+        "headings": [],
+        "warnings": [
+          { "code": "W-COMP-02", "name": "note", "target": null },
+          { "code": "W-COMP-02", "name": "quote", "target": null },
+          { "code": "W-COMP-02", "name": "columns", "target": null }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "render-blocks",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "## Blocks\n\n> quoted\n>\n> text\n\n3. three\n4. four\n\n- [ ] open\n- [x] done\n\n| left | middle | right |\n| :--- | :---: | ---: |\n| a | b | c |\n\n---\n\n```js\nconst x = \"<x>\";\n```\n",
+  "expect": {
+    "html": "<section data-md-section=\"blocks\"><h2 id=\"blocks\">Blocks</h2><blockquote><p>quoted</p><p>text</p></blockquote><ol start=\"3\"><li><p>three</p></li><li><p>four</p></li></ol><ul><li><input type=\"checkbox\" disabled> <p>open</p></li><li><input type=\"checkbox\" disabled checked> <p>done</p></li></ul><table><thead><tr><th align=\"left\">left</th><th align=\"center\">middle</th><th align=\"right\">right</th></tr></thead><tbody><tr><td align=\"left\">a</td><td align=\"center\">b</td><td align=\"right\">c</td></tr></tbody></table><hr><pre><code class=\"language-js\">const x = \"&lt;x&gt;\";\n</code></pre></section>",
+    "headings": [{ "level": 2, "id": "blocks", "text": "Blocks" }],
+    "warnings": []
+  }
+}

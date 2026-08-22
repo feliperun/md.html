@@ -1,0 +1,7 @@
+{
+  "id": "frontmatter-invalid-tag",
+  "requirement": "PARSE-01",
+  "status": "invalid",
+  "diagnostic": "E-PARSE-01",
+  "source": "---\na: !!str hello\n---\n"
+}

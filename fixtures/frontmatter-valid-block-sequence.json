@@ -1,0 +1,30 @@
+{
+  "id": "frontmatter-valid-block-sequence",
+  "requirement": "PARSE-01",
+  "status": "valid",
+  "source": "---\nitems:\n  - alpha\n  - beta\n  - 42\nnested:\n  - - one\n    - two\n  - name: Ada\n    role: engineer\n    langs: [Rust, JS]\n  - solo\n---\n",
+  "expect": {
+    "frontMatter": {
+      "items": [
+        "alpha",
+        "beta",
+        42
+      ],
+      "nested": [
+        [
+          "one",
+          "two"
+        ],
+        {
+          "name": "Ada",
+          "role": "engineer",
+          "langs": [
+            "Rust",
+            "JS"
+          ]
+        },
+        "solo"
+      ]
+    }
+  }
+}

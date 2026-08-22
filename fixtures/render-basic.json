@@ -1,0 +1,11 @@
+{
+  "id": "render-basic",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "# Title\n\nParagraph with **strong**, *emphasis*, ~~deleted~~, `code`, [link](https://example.com \"Example\"), and ![<image>&\"alt](image.png \"<Image>&\").\n",
+  "expect": {
+    "html": "<section data-md-section=\"title\"><h1 id=\"title\">Title</h1><p>Paragraph with <strong>strong</strong>, <em>emphasis</em>, <del>deleted</del>, <code>code</code>, <a href=\"https://example.com\" title=\"Example\">link</a>, and <img data-md-asset-path=\"image.png\" alt=\"&lt;image&gt;&amp;&quot;alt\" title=\"&lt;Image&gt;&amp;\">.</p></section>",
+    "headings": [{ "level": 1, "id": "title", "text": "Title" }],
+    "warnings": []
+  }
+}

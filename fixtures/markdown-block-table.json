@@ -1,0 +1,45 @@
+{
+  "id": "markdown-block-table",
+  "requirement": "PARSE-02",
+  "status": "valid",
+  "source": "| a | b | c |\n| :--- | :---: | ---: |\n| 1 | 2 | 3 |\n| 4 | 5 | 6 |\n\nleft | right\n:--- | ---:\nx | y\n\n| a \\| b | c |\n| --- | --- |\n| 1 | 2 |\n\n| a | b |\n| --- | --- |\n| only one |\n| one | two | three |\n\n| abc | def |\n| --- | --- |\n| bar | baz |\nbar\n",
+  "expect": {
+    "blocks": [
+      {
+        "type": "table",
+        "align": [ "left", "center", "right" ],
+        "header": [ "a", "b", "c" ],
+        "rows": [ [ "1", "2", "3" ], [ "4", "5", "6" ] ],
+        "sourceCellCounts": { "header": 3, "rows": [ 3, 3 ] }
+      },
+      {
+        "type": "table",
+        "align": [ "left", "right" ],
+        "header": [ "left", "right" ],
+        "rows": [ [ "x", "y" ] ],
+        "sourceCellCounts": { "header": 2, "rows": [ 2 ] }
+      },
+      {
+        "type": "table",
+        "align": [ null, null ],
+        "header": [ "a \\| b", "c" ],
+        "rows": [ [ "1", "2" ] ],
+        "sourceCellCounts": { "header": 2, "rows": [ 2 ] }
+      },
+      {
+        "type": "table",
+        "align": [ null, null ],
+        "header": [ "a", "b" ],
+        "rows": [ [ "only one", "" ], [ "one", "two" ] ],
+        "sourceCellCounts": { "header": 2, "rows": [ 1, 3 ] }
+      },
+      {
+        "type": "table",
+        "align": [ null, null ],
+        "header": [ "abc", "def" ],
+        "rows": [ [ "bar", "baz" ], [ "bar", "" ] ],
+        "sourceCellCounts": { "header": 2, "rows": [ 2, 1 ] }
+      }
+    ]
+  }
+}

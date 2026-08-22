@@ -1,0 +1,13 @@
+{
+  "id": "frontmatter-valid-block-scalars",
+  "requirement": "PARSE-01",
+  "status": "valid",
+  "source": "---\nliteral: |\n  line one\n  line two\nfolded: >\n  fold this\n  into one\nblank: |\n  first\n\n  third\n---\n",
+  "expect": {
+    "frontMatter": {
+      "literal": "line one\nline two\n",
+      "folded": "fold this into one\n",
+      "blank": "first\n\nthird\n"
+    }
+  }
+}

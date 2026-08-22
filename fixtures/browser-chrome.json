@@ -1,0 +1,14 @@
+{
+  "id": "browser-chrome",
+  "requirement": "UI-01",
+  "status": "valid",
+  "source": "---\ntitle: Browser chrome\ntheme: technical\n---\n\n# Chrome\n\nSynthetic toolbar content.\n",
+  "expect": {
+    "modes": {
+      "smart": "---\n\"title\": \"Browser chrome\"\n---\n\n# Chrome\n\nSynthetic toolbar content.\n",
+      "full": "---\ntitle: Browser chrome\ntheme: technical\n---\n\n# Chrome\n\nSynthetic toolbar content.\n",
+      "body": "\n# Chrome\n\nSynthetic toolbar content.\n"
+    },
+    "controls": ["copy", "view", "download", "theme"]
+  }
+}

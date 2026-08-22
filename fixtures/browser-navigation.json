@@ -1,0 +1,12 @@
+{
+  "id": "browser-navigation",
+  "requirement": "UI-03",
+  "status": "valid",
+  "source": "# Intro\n\n## Details\n",
+  "expect": {
+    "headings": [
+      { "level": 1, "id": "intro", "text": "Intro" },
+      { "level": 2, "id": "details", "text": "Details" }
+    ]
+  }
+}
