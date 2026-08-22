@@ -1,7 +1,15 @@
 {
   "packages": {
     ".": {
-      "release-type": "simple"
+      "release-type": "simple",
+      "extra-files": [
+        "package.json",
+        {
+          "type": "toml",
+          "path": "crates/mdhtml/Cargo.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
     }
   },
   "changelog-sections": [

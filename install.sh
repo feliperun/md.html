@@ -19,7 +19,8 @@ if [ -z "$REPO" ]; then
   remote="$(git config --get remote.origin.url 2>/dev/null || true)"
   case "$remote" in
     *github.com*)
-      REPO="$(printf '%s' "$remote" | sed -E 's#^.*github\.com[:/]([^/]+/[^/]+)(\.git)?$#\1#')"
+      REPO="$(printf '%s' "$remote" | sed -E 's#^.*github\.com[:/]##')"
+      REPO="${REPO%.git}"
       ;;
   esac
 fi
@@ -75,7 +76,7 @@ esac
 if [ -n "${MDHTML_VERSION:-}" ]; then
   TAG="v${MDHTML_VERSION#v}"
 else
-  redirect="$(curl -fsSL -o /dev/null -w '%{redirect_url}' "https://github.com/${REPO}/releases/latest")"
+  redirect="$(curl -fsS -o /dev/null -w '%{redirect_url}' "https://github.com/${REPO}/releases/latest")"
   TAG="$(printf '%s' "$redirect" | sed -n 's#.*/releases/tag/##p')"
   [ -n "$TAG" ] || { echo "install.sh: could not resolve the latest release of ${REPO}" >&2; exit 1; }
 fi
