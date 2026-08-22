@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/feliperun/md.html/compare/v1.1.2...v1.1.3) (2026-08-22)
+
+
+### Bug Fixes
+
+* repair the npx installer's transport wiring and arch detection ([c277c29](https://github.com/feliperun/md.html/commit/c277c29c625758204502be4b752e042c0636f084))
+
 ## [1.1.2](https://github.com/feliperun/md.html/compare/v1.1.1...v1.1.2) (2026-08-22)
 
 
