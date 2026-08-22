@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/feliperun/md.html/compare/v1.1.1...v1.1.2) (2026-08-22)
+
+
+### Bug Fixes
+
+* keep Cargo.lock in sync with the released crate version ([33e0be1](https://github.com/feliperun/md.html/commit/33e0be19dafbd73da31abaf7167acb4679e2127b))
+
 ## [1.1.1](https://github.com/feliperun/md.html/compare/v1.1.0...v1.1.1) (2026-08-22)
 
 
