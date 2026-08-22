@@ -8,6 +8,11 @@
           "type": "toml",
           "path": "crates/mdhtml/Cargo.toml",
           "jsonpath": "$.package.version"
+        },
+        {
+          "type": "toml",
+          "path": "Cargo.lock",
+          "jsonpath": "$.package[0].version"
         }
       ]
     }
