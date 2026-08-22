@@ -55,6 +55,15 @@ export function resolveTarget(platform, arch, isMusl = isMuslLibc) {
   return target;
 }
 
+// Node reports the architecture of its own binary, not the host CPU: an x64
+// Node build under Rosetta on Apple Silicon reports "x64", and a process it
+// spawns (even `uname -m`) inherits that same translation and echoes "x86_64"
+// right back. hw.optional.arm64 is a kernel sysctl, not a translatable
+// binary's own report, so it stays accurate regardless of who is asking.
+export function detectDarwinArch(fallbackArch, isAppleSilicon = () => spawnSync("sysctl", ["-n", "hw.optional.arm64"], { encoding: "utf8" }).stdout?.trim() === "1") {
+  return isAppleSilicon() ? "arm64" : fallbackArch;
+}
+
 function isMuslLibc() {
   try {
     const result = spawnSync("ldd", ["--version"], { encoding: "utf8" });
@@ -97,7 +106,7 @@ function normalizeVersion(value) {
 async function resolveVersion(env, transport) {
   if (env.MDHTML_VERSION) return normalizeVersion(env.MDHTML_VERSION);
   const latestUrl = `https://github.com/${repo(env)}/releases/latest`;
-  const response = await transport.get(latestUrl);
+  const response = await transport.get(latestUrl, { manual: true });
   const match = response.location?.match(/\/releases\/tag\/([^/?#]+)$/);
   if (!match) {
     throw new Error("mdhtml: could not resolve the latest release version");
@@ -239,14 +248,16 @@ export async function main(options = {}) {
     platform = process.platform,
     arch = process.arch,
     isMusl = isMuslLibc,
-    transport = httpGet,
+    isAppleSilicon = undefined,
+    transport = { get: httpGet },
     run = runBinary,
     log = console.log,
     logError = console.error,
   } = options;
 
   try {
-    const target = resolveTarget(platform, arch, isMusl);
+    const resolvedArch = platform === "darwin" ? detectDarwinArch(arch, isAppleSilicon) : arch;
+    const target = resolveTarget(platform, resolvedArch, isMusl);
     const version = await resolveVersion(env, transport);
     const installDir = env.MDHTML_INSTALL_DIR ?? defaultInstallDir(env);
     const binaryPath = path.join(installDir, binaryNameFor(target));
@@ -293,10 +304,14 @@ export async function main(options = {}) {
   }
 }
 
-async function httpGet(url) {
-  const response = await fetch(url, { redirect: "manual" });
+// GitHub release assets always 302 to a signed CDN URL: content requests must
+// follow that redirect to reach real bytes. The one caller that only wants to
+// read the target of a redirect (resolving /releases/latest to its tag) asks
+// for manual mode instead, so it never pays for or depends on a response body.
+async function httpGet(url, { manual = false } = {}) {
+  const response = await fetch(url, { redirect: manual ? "manual" : "follow" });
   const location = response.headers.get("location");
-  const body = location === null ? Buffer.from(await response.arrayBuffer()) : null;
+  const body = manual ? null : Buffer.from(await response.arrayBuffer());
   return { status: response.status, location, body };
 }
 
