@@ -7,6 +7,9 @@
   "engines": {
     "node": ">=22"
   },
+  "bin": {
+    "mdhtml": "scripts/mdhtml-cli.mjs"
+  },
   "scripts": {
     "test": "node --test runtime/test/*.test.mjs",
     "check": "node runtime/build.mjs check",
