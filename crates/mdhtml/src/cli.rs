@@ -1,0 +1,466 @@
+use std::ffi::{OsStr, OsString};
+use std::fmt;
+use std::path::PathBuf;
+
+const HELP: &str = "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts]\nmdhtml check <file>\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n";
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum CliAction {
+    Help,
+    Version,
+    Command(Command),
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum Command {
+    Build {
+        input: PathBuf,
+        output: Option<PathBuf>,
+        watch: bool,
+        no_fonts: bool,
+    },
+    Check {
+        file: PathBuf,
+    },
+    Extract {
+        input: PathBuf,
+        output: Option<PathBuf>,
+        assets: Option<PathBuf>,
+    },
+    New {
+        name: OsString,
+        template: Option<ParsedTemplate>,
+    },
+    Themes,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ParsedTemplate {
+    Resume,
+    Memo,
+    Spec,
+    Recipe,
+    Chapter,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CliError {
+    message: String,
+}
+
+impl CliError {
+    fn new(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+        }
+    }
+
+    pub fn format_for_user(&self) -> String {
+        format!("mdhtml: E-CLI-05: {}", self.message)
+    }
+
+    pub(crate) fn from_not_implemented(command: &str) -> Self {
+        Self::new(format!("{command} is not implemented"))
+    }
+}
+
+impl fmt::Display for CliError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str(&self.format_for_user())
+    }
+}
+
+impl std::error::Error for CliError {}
+
+pub fn parse_args<I, T>(args: I) -> Result<CliAction, CliError>
+where
+    I: IntoIterator<Item = T>,
+    T: Into<OsString>,
+{
+    let args: Vec<OsString> = args.into_iter().map(Into::into).collect();
+    let Some(first) = args.first() else {
+        return Err(CliError::new("a command is required; use --help for usage"));
+    };
+
+    if args.len() == 1 && (first == "-h" || first == "--help") {
+        return Ok(CliAction::Help);
+    }
+    if args.len() == 1 && (first == "-V" || first == "--version") {
+        return Ok(CliAction::Version);
+    }
+    if is_dash_prefixed(first) {
+        return Err(CliError::new(format!(
+            "unsupported top-level option {}; use --help for usage",
+            display(first)
+        )));
+    }
+
+    match first.to_str() {
+        Some("build") => parse_build(&args[1..]).map(CliAction::Command),
+        Some("check") => parse_check(&args[1..]).map(CliAction::Command),
+        Some("extract") => parse_extract(&args[1..]).map(CliAction::Command),
+        Some("new") => parse_new(&args[1..]).map(CliAction::Command),
+        Some("themes") => parse_themes(&args[1..]).map(CliAction::Command),
+        _ => Err(CliError::new(format!(
+            "unknown subcommand {}; use --help for usage",
+            display(first)
+        ))),
+    }
+}
+
+pub fn help_text() -> String {
+    HELP.to_owned()
+}
+
+pub fn version_text() -> String {
+    format!("mdhtml {}\n", env!("CARGO_PKG_VERSION"))
+}
+
+fn parse_build(args: &[OsString]) -> Result<Command, CliError> {
+    let mut input = None;
+    let mut output = None;
+    let mut watch = false;
+    let mut no_fonts = false;
+    let mut options = true;
+    let mut index = 0;
+
+    while index < args.len() {
+        let token = &args[index];
+        if options && token == "--" {
+            options = false;
+            index += 1;
+            continue;
+        }
+        if options && is_dash_prefixed(token) {
+            match token.to_str() {
+                Some("--watch") if !watch => watch = true,
+                Some("--watch") => return duplicate("--watch"),
+                Some("--no-fonts") if !no_fonts => no_fonts = true,
+                Some("--no-fonts") => return duplicate("--no-fonts"),
+                Some("-o") => {
+                    if output.is_some() {
+                        return duplicate("-o");
+                    }
+                    output = Some(PathBuf::from(option_value(args, &mut index, token)?));
+                }
+                _ => return unknown_option(token),
+            }
+        } else {
+            set_input(&mut input, token)?;
+        }
+        index += 1;
+    }
+
+    let input = input.ok_or_else(|| missing_positional("build", "<in.md>"))?;
+    Ok(Command::Build {
+        input,
+        output,
+        watch,
+        no_fonts,
+    })
+}
+
+fn parse_check(args: &[OsString]) -> Result<Command, CliError> {
+    let file = one_positional(args, "check", "<file>")?;
+    Ok(Command::Check { file })
+}
+
+fn parse_extract(args: &[OsString]) -> Result<Command, CliError> {
+    let mut input = None;
+    let mut output = None;
+    let mut assets = None;
+    let mut options = true;
+    let mut index = 0;
+
+    while index < args.len() {
+        let token = &args[index];
+        if options && token == "--" {
+            options = false;
+            index += 1;
+            continue;
+        }
+        if options && is_dash_prefixed(token) {
+            match token.to_str() {
+                Some("-o") => {
+                    if output.is_some() {
+                        return duplicate("-o");
+                    }
+                    output = Some(PathBuf::from(option_value(args, &mut index, token)?));
+                }
+                Some("--assets") => {
+                    if assets.is_some() {
+                        return duplicate("--assets");
+                    }
+                    assets = Some(PathBuf::from(option_value(args, &mut index, token)?));
+                }
+                _ => return unknown_option(token),
+            }
+        } else {
+            set_input(&mut input, token)?;
+        }
+        index += 1;
+    }
+
+    let input = input.ok_or_else(|| missing_positional("extract", "<in.md.html>"))?;
+    Ok(Command::Extract {
+        input,
+        output,
+        assets,
+    })
+}
+
+fn parse_new(args: &[OsString]) -> Result<Command, CliError> {
+    let mut name = None;
+    let mut template = None;
+    let mut options = true;
+    let mut index = 0;
+
+    while index < args.len() {
+        let token = &args[index];
+        if options && token == "--" {
+            options = false;
+            index += 1;
+            continue;
+        }
+        if options && is_dash_prefixed(token) {
+            match token.to_str() {
+                Some("--template") => {
+                    if template.is_some() {
+                        return duplicate("--template");
+                    }
+                    let value = option_value(args, &mut index, token)?;
+                    template = Some(parse_template(&value)?);
+                }
+                _ => return unknown_option(token),
+            }
+        } else if name.replace(token.clone()).is_some() {
+            return Err(CliError::new("new accepts one positional argument"));
+        }
+        index += 1;
+    }
+
+    let name = name.ok_or_else(|| missing_positional("new", "<name>"))?;
+    Ok(Command::New { name, template })
+}
+
+fn parse_themes(args: &[OsString]) -> Result<Command, CliError> {
+    if args.iter().any(|arg| *arg != "--") || args.iter().filter(|arg| *arg == "--").count() > 1 {
+        return Err(CliError::new("themes does not accept arguments"));
+    }
+    Ok(Command::Themes)
+}
+
+fn one_positional(args: &[OsString], command: &str, usage: &str) -> Result<PathBuf, CliError> {
+    let mut value = None;
+    let mut options = true;
+    for token in args {
+        if options && token == "--" {
+            options = false;
+        } else if options && is_dash_prefixed(token) {
+            return unknown_option(token);
+        } else if value.replace(PathBuf::from(token)).is_some() {
+            return Err(CliError::new(format!(
+                "{command} accepts one positional argument"
+            )));
+        }
+    }
+    value.ok_or_else(|| missing_positional(command, usage))
+}
+
+fn set_input(input: &mut Option<PathBuf>, token: &OsStr) -> Result<(), CliError> {
+    if input.replace(PathBuf::from(token)).is_some() {
+        return Err(CliError::new("command accepts one positional argument"));
+    }
+    Ok(())
+}
+
+fn option_value(
+    args: &[OsString],
+    index: &mut usize,
+    option: &OsStr,
+) -> Result<OsString, CliError> {
+    let Some(value) = args.get(*index + 1) else {
+        return Err(CliError::new(format!(
+            "option {} requires a value",
+            display(option)
+        )));
+    };
+    if value == "--" || is_dash_prefixed(value) {
+        return Err(CliError::new(format!(
+            "option {} requires a value",
+            display(option)
+        )));
+    }
+    *index += 1;
+    Ok(value.clone())
+}
+
+fn parse_template(value: &OsStr) -> Result<ParsedTemplate, CliError> {
+    match value.to_str() {
+        Some("resume") => Ok(ParsedTemplate::Resume),
+        Some("memo") => Ok(ParsedTemplate::Memo),
+        Some("spec") => Ok(ParsedTemplate::Spec),
+        Some("recipe") => Ok(ParsedTemplate::Recipe),
+        Some("chapter") => Ok(ParsedTemplate::Chapter),
+        _ => Err(CliError::new(format!(
+            "invalid template {}",
+            display(value)
+        ))),
+    }
+}
+
+fn is_dash_prefixed(value: &OsStr) -> bool {
+    value.to_str().is_some_and(|text| text.starts_with('-'))
+}
+
+fn display(value: &OsStr) -> String {
+    value
+        .to_string_lossy()
+        .chars()
+        .flat_map(char::escape_default)
+        .collect()
+}
+
+fn duplicate<T>(option: &str) -> Result<T, CliError> {
+    Err(CliError::new(format!("duplicate option {option}")))
+}
+
+fn unknown_option<T>(option: &OsStr) -> Result<T, CliError> {
+    Err(CliError::new(format!("unknown option {}", display(option))))
+}
+
+fn missing_positional(command: &str, usage: &str) -> CliError {
+    CliError::new(format!("{command} requires {usage}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn args(values: &[&str]) -> Vec<OsString> {
+        values.iter().map(OsString::from).collect()
+    }
+
+    #[test]
+    fn parses_build_options_in_any_order() {
+        assert_eq!(
+            parse_args(args(&[
+                "build",
+                "--no-fonts",
+                "-o",
+                "out",
+                "input.md",
+                "--watch"
+            ])),
+            Ok(CliAction::Command(Command::Build {
+                input: PathBuf::from("input.md"),
+                output: Some(PathBuf::from("out")),
+                watch: true,
+                no_fonts: true,
+            }))
+        );
+    }
+
+    #[test]
+    fn parses_end_marker_for_dash_prefixed_paths_and_names() {
+        assert_eq!(
+            parse_args(args(&["build", "--", "-input.md"])),
+            Ok(CliAction::Command(Command::Build {
+                input: PathBuf::from("-input.md"),
+                output: None,
+                watch: false,
+                no_fonts: false,
+            }))
+        );
+        assert_eq!(
+            parse_args(args(&["new", "--", "-draft"])),
+            Ok(CliAction::Command(Command::New {
+                name: OsString::from("-draft"),
+                template: None,
+            }))
+        );
+    }
+
+    #[test]
+    fn parses_all_commands_and_templates() {
+        assert!(matches!(
+            parse_args(args(&["check", "file"])),
+            Ok(CliAction::Command(Command::Check { .. }))
+        ));
+        assert!(matches!(
+            parse_args(args(&[
+                "extract", "file", "--assets", "assets", "-o", "out"
+            ])),
+            Ok(CliAction::Command(Command::Extract { .. }))
+        ));
+        for template in ["resume", "memo", "spec", "recipe", "chapter"] {
+            assert!(matches!(
+                parse_args(args(&["new", "name", "--template", template])),
+                Ok(CliAction::Command(Command::New {
+                    template: Some(_),
+                    ..
+                }))
+            ));
+        }
+        assert_eq!(
+            parse_args(args(&["themes"])),
+            Ok(CliAction::Command(Command::Themes))
+        );
+    }
+
+    #[test]
+    fn parses_only_top_level_help_and_version() {
+        assert_eq!(parse_args(args(&["-h"])), Ok(CliAction::Help));
+        assert_eq!(parse_args(args(&["--help"])), Ok(CliAction::Help));
+        assert_eq!(parse_args(args(&["-V"])), Ok(CliAction::Version));
+        assert_eq!(parse_args(args(&["--version"])), Ok(CliAction::Version));
+        assert!(parse_args(args(&["build", "--help", "file"])).is_err());
+        assert!(parse_args(args(&["--help", "build"])).is_err());
+    }
+
+    #[test]
+    fn rejects_every_invalid_argument_shape() {
+        let invalid = [
+            vec![],
+            vec!["unknown"],
+            vec!["--watch"],
+            vec!["build"],
+            vec!["build", "a", "b"],
+            vec!["build", "--bad", "a"],
+            vec!["build", "-o"],
+            vec!["build", "-o", "--", "a"],
+            vec!["build", "-o", "a", "--output", "b", "input"],
+            vec!["build", "--watch", "--watch", "input"],
+            vec!["build", "--no-fonts", "--no-fonts", "input"],
+            vec!["check"],
+            vec!["check", "--bad"],
+            vec!["check", "a", "b"],
+            vec!["extract"],
+            vec!["extract", "--assets"],
+            vec!["extract", "--assets", "a", "--assets", "b", "input"],
+            vec!["extract", "a", "b"],
+            vec!["new"],
+            vec!["new", "a", "b"],
+            vec!["new", "--template"],
+            vec!["new", "--template", "bad", "a"],
+            vec!["new", "--template", "memo", "--template", "spec", "a"],
+            vec!["themes", "extra"],
+        ];
+        for case in invalid {
+            assert!(
+                parse_args(args(&case)).is_err(),
+                "accepted invalid args: {case:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn formats_all_errors_with_one_public_prefix() {
+        let error = parse_args(args(&["build"])).expect_err("build needs an input");
+        assert_eq!(
+            error.to_string(),
+            "mdhtml: E-CLI-05: build requires <in.md>"
+        );
+        assert_eq!(error.format_for_user(), error.to_string());
+    }
+}
