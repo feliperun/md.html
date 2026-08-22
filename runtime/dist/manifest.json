@@ -1,0 +1,39 @@
+{
+  "format": "mdhtml/manifest/1.0",
+  "fragments": [
+    {
+      "id": "core",
+      "file": "core.min.js",
+      "size": 50382,
+      "sha256": "a8cc421b44aae8b7b057085bef56d79699cc5845aef25205978d50e96754b283",
+      "requires": []
+    },
+    {
+      "id": "copy",
+      "file": "copy.min.js",
+      "size": 2535,
+      "sha256": "75d22ae784810a456a6e3254b52c0e634161acddabc611e12c1a822a9b85fc37",
+      "requires": [
+        "core"
+      ]
+    },
+    {
+      "id": "toc",
+      "file": "toc.min.js",
+      "size": 1360,
+      "sha256": "ccac192ef3a1d12d54d068042c6d656674ff25ecfd5f542861679b4e1d350835",
+      "requires": [
+        "core"
+      ]
+    },
+    {
+      "id": "lightbox",
+      "file": "lightbox.min.js",
+      "size": 2231,
+      "sha256": "222cffdcad98e281a5360c841e7937fea958cf89abe5fb89550fef62b7b56154",
+      "requires": [
+        "core"
+      ]
+    }
+  ]
+}

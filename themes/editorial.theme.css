@@ -1,0 +1,9 @@
+:root {
+  --md-font-body: "Newsreader", Georgia, serif;
+  --md-font-mono: "Geist Mono", ui-monospace, monospace;
+  --md-measure: 68ch;
+  --md-density: 1;
+  --md-heading-scale: 1.25;
+  --md-radius: 0.25rem;
+  --md-shadow: 0 2px 10px rgb(57 45 35 / 0.12);
+}

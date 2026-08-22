@@ -1,0 +1,9 @@
+:root {
+  --md-font-body: "Instrument Sans", system-ui, sans-serif;
+  --md-font-mono: "Geist Mono", ui-monospace, monospace;
+  --md-measure: 78ch;
+  --md-density: 0.88;
+  --md-heading-scale: 1.18;
+  --md-radius: 0.5rem;
+  --md-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+}
