@@ -1,0 +1,73 @@
+/* "Terminal" — a dark, monospace-forward theme that reads like a
+   spec rendered in an editor, not a document. Overrides the light
+   default itself: a theme can recolor the whole document, not just
+   accent it. */
+/* The runtime re-injects base.css's own rules (colors, spacing, component
+   selectors) after mount, landing after this stylesheet with matching
+   specificity for any plain-class or plain-id rule. #mdhtml-app-prefixed
+   selectors outrank base.css's class-only selectors regardless of source
+   order (and `html #mdhtml-toolbar` outranks a bare `#mdhtml-toolbar`);
+   :root custom properties still need !important, since there is no
+   higher-specificity form of :root to borrow. */
+:root {
+  --md-bg: #0d1117 !important;
+  --md-text: #c9d1d9 !important;
+  --md-muted: #8b949e !important;
+  --md-surface: #161b22 !important;
+  --md-border: #30363d !important;
+  --md-accent: #39d0d8 !important;
+  --md-focus: #f2cc60 !important;
+  --md-font-body: "Geist Mono", ui-monospace, "SF Mono", monospace !important;
+  --md-font-mono: "Geist Mono", ui-monospace, monospace !important;
+  --md-measure: 62rem !important;
+  --md-density: 0.92 !important;
+  --md-heading-scale: 1.05 !important;
+  --md-radius: 0.2rem !important;
+  --md-shadow: none !important;
+}
+
+#mdhtml-app h1, #mdhtml-app h2, #mdhtml-app h3 { font-weight: 600; letter-spacing: -0.01em; }
+#mdhtml-app h1::before { content: "# "; color: var(--md-accent); }
+#mdhtml-app h2::before { content: "## "; color: var(--md-accent); font-weight: 400; }
+#mdhtml-app h3::before { content: "### "; color: var(--md-muted); font-weight: 400; }
+
+#mdhtml-app a { text-decoration-style: dotted; }
+#mdhtml-app code { background: var(--md-surface); border-color: var(--md-border); color: #79c0ff; }
+#mdhtml-app pre { background: #010409; border-color: var(--md-border); }
+#mdhtml-app pre code { color: #c9d1d9; }
+
+#mdhtml-app .md-callout, #mdhtml-app .md-quote, #mdhtml-app .md-details, #mdhtml-app .md-stats,
+#mdhtml-app .md-bars, #mdhtml-app .md-kv, #mdhtml-app .md-timeline, #mdhtml-app .md-cards, #mdhtml-app .md-grid-item {
+  border-color: var(--md-border);
+  box-shadow: none;
+}
+#mdhtml-app .md-callout { background: #101820; border-left-color: var(--md-accent); }
+#mdhtml-app .md-callout-badge { color: var(--md-accent); font-family: var(--md-font-mono); }
+
+#mdhtml-app .md-cards > section {
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius);
+  padding: 0.9rem 1rem;
+  background: var(--md-surface);
+}
+#mdhtml-app .md-cards > section h3 { margin-top: 0; }
+#mdhtml-app .md-cards > section h3::before { content: "▸ "; color: var(--md-accent); }
+
+#mdhtml-app .md-timeline { list-style: none; padding-left: 1rem; border-left: 2px solid var(--md-border); }
+#mdhtml-app .md-timeline li { position: relative; padding-left: 1rem; }
+#mdhtml-app .md-timeline li::before {
+  content: "";
+  position: absolute;
+  left: -1.4rem;
+  top: 0.55rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--md-accent);
+}
+
+#mdhtml-app table { font-size: 0.9rem; }
+#mdhtml-app th { color: var(--md-accent); border-bottom-color: var(--md-border); }
+#mdhtml-app td { border-bottom-color: var(--md-border); }
+
+html #mdhtml-toolbar, html #mdhtml-toc { background: var(--md-surface); border-color: var(--md-border); }

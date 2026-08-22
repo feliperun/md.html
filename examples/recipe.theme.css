@@ -1,0 +1,65 @@
+/* "Hearth" — a warm, rounded cookbook theme. Serif headings, terracotta
+   accent, numbered steps with circular badges. */
+/* The runtime re-injects base.css's own rules (colors, spacing, component
+   selectors) after mount, landing after this stylesheet with matching
+   specificity for any plain-class rule. #mdhtml-app-prefixed selectors
+   outrank base.css's class-only selectors regardless of source order;
+   :root custom properties still need !important, since there is no
+   higher-specificity form of :root to borrow. */
+:root {
+  --md-bg: #fdf6ec !important;
+  --md-text: #4a3728 !important;
+  --md-muted: #8a6f5c !important;
+  --md-surface: #f7ead6 !important;
+  --md-border: #e8cfa9 !important;
+  --md-accent: #c2410c !important;
+  --md-focus: #c2410c !important;
+  --md-font-body: "Instrument Sans", system-ui, sans-serif !important;
+  --md-font-mono: "Geist Mono", ui-monospace, monospace !important;
+  --md-measure: 40rem !important;
+  --md-density: 1.02 !important;
+  --md-heading-scale: 1.15 !important;
+  --md-radius: 1.1rem !important;
+  --md-shadow: 0 8px 20px -12px rgb(74 55 40 / 0.25) !important;
+}
+
+#mdhtml-app h1, #mdhtml-app h2 { font-family: "Newsreader", Georgia, serif; font-weight: 600; }
+#mdhtml-app h1 { font-style: italic; }
+
+#mdhtml-app .md-callout, #mdhtml-app .md-quote, #mdhtml-app .md-details, #mdhtml-app .md-stats,
+#mdhtml-app .md-bars, #mdhtml-app .md-kv, #mdhtml-app .md-timeline, #mdhtml-app .md-cards, #mdhtml-app .md-grid-item {
+  border: 1px dashed var(--md-border);
+}
+#mdhtml-app .md-callout { border-style: solid; border-left: 0.35rem solid var(--md-accent); }
+#mdhtml-app .md-callout-badge { color: var(--md-accent); }
+
+#mdhtml-app .md-steps { list-style: none; padding-left: 0; counter-reset: step; display: grid; gap: 0.6rem; }
+#mdhtml-app .md-steps li {
+  position: relative;
+  padding: 0.6rem 1rem 0.6rem 3rem;
+  background: var(--md-surface);
+  border: 1px dashed var(--md-border);
+  border-radius: var(--md-radius);
+}
+#mdhtml-app .md-steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0.7rem;
+  top: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--md-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+#mdhtml-app .md-kv { background: var(--md-surface); border-radius: var(--md-radius); padding: 0.3rem 1rem; border: 1px dashed var(--md-border); }
+#mdhtml-app .md-kv dt { color: var(--md-accent); }
+#mdhtml-app .md-kv dt, #mdhtml-app .md-kv dd { border-bottom-style: dashed; }
+
+#mdhtml-app blockquote { border-left-color: var(--md-accent); font-style: italic; }

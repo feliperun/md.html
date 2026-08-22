@@ -2,7 +2,7 @@
 title: Weeknight chickpea curry
 summary: A synthetic one-pot curry recipe in canonical mdhtml.
 lang: en
-theme: technical
+theme: recipe.theme.css
 date: 2026-08-21
 tags:
   - recipe

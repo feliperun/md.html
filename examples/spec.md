@@ -2,7 +2,7 @@
 title: Meridian API specification
 summary: A synthetic technical development spec for the Meridian scheduling service.
 lang: en
-theme: technical
+theme: spec.theme.css
 toc:
   depth: 2
 sections:

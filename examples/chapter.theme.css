@@ -1,0 +1,81 @@
+/* "Folio" — a literary book theme. Sepia parchment, a drop cap on the
+   opening paragraph, and small-caps quote attribution. */
+/* The runtime re-injects base.css's own rules (colors, spacing, component
+   selectors) after mount, landing after this stylesheet with matching
+   specificity for any plain-class rule. #mdhtml-app-prefixed selectors
+   outrank base.css's class-only selectors regardless of source order;
+   :root custom properties still need !important, since there is no
+   higher-specificity form of :root to borrow. */
+:root {
+  --md-bg: #f4ecd8 !important;
+  --md-text: #2b2018 !important;
+  --md-muted: #7a6a56 !important;
+  --md-surface: #ece0c6 !important;
+  --md-border: #d8c69e !important;
+  --md-accent: #7c2d3a !important;
+  --md-focus: #7c2d3a !important;
+  --md-font-body: "Newsreader", Georgia, serif !important;
+  --md-font-mono: "Geist Mono", ui-monospace, monospace !important;
+  --md-measure: 38rem !important;
+  --md-density: 1.08 !important;
+  --md-heading-scale: 1.2 !important;
+  --md-radius: 0.2rem !important;
+  --md-shadow: none !important;
+}
+
+#mdhtml-app h1 {
+  font-weight: 500;
+  font-style: italic;
+  text-align: center;
+}
+
+#mdhtml-app h1 + p::first-letter {
+  float: left;
+  margin: 0.05em 0.08em -0.1em 0;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 3.6em;
+  font-weight: 600;
+  line-height: 0.8;
+  color: var(--md-accent);
+}
+
+#mdhtml-app .md-quote {
+  padding: 0;
+  text-align: center;
+}
+#mdhtml-app .md-quote blockquote {
+  border-left: none;
+  padding: 0;
+  padding-left: 0;
+  font-style: italic;
+  font-size: 1.08em;
+}
+#mdhtml-app .md-quote blockquote::before { content: "“"; }
+#mdhtml-app .md-quote blockquote::after { content: "”"; }
+#mdhtml-app .md-quote figcaption {
+  margin: 0.6rem 0 0;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--md-muted);
+}
+
+#mdhtml-app hr {
+  margin: 3rem auto;
+  width: 8rem;
+  border-top: 1px solid var(--md-border);
+}
+#mdhtml-app hr::after {
+  content: "❧";
+  display: block;
+  margin-top: -0.9rem;
+  text-align: center;
+  color: var(--md-accent);
+  background: var(--md-bg);
+  width: 1.6rem;
+  margin-inline: auto;
+}
+
+#mdhtml-app blockquote { border-left-color: var(--md-accent); }

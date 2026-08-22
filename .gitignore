@@ -29,3 +29,7 @@ runtime/dist/*
 !runtime/dist/lightbox.min.js
 !runtime/dist/runtime.min.js
 !runtime/dist/manifest.json
+
+# --- build output of the examples: generated fresh by scripts/check-examples.sh
+# and the Pages workflow, never committed. ---
+examples/*.md.html

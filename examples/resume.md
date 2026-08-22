@@ -2,7 +2,7 @@
 title: Alex Rivera — Product Engineer
 summary: A synthetic resume for a product engineer focused on developer tooling.
 lang: en
-theme: technical
+theme: resume.theme.css
 toc: false
 ---
 

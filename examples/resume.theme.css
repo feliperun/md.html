@@ -1,0 +1,83 @@
+/* "Ledger" — a flat, high-contrast executive theme. Sharp corners, no
+   shadows, small-caps section labels: reads like a well-typeset dossier. */
+/* The runtime re-injects base.css's own rules (colors, spacing, component
+   selectors) after mount, landing after this stylesheet with matching
+   specificity for any plain-class rule. #mdhtml-app-prefixed selectors
+   outrank base.css's class-only selectors regardless of source order;
+   :root custom properties still need !important, since there is no
+   higher-specificity form of :root to borrow. */
+:root {
+  --md-bg: #faf8f4 !important;
+  --md-text: #16233a !important;
+  --md-muted: #5b6b85 !important;
+  --md-surface: #f0ece2 !important;
+  --md-border: #16233a !important;
+  --md-accent: #a8590f !important;
+  --md-focus: #a8590f !important;
+  --md-font-body: "Instrument Sans", system-ui, sans-serif !important;
+  --md-font-mono: "Geist Mono", ui-monospace, monospace !important;
+  --md-measure: 42rem !important;
+  --md-density: 0.86 !important;
+  --md-heading-scale: 1 !important;
+  --md-radius: 0 !important;
+  --md-shadow: none !important;
+}
+
+#mdhtml-app { padding-top: 3.5rem; }
+
+#mdhtml-app h1 {
+  padding-bottom: 0.6rem;
+  border-bottom: 3px solid var(--md-text);
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+}
+#mdhtml-app h2 {
+  margin-top: 3rem;
+  padding-left: 0.85rem;
+  border-left: 4px solid var(--md-accent);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+#mdhtml-app h3 { font-size: 1.05rem; letter-spacing: -0.01em; }
+
+#mdhtml-app .md-kv { grid-template-columns: minmax(6rem, 0.35fr) 1fr; }
+#mdhtml-app .md-kv dt {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--md-text);
+}
+#mdhtml-app .md-kv dt, #mdhtml-app .md-kv dd { border-bottom-color: var(--md-border); padding: 0.55rem 0; }
+
+#mdhtml-app .md-callout, #mdhtml-app .md-quote, #mdhtml-app .md-details, #mdhtml-app .md-stats,
+#mdhtml-app .md-bars, #mdhtml-app .md-timeline, #mdhtml-app .md-cards, #mdhtml-app .md-grid-item {
+  border-width: 1px;
+  border-radius: 0;
+}
+#mdhtml-app .md-callout { border-left-width: 3px; background: var(--md-surface); }
+#mdhtml-app .md-callout-badge { letter-spacing: 0.14em; }
+
+#mdhtml-app .md-steps { list-style: none; padding-left: 0; counter-reset: step; }
+#mdhtml-app .md-steps li {
+  position: relative;
+  padding: 0.4rem 0 0.4rem 2.4rem;
+  border-bottom: 1px dotted var(--md-border);
+}
+#mdhtml-app .md-steps li::before {
+  counter-increment: step;
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  font-family: var(--md-font-mono);
+  font-size: 0.78rem;
+  color: var(--md-accent);
+}
+
+#mdhtml-app table { font-size: 0.92rem; }
+#mdhtml-app th { border-bottom: 2px solid var(--md-text); color: var(--md-text); }
+
+@media print {
+  #mdhtml-app h2 { border-left-color: #000; color: #000; }
+}

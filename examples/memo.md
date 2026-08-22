@@ -2,7 +2,7 @@
 title: 2026 Q3 OKR review
 summary: A synthetic quarterly OKR review for the Meridian platform team.
 lang: en
-theme: technical
+theme: memo.theme.css
 date: 2026-08-21
 authors:
   - Priya Raman

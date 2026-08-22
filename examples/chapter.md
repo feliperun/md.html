@@ -2,7 +2,7 @@
 title: Chapter four — The bell that did not ring
 summary: A synthetic mystery chapter about a keeper, a parcel, and a bell that should not be warm.
 lang: en
-theme: editorial
+theme: chapter.theme.css
 toc: false
 ---
 
