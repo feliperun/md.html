@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/feliperun/md.html/compare/v1.1.3...v1.2.0) (2026-08-22)
+
+
+### Features
+
+* add a real CV showcase example and link examples from the README ([8319b89](https://github.com/feliperun/md.html/commit/8319b89513103add7da5da490670202c0fca1a51))
+* give each canonical example a distinct custom theme ([f63315b](https://github.com/feliperun/md.html/commit/f63315b98a8558bb323ba061a5ee9acf4d0b80f5))
+
 ## [1.1.3](https://github.com/feliperun/md.html/compare/v1.1.2...v1.1.3) (2026-08-22)
 
 
