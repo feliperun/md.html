@@ -50,3 +50,5 @@ proposed → active → superseded
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | active |
 | [0002](0002-root-managed-ai-guidance.md) | Root-managed AI guidance files | active |
 | [0003](0003-sentrux-structural-quality-gates.md) | Sentrux structural quality gates | active |
+| [0004](0004-mdhtml-format-and-toolchain.md) | mdhtml 1.0 format and toolchain | active |
+| [0005](0005-runtime-fragment-boundaries.md) | Runtime fragment boundaries | active |

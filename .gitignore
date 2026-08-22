@@ -2,6 +2,8 @@
 node_modules/
 dist/
 *.log
+.runs/
+.plans/
 
 # --- rust (cli) ---
 /target/
@@ -16,9 +18,14 @@ crates/**/target/
 .env
 .env.*
 
-# --- artefatos compilados do runtime: buildados, mas o minificado é
-# commitado de propósito — o build da CLI Rust roda sem node. ---
+# --- artefatos compilados do runtime: gerados pelo build, mas os fragmentos
+# minificados e o manifesto são commitados de propósito — o build da CLI Rust
+# roda sem node. ---
 runtime/dist/*
+!runtime/dist/
+!runtime/dist/core.min.js
+!runtime/dist/copy.min.js
+!runtime/dist/toc.min.js
+!runtime/dist/lightbox.min.js
 !runtime/dist/runtime.min.js
-!runtime/dist/theme.css
-!runtime/dist/fonts/
+!runtime/dist/manifest.json
