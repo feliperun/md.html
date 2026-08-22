@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/feliperun/md.html/compare/v1.1.0...v1.1.1) (2026-08-22)
+
+
+### Bug Fixes
+
+* repair install.sh release resolution and version drift ([484455b](https://github.com/feliperun/md.html/commit/484455b29a84ba9b735af3a9084d9735bf722de1))
+
 ## [1.1.0](https://github.com/feliperun/md.html/compare/v1.0.0...v1.1.0) (2026-08-22)
 
 
