@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "mdhtml 1.0 conformance fixtures and runtime build harness.",
+  "license": "MIT",
   "engines": {
     "node": ">=22"
   },

@@ -40,3 +40,7 @@ cargo build --release -p mdhtml
 - [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) — setup, daily commands, and contribution flow
 - [skills/mdhtml-author/SKILL.md](skills/mdhtml-author/SKILL.md) — authoring guidance
 - [AGENTS.md](AGENTS.md) — the contributor/agent playbook
+
+## License
+
+[MIT](LICENSE)
