@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en" data-theme="system">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mdhtml — one portable Markdown document</title>
+<meta name="description" content="mdhtml ships a single self-contained .md.html document: write Markdown, get a portable file that opens from disk with no server and no build step for the reader.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,wght@0,400..600;1,400..600&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1f2937;
+    --muted: #667085;
+    --surface: #f8fafc;
+    --surface-2: #ffffff;
+    --border: #dbe2ea;
+    --accent: #0f766e;
+    --accent-ink: #ffffff;
+    --focus: #f59e0b;
+    --shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 10px 30px -12px rgb(15 23 42 / 0.12);
+    --font-body: "Instrument Sans", system-ui, -apple-system, sans-serif;
+    --font-serif: "Newsreader", Georgia, serif;
+    --font-mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1220;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --surface: #131c2e;
+    --surface-2: #101828;
+    --border: #263244;
+    --accent: #5eead4;
+    --accent-ink: #06201c;
+    --focus: #fbbf24;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -12px rgb(0 0 0 / 0.5);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="system"] {
+      --bg: #0b1220;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --surface: #131c2e;
+      --surface-2: #101828;
+      --border: #263244;
+      --accent: #5eead4;
+      --accent-ink: #06201c;
+      --focus: #fbbf24;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -12px rgb(0 0 0 / 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+
+  .wrap { width: min(calc(100% - 3rem), 72rem); margin-inline: auto; }
+
+  header.site {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; font-size: 1.05rem; text-decoration: none; }
+  .brand .mark {
+    display: grid; place-items: center;
+    width: 2rem; height: 2rem; border-radius: 0.55rem;
+    background: var(--accent); color: var(--accent-ink);
+    font-family: var(--font-mono); font-weight: 700; font-size: 0.85rem;
+  }
+  nav.top { display: flex; align-items: center; gap: 1.25rem; font-size: 0.92rem; }
+  nav.top a { text-decoration: none; color: var(--muted); }
+  nav.top a:hover { color: var(--text); }
+  .gh-link {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.4rem 0.75rem; border: 1px solid var(--border); border-radius: 999px;
+    color: var(--text) !important; text-decoration: none; font-size: 0.85rem;
+  }
+  .gh-link:hover { border-color: var(--accent); }
+  #theme-toggle {
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 999px; width: 2.1rem; height: 2.1rem; cursor: pointer; font-size: 1rem;
+    display: grid; place-items: center;
+  }
+  #theme-toggle:hover { border-color: var(--accent); }
+
+  @media (max-width: 30rem) {
+    header.site .wrap { gap: 0.5rem; }
+    .brand { font-size: 0.95rem; gap: 0.45rem; }
+    .brand .mark { width: 1.7rem; height: 1.7rem; font-size: 0.72rem; }
+    nav.top { gap: 0.5rem; }
+    nav.top a:not(.gh-link) { display: none; }
+    .gh-link { padding: 0.4rem 0.55rem; }
+    .gh-link .gh-text { display: none; }
+    #theme-toggle { width: 1.9rem; height: 1.9rem; flex: none; }
+  }
+
+  main { padding-bottom: 5rem; }
+
+  .hero { padding: 4.5rem 0 3.5rem; }
+  .hero .eyebrow {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.78rem;
+    letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    padding: 0.3rem 0.65rem; border-radius: 999px; margin-bottom: 1.1rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 4.5vw, 3.1rem); line-height: 1.12; margin: 0 0 1.1rem;
+    max-width: 24ch; letter-spacing: -0.01em;
+  }
+  .hero p.lede { font-size: clamp(1.02rem, 1.6vw, 1.2rem); color: var(--muted); max-width: 56ch; margin: 0 0 2rem; }
+  .hero .cta { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.15rem; border-radius: 0.6rem; font-weight: 600; font-size: 0.95rem;
+    text-decoration: none; border: 1px solid transparent;
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn.ghost { border-color: var(--border); color: var(--text); }
+  .btn.ghost:hover { border-color: var(--accent); }
+
+  pre.snippet {
+    margin: 2.25rem 0 0; padding: 1.1rem 1.25rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 0.75rem;
+    font-family: var(--font-mono); font-size: 0.86rem; overflow-x: auto;
+    box-shadow: var(--shadow);
+  }
+  pre.snippet .muted { color: var(--muted); }
+  pre.snippet .accent { color: var(--accent); }
+
+  section.gallery { padding: 1rem 0 3rem; }
+  section.gallery > .wrap > h2 { font-size: 1.5rem; margin: 0 0 0.4rem; }
+  section.gallery > .wrap > p { color: var(--muted); margin: 0 0 2.25rem; max-width: 60ch; }
+
+  .grid {
+    display: grid; gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr));
+  }
+  .card {
+    position: relative;
+    display: flex; flex-direction: column; gap: 0.7rem;
+    padding: 1.5rem; border-radius: 1rem;
+    background: var(--surface-2); border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    text-decoration: none; color: inherit;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .card .kind {
+    align-self: flex-start;
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.03em; text-transform: uppercase;
+    color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent);
+    padding: 0.22rem 0.55rem; border-radius: 999px;
+  }
+  .card h3 { margin: 0.2rem 0 0; font-size: 1.2rem; line-height: 1.3; }
+  .card.serif h3 { font-family: var(--font-serif); font-weight: 500; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.92rem; flex: 1; }
+  .card .open {
+    margin-top: 0.4rem; font-size: 0.86rem; font-weight: 600; color: var(--accent);
+    display: inline-flex; align-items: center; gap: 0.35rem;
+  }
+  .card .open .arrow { transition: transform 0.15s ease; }
+  .card:hover .open .arrow { transform: translateX(3px); }
+
+  section.why { padding: 1rem 0 4rem; border-top: 1px solid var(--border); margin-top: 1rem; }
+  section.why .wrap { padding-top: 3.5rem; }
+  .why-grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin-top: 2rem; }
+  .why-grid h3 { font-size: 1.02rem; margin: 0 0 0.4rem; }
+  .why-grid p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .why-grid .num {
+    font-family: var(--font-mono); color: var(--accent); font-size: 0.8rem; margin-bottom: 0.5rem; display: block;
+  }
+
+  footer.site { border-top: 1px solid var(--border); padding: 2.5rem 0; }
+  footer.site .wrap { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; color: var(--muted); font-size: 0.86rem; }
+  footer.site a { text-decoration: none; color: var(--muted); }
+  footer.site a:hover { color: var(--text); }
+  footer.site .links { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <span class="mark">md</span>
+      <span>mdhtml</span>
+    </a>
+    <nav class="top">
+      <a href="#examples">Examples</a>
+      <a href="#why">Why</a>
+      <a class="gh-link" href="https://github.com/feliperun/md.html">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span class="gh-text">GitHub</span>
+      </a>
+      <button id="theme-toggle" type="button" aria-label="Toggle color theme">◐</button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow">v1.0 · single-file document format</span>
+      <h1>Write Markdown. Ship one file that just opens.</h1>
+      <p class="lede">
+        mdhtml builds a self-contained <code>.md.html</code> document: the canonical
+        Markdown source lives inside it, byte for byte. Readers get a rendered page
+        with navigation, themes, copy, and download — no server, no network, no
+        build step, opened straight from disk.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="#examples">Browse the examples</a>
+        <a class="btn ghost" href="https://github.com/feliperun/md.html#readme">Read the docs</a>
+      </div>
+      <pre class="snippet"><span class="muted"># scaffold, build, verify — three commands</span>
+<span class="accent">npx</span> mdhtml new brief --template spec
+<span class="accent">npx</span> mdhtml build brief.md
+<span class="accent">npx</span> mdhtml check brief.md</pre>
+    </div>
+  </div>
+
+  <section class="gallery" id="examples">
+    <div class="wrap">
+      <h2>Five canonical documents</h2>
+      <p>Same format, five very different shapes — a résumé, an OKR deck, an API
+        spec, a recipe, and a short story. Every one below is a real
+        <code>.md.html</code> file: open it, resize the window, flip the theme,
+        try it offline.</p>
+      <div class="grid">
+
+        <a class="card" href="examples/spec.html">
+          <span class="kind">Technical spec</span>
+          <h3>Meridian API specification</h3>
+          <p>A development spec exercising headings, tables, code, cards,
+            timeline, and ownership containers.</p>
+          <span class="open">Open example <span class="arrow">→</span></span>
+        </a>
+
+        <a class="card" href="examples/memo.html">
+          <span class="kind">Presentation</span>
+          <h3>2026 Q3 OKR review</h3>
+          <p>A visual quarterly review built from stat, bar, grid, and callout
+            components — numbers that read at a glance.</p>
+          <span class="open">Open example <span class="arrow">→</span></span>
+        </a>
+
+        <a class="card serif" href="examples/chapter.html">
+          <span class="kind">Fiction</span>
+          <h3>The bell that did not ring</h3>
+          <p>A mystery chapter in the editorial theme — serif type, epigraph
+            quote, and a slow-burn cliffhanger.</p>
+          <span class="open">Open example <span class="arrow">→</span></span>
+        </a>
+
+        <a class="card" href="examples/resume.html">
+          <span class="kind">Résumé</span>
+          <h3>Alex Rivera — Product Engineer</h3>
+          <p>A compact one-page résumé built entirely from key-value and list
+            containers.</p>
+          <span class="open">Open example <span class="arrow">→</span></span>
+        </a>
+
+        <a class="card" href="examples/recipe.html">
+          <span class="kind">Recipe</span>
+          <h3>Weeknight chickpea curry</h3>
+          <p>A one-pot recipe using the steps container — ingredients, method,
+            timing, all in canonical Markdown.</p>
+          <span class="open">Open example <span class="arrow">→</span></span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="why" id="why">
+    <div class="wrap">
+      <h2>Why a single file</h2>
+      <div class="why-grid">
+        <div>
+          <span class="num">01</span>
+          <h3>Portable by construction</h3>
+          <p>Fonts, styles, runtime, and assets are embedded. A finished
+            document makes zero network requests — it works from a USB
+            stick as well as it works on the web.</p>
+        </div>
+        <div>
+          <span class="num">02</span>
+          <h3>Lossless round-trip</h3>
+          <p>The canonical Markdown source travels inside the HTML, verbatim.
+            <code>mdhtml extract</code> always recovers exactly what the
+            author wrote.</p>
+        </div>
+        <div>
+          <span class="num">03</span>
+          <h3>Degrades honestly</h3>
+          <p>No JavaScript? The document still renders as readable prose.
+            Unknown container syntax degrades to plain text instead of
+            silently breaking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>mdhtml — synthetic examples, no personal or production data.</span>
+    <div class="links">
+      <a href="https://github.com/feliperun/md.html">Source</a>
+      <a href="https://github.com/feliperun/md.html/blob/main/SPEC.md">Spec</a>
+      <a href="https://github.com/feliperun/md.html/blob/main/docs/GETTING-STARTED.md">Getting started</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var KEY = "mdhtml-site-theme";
+  var btn = document.getElementById("theme-toggle");
+  function apply(mode) {
+    root.setAttribute("data-theme", mode);
+    btn.textContent = mode === "dark" ? "●" : mode === "light" ? "○" : "◐";
+    btn.setAttribute("aria-label", "Color theme: " + mode + ". Activate to change.");
+  }
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  apply(saved || "system");
+  btn.addEventListener("click", function () {
+    var order = ["system", "light", "dark"];
+    var current = root.getAttribute("data-theme") || "system";
+    var next = order[(order.indexOf(current) + 1) % order.length];
+    apply(next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "examples/**"
+      - "site/**"
+      - "crates/**"
+      - "runtime/**"
+      - "themes/**"
+      - "fonts/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build mdhtml CLI
+        run: cargo build --locked --release -p mdhtml
+
+      - name: Build example documents
+        run: |
+          set -euo pipefail
+          mkdir -p _site/examples
+          for f in resume memo spec recipe chapter; do
+            ./target/release/mdhtml build "examples/${f}.md" -o "_site/examples/${f}.html"
+          done
+
+      - name: Assemble site
+        run: cp site/index.html _site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
