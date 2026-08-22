@@ -127,5 +127,4 @@ are symlinks to this file — edit `AGENTS.md` only.
 Before starting new work here, check `.runs/`: if a campaign is active or a run is not terminal, continue it instead of starting over — read its `HANDOFF.md`/`STATUS.md`, attach to the campaign, and `resume` or `supervise` the run. Active runs are supervised by a deterministic detached process: do not poll `status` in a loop — on resume, check status once and act only on terminal states.
 
 - plan-runner campaign `mdhtml-v1`: active — read `.runs/campaigns/mdhtml-v1/HANDOFF.md`
-- plan-runner run `mdhtml-t18a-fix1`: active (0/1 nodes done) — read `.runs/mdhtml-t18a-fix1/STATUS.md`; `resume` or `supervise` it
 <!-- plan-runner-active:end -->
