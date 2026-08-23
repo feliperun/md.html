@@ -252,6 +252,63 @@ fn no_fonts_build_differs_from_normal_build_only_in_the_fonts_block() {
 }
 
 #[test]
+fn unsafe_build_requires_the_flag_and_attests_and_warns() {
+    let dir = temp_dir("unsafe");
+    let input = dir.join("unsafe.md");
+    let source = "---\ntitle: Unsafe\n---\n\n[click](javascript:alert(1))\n";
+    fs::write(&input, source).expect("write input");
+
+    let safe_output = dir.join("safe.html");
+    let without = run(&[
+        "build",
+        input.to_str().expect("utf8 path"),
+        "-o",
+        safe_output.to_str().expect("utf8 path"),
+    ]);
+    assert_eq!(without.status.code(), Some(1));
+    assert_eq!(String::from_utf8_lossy(&without.stdout), "");
+    assert!(
+        String::from_utf8_lossy(&without.stderr)
+            .starts_with("mdhtml: E-MDHSEC-012: "),
+        "{}",
+        String::from_utf8_lossy(&without.stderr)
+    );
+    assert!(
+        !safe_output.exists(),
+        "a guard-violating source without --unsafe writes no artifact"
+    );
+
+    let unsafe_output = dir.join("unsafe.html");
+    let with = run(&[
+        "build",
+        input.to_str().expect("utf8 path"),
+        "-o",
+        unsafe_output.to_str().expect("utf8 path"),
+        "--unsafe",
+    ]);
+    assert!(
+        with.status.success(),
+        "{}",
+        String::from_utf8_lossy(&with.stderr)
+    );
+    assert_eq!(String::from_utf8_lossy(&with.stdout), "");
+    assert_eq!(
+        String::from_utf8_lossy(&with.stderr),
+        "mdhtml: W-MDHSEC-019: --unsafe disables the security guards; \
+         this artifact is marked unsafe and will fail mdhtml audit\n"
+    );
+    let artifact = fs::read_to_string(&unsafe_output).expect("read unsafe artifact");
+    assert!(artifact.contains("data-mdhtml-safe=\"false\""));
+
+    let checked = run(&["check", unsafe_output.to_str().expect("utf8 path")]);
+    assert!(
+        checked.status.success(),
+        "mdhtml check stays green on the unsafe artifact: {}",
+        String::from_utf8_lossy(&checked.stdout)
+    );
+}
+
+#[test]
 fn every_template_builds_and_checks_clean() {
     let dir = temp_dir("templates");
     for template in ["resume", "memo", "spec", "recipe", "chapter"] {
@@ -393,4 +450,140 @@ fn watch_rerun_is_idempotent_and_never_duplicates() {
     let document = fs::read_to_string(&output).expect("read final document");
     assert!(document.starts_with("<!doctype html>\n"));
     assert_eq!(document.matches("<!doctype html>").count(), 1);
+}
+
+#[test]
+fn audit_of_a_freshly_built_clean_artifact_exits_zero_with_the_prd13_lines() {
+    let dir = temp_dir("audit-clean");
+    let input = dir.join("note.md");
+    fs::write(&input, "---\ntitle: Note\n---\n# Note\n").expect("write input");
+    let artifact = dir.join("note.md.html");
+    let built = run(&[
+        "build",
+        input.to_str().expect("utf8 path"),
+        "-o",
+        artifact.to_str().expect("utf8 path"),
+    ]);
+    assert!(
+        built.status.success(),
+        "{}",
+        String::from_utf8_lossy(&built.stderr)
+    );
+
+    let audited = run(&["audit", artifact.to_str().expect("utf8 path")]);
+    assert!(
+        audited.status.success(),
+        "{}",
+        String::from_utf8_lossy(&audited.stderr)
+    );
+    assert_eq!(String::from_utf8_lossy(&audited.stderr), "");
+    let stdout = String::from_utf8_lossy(&audited.stdout);
+    assert_eq!(
+        stdout,
+        "✓ valid mdhtml v1.0\n\
+         ✓ canonical source present\n\
+         ✓ source integrity valid\n\
+         ✓ HTML security policy passed\n\
+         ✓ CSS security policy passed\n\
+         ✓ no unauthorized executable content\n\
+         ✓ runtime integrity valid\n\
+         ✓ no unexpected external resources\n\
+         SAFE\n"
+    );
+}
+
+#[test]
+fn audit_json_matches_the_frozen_schema_in_exact_field_order() {
+    let dir = temp_dir("audit-json");
+    let input = dir.join("note.md");
+    fs::write(&input, "---\ntitle: Note\n---\n# Note\n").expect("write input");
+    let artifact = dir.join("note.md.html");
+    let built = run(&[
+        "build",
+        input.to_str().expect("utf8 path"),
+        "-o",
+        artifact.to_str().expect("utf8 path"),
+    ]);
+    assert!(
+        built.status.success(),
+        "{}",
+        String::from_utf8_lossy(&built.stderr)
+    );
+
+    let audited = run(&[
+        "audit",
+        artifact.to_str().expect("utf8 path"),
+        "--json",
+    ]);
+    assert!(
+        audited.status.success(),
+        "{}",
+        String::from_utf8_lossy(&audited.stderr)
+    );
+    assert_eq!(String::from_utf8_lossy(&audited.stderr), "");
+    assert_eq!(
+        String::from_utf8_lossy(&audited.stdout),
+        "{\"safe\":true,\"specVersion\":\"1.0\",\"sourceIntegrity\":true,\"html\":\"pass\",\"css\":\"pass\",\"runtime\":\"pass\",\"externalResources\":[]}\n"
+    );
+}
+
+#[test]
+fn audit_of_an_unsafe_built_artifact_exits_one_and_prints_the_report_to_stdout() {
+    let dir = temp_dir("audit-unsafe");
+    let input = dir.join("unsafe.md");
+    fs::write(
+        &input,
+        "---\ntitle: Unsafe\n---\n\n[click](javascript:alert(1))\n",
+    )
+    .expect("write input");
+    let artifact = dir.join("unsafe.md.html");
+    let built = run(&[
+        "build",
+        input.to_str().expect("utf8 path"),
+        "-o",
+        artifact.to_str().expect("utf8 path"),
+        "--unsafe",
+    ]);
+    assert!(
+        built.status.success(),
+        "{}",
+        String::from_utf8_lossy(&built.stderr)
+    );
+
+    let audited = run(&["audit", artifact.to_str().expect("utf8 path")]);
+    assert_eq!(audited.status.code(), Some(1));
+    assert_eq!(
+        String::from_utf8_lossy(&audited.stderr),
+        "mdhtml: E-CLI-06: artifact failed audit\n"
+    );
+    let stdout = String::from_utf8_lossy(&audited.stdout);
+    assert!(stdout.contains("✗ HTML security policy passed\n"), "{stdout}");
+    assert!(
+        stdout.contains("mdhtml: E-MDHSEC-018: artifact is marked unsafe\n"),
+        "{stdout}"
+    );
+    assert!(stdout.ends_with("UNSAFE\n"), "{stdout}");
+}
+
+#[test]
+fn audit_of_a_non_artifact_file_exits_one_with_the_cli05_one_liner() {
+    let dir = temp_dir("audit-input");
+    let input = dir.join("note.md");
+    fs::write(&input, "---\ntitle: Note\n---\n# Note\n").expect("write input");
+
+    let audited = run(&["audit", input.to_str().expect("utf8 path")]);
+    assert_eq!(audited.status.code(), Some(1));
+    assert_eq!(String::from_utf8_lossy(&audited.stdout), "");
+    let stderr = String::from_utf8_lossy(&audited.stderr);
+    assert!(
+        stderr.starts_with("mdhtml: E-CLI-05: input "),
+        "{stderr}"
+    );
+    assert_eq!(stderr.matches('\n').count(), 1);
+
+    let missing = run(&["audit", dir.join("nope.md.html").to_str().expect("utf8 path")]);
+    assert_eq!(missing.status.code(), Some(1));
+    assert_eq!(String::from_utf8_lossy(&missing.stdout), "");
+    assert_eq!(String::from_utf8_lossy(&missing.stderr).matches('\n').count(), 1);
+    assert!(String::from_utf8_lossy(&missing.stderr).starts_with("mdhtml: E-CLI-05: "));
 }

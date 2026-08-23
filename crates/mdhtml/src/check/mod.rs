@@ -258,15 +258,15 @@ pub fn check_artifact(html: &str) -> CheckReport {
 /// Everything derived from the stored canonical source of an artifact: the
 /// accepted analysis diagnostics, the declared fonts.url, the content-derived
 /// external origins, the referenced asset paths and the source byte length.
-struct StoredAnalysis {
-    diagnostics: Vec<Diagnostic>,
-    fonts_url: Option<String>,
-    origins: Vec<String>,
+pub(crate) struct StoredAnalysis {
+    pub(crate) diagnostics: Vec<Diagnostic>,
+    pub(crate) fonts_url: Option<String>,
+    pub(crate) origins: Vec<String>,
     referenced: Vec<String>,
     content: usize,
 }
 
-fn analyze_stored_source(source: &str) -> StoredAnalysis {
+pub(crate) fn analyze_stored_source(source: &str) -> StoredAnalysis {
     let analysis = analyze_document(source);
     let body = crate::frontmatter::parse_front_matter(source)
         .map(|parsed| parsed.body.to_owned())
@@ -303,7 +303,7 @@ fn content_verdict(analysis: &Analysis, body: &str) -> (bool, usize) {
 
 /// The external origins a `fonts.url` declaration relaxes the CSP for,
 /// mirroring `build::assets::relaxed_csp` exactly.
-fn fonts_origins(fonts: &Fonts) -> (Vec<String>, Option<String>) {
+pub(crate) fn fonts_origins(fonts: &Fonts) -> (Vec<String>, Option<String>) {
     let Fonts::Map { url: Some(url), .. } = fonts else {
         return (Vec::new(), None);
     };
@@ -317,7 +317,7 @@ fn fonts_origins(fonts: &Fonts) -> (Vec<String>, Option<String>) {
 
 /// Collect external origins from artifact-level subresource tags and style
 /// contents in document order.
-fn collect_html_origins(elements: &[Element<'_>], origins: &mut Vec<String>) {
+pub(crate) fn collect_html_origins(elements: &[Element<'_>], origins: &mut Vec<String>) {
     for element in elements {
         match element.name.to_ascii_lowercase().as_str() {
             "script" => collect_attr_origin(element, "src", origins),
@@ -349,7 +349,7 @@ fn collect_attr_origin<'a>(element: &Element<'a>, name: &str, origins: &mut Vec<
     }
 }
 
-fn collect_css_url_origins(css: &str, origins: &mut Vec<String>) {
+pub(crate) fn collect_css_url_origins(css: &str, origins: &mut Vec<String>) {
     let mut rest = css;
     while let Some(start) = rest.find("url(") {
         let after = &rest[start + 4..];
@@ -557,19 +557,19 @@ fn decode_base64(text: &str) -> Vec<u8> {
 
 /// One element of the artifact, scanned structurally: tag name, attributes
 /// and — for raw text elements (`script`, `style`) — the text content.
-struct Element<'a> {
-    name: &'a str,
-    attrs: Vec<(&'a str, &'a str)>,
-    text: Option<&'a str>,
+pub(crate) struct Element<'a> {
+    pub(crate) name: &'a str,
+    pub(crate) attrs: Vec<(&'a str, &'a str)>,
+    pub(crate) text: Option<&'a str>,
 }
 
 impl Element<'_> {
-    fn is(&self, name: &str) -> bool {
+    pub(crate) fn is(&self, name: &str) -> bool {
         self.name.eq_ignore_ascii_case(name)
     }
 }
 
-fn attr<'a>(element: &Element<'a>, name: &str) -> Option<&'a str> {
+pub(crate) fn attr<'a>(element: &Element<'a>, name: &str) -> Option<&'a str> {
     element
         .attrs
         .iter()
@@ -579,7 +579,7 @@ fn attr<'a>(element: &Element<'a>, name: &str) -> Option<&'a str> {
 
 /// Scan every element of the built document in source order, extracting the
 /// raw text of `script` and `style` elements up to their closing tag.
-fn scan_elements(html: &str) -> Vec<Element<'_>> {
+pub(crate) fn scan_elements(html: &str) -> Vec<Element<'_>> {
     let mut elements = Vec::new();
     let mut rest = html;
     while let Some(lt) = rest.find('<') {

@@ -1,0 +1,10 @@
+{
+  "id": "artifact-structure-missing-source",
+  "category": "artifact",
+  "requirement": "PRD-14",
+  "kind": "artifact",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-017",
+  "html": "<!doctype html>\n<html lang=\"en\" data-mdhtml=\"1.0\" data-mdhtml-portable=\"true\" data-mdhtml-safe=\"true\">\n<head>\n  <meta charset=\"utf-8\">\n</head>\n<body>\n  <div id=\"mdhtml-app\"></div>\n</body>\n</html>\n",
+  "detail": "a hand-built artifact without the canonical source script fails the structure check (E-MDHSEC-017)"
+}

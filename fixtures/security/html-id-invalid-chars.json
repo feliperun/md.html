@@ -4,6 +4,7 @@
   "requirement": "PRD-14",
   "status": "invalid",
   "diagnostic": "E-MDHSEC-004",
+  "location": "5:1",
   "source": "---\ntitle: T\n---\n\n# Heading {#bad.id}\n",
   "detail": "heading {#id} override with characters outside [A-Za-z0-9_-]"
 }

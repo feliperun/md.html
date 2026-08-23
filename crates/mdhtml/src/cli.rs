@@ -2,7 +2,7 @@ use std::ffi::{OsStr, OsString};
 use std::fmt;
 use std::path::PathBuf;
 
-const HELP: &str = "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts]\nmdhtml check <file>\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n";
+const HELP: &str = "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\nmdhtml check <file>\nmdhtml audit <file.md.html> [--json]\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n";
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum CliAction {
@@ -18,9 +18,14 @@ pub enum Command {
         output: Option<PathBuf>,
         watch: bool,
         no_fonts: bool,
+        unsafe_mode: bool,
     },
     Check {
         file: PathBuf,
+    },
+    Audit {
+        file: PathBuf,
+        json: bool,
     },
     Extract {
         input: PathBuf,
@@ -98,6 +103,7 @@ where
     match first.to_str() {
         Some("build") => parse_build(&args[1..]).map(CliAction::Command),
         Some("check") => parse_check(&args[1..]).map(CliAction::Command),
+        Some("audit") => parse_audit(&args[1..]).map(CliAction::Command),
         Some("extract") => parse_extract(&args[1..]).map(CliAction::Command),
         Some("new") => parse_new(&args[1..]).map(CliAction::Command),
         Some("themes") => parse_themes(&args[1..]).map(CliAction::Command),
@@ -121,6 +127,7 @@ fn parse_build(args: &[OsString]) -> Result<Command, CliError> {
     let mut output = None;
     let mut watch = false;
     let mut no_fonts = false;
+    let mut unsafe_mode = false;
     let mut options = true;
     let mut index = 0;
 
@@ -132,19 +139,15 @@ fn parse_build(args: &[OsString]) -> Result<Command, CliError> {
             continue;
         }
         if options && is_dash_prefixed(token) {
-            match token.to_str() {
-                Some("--watch") if !watch => watch = true,
-                Some("--watch") => return duplicate("--watch"),
-                Some("--no-fonts") if !no_fonts => no_fonts = true,
-                Some("--no-fonts") => return duplicate("--no-fonts"),
-                Some("-o") => {
-                    if output.is_some() {
-                        return duplicate("-o");
-                    }
-                    output = Some(PathBuf::from(option_value(args, &mut index, token)?));
-                }
-                _ => return unknown_option(token),
-            }
+            parse_build_option(
+                token,
+                &mut output,
+                &mut watch,
+                &mut no_fonts,
+                &mut unsafe_mode,
+                args,
+                &mut index,
+            )?;
         } else {
             set_input(&mut input, token)?;
         }
@@ -157,12 +160,63 @@ fn parse_build(args: &[OsString]) -> Result<Command, CliError> {
         output,
         watch,
         no_fonts,
+        unsafe_mode,
     })
+}
+
+/// One dash-prefixed `build` option: the boolean flags reject duplicates and
+/// `-o` consumes the following token as the output path.
+fn parse_build_option(
+    token: &OsStr,
+    output: &mut Option<PathBuf>,
+    watch: &mut bool,
+    no_fonts: &mut bool,
+    unsafe_mode: &mut bool,
+    args: &[OsString],
+    index: &mut usize,
+) -> Result<(), CliError> {
+    match token.to_str() {
+        Some("--watch") if !*watch => *watch = true,
+        Some("--watch") => return duplicate("--watch"),
+        Some("--no-fonts") if !*no_fonts => *no_fonts = true,
+        Some("--no-fonts") => return duplicate("--no-fonts"),
+        Some("--unsafe") if !*unsafe_mode => *unsafe_mode = true,
+        Some("--unsafe") => return duplicate("--unsafe"),
+        Some("-o") => {
+            if output.is_some() {
+                return duplicate("-o");
+            }
+            *output = Some(PathBuf::from(option_value(args, index, token)?));
+        }
+        _ => return unknown_option(token),
+    }
+    Ok(())
 }
 
 fn parse_check(args: &[OsString]) -> Result<Command, CliError> {
     let file = one_positional(args, "check", "<file>")?;
     Ok(Command::Check { file })
+}
+
+fn parse_audit(args: &[OsString]) -> Result<Command, CliError> {
+    let mut file = None;
+    let mut json = false;
+    let mut options = true;
+    for token in args {
+        if options && token == "--" {
+            options = false;
+        } else if options && is_dash_prefixed(token) {
+            match token.to_str() {
+                Some("--json") if !json => json = true,
+                Some("--json") => return duplicate("--json"),
+                _ => return unknown_option(token),
+            }
+        } else if file.replace(PathBuf::from(token)).is_some() {
+            return Err(CliError::new("audit accepts one positional argument"));
+        }
+    }
+    let file = file.ok_or_else(|| missing_positional("audit", "<file.md.html>"))?;
+    Ok(Command::Audit { file, json })
 }
 
 fn parse_extract(args: &[OsString]) -> Result<Command, CliError> {
@@ -350,13 +404,15 @@ mod tests {
                 "-o",
                 "out",
                 "input.md",
-                "--watch"
+                "--watch",
+                "--unsafe"
             ])),
             Ok(CliAction::Command(Command::Build {
                 input: PathBuf::from("input.md"),
                 output: Some(PathBuf::from("out")),
                 watch: true,
                 no_fonts: true,
+                unsafe_mode: true,
             }))
         );
     }
@@ -370,6 +426,7 @@ mod tests {
                 output: None,
                 watch: false,
                 no_fonts: false,
+                unsafe_mode: false,
             }))
         );
         assert_eq!(
@@ -432,9 +489,14 @@ mod tests {
             vec!["build", "-o", "a", "--output", "b", "input"],
             vec!["build", "--watch", "--watch", "input"],
             vec!["build", "--no-fonts", "--no-fonts", "input"],
+            vec!["build", "--unsafe", "--unsafe", "input"],
             vec!["check"],
             vec!["check", "--bad"],
             vec!["check", "a", "b"],
+            vec!["audit"],
+            vec!["audit", "--bad", "a"],
+            vec!["audit", "a", "b"],
+            vec!["audit", "a", "--json", "--json"],
             vec!["extract"],
             vec!["extract", "--assets"],
             vec!["extract", "--assets", "a", "--assets", "b", "input"],
@@ -452,6 +514,59 @@ mod tests {
                 "accepted invalid args: {case:?}"
             );
         }
+    }
+
+    #[test]
+    fn help_lists_the_unsafe_flag_on_the_build_usage_line() {
+        assert!(help_text().contains(
+            "mdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\n"
+        ));
+    }
+
+    #[test]
+    fn parses_audit_file_and_json_flag() {
+        assert_eq!(
+            parse_args(args(&["audit", "note.md.html"])),
+            Ok(CliAction::Command(Command::Audit {
+                file: PathBuf::from("note.md.html"),
+                json: false,
+            }))
+        );
+        assert_eq!(
+            parse_args(args(&["audit", "note.md.html", "--json"])),
+            Ok(CliAction::Command(Command::Audit {
+                file: PathBuf::from("note.md.html"),
+                json: true,
+            }))
+        );
+        assert_eq!(
+            parse_args(args(&["audit", "--json", "note.md.html"])),
+            Ok(CliAction::Command(Command::Audit {
+                file: PathBuf::from("note.md.html"),
+                json: true,
+            }))
+        );
+    }
+
+    #[test]
+    fn audit_rejects_duplicate_json_and_missing_positional() {
+        assert_eq!(
+            parse_args(args(&["audit", "a.md.html", "--json", "--json"]))
+                .expect_err("duplicate --json")
+                .to_string(),
+            "mdhtml: E-CLI-05: duplicate option --json"
+        );
+        assert_eq!(
+            parse_args(args(&["audit"])).expect_err("missing positional").to_string(),
+            "mdhtml: E-CLI-05: audit requires <file.md.html>"
+        );
+    }
+
+    #[test]
+    fn help_lists_the_audit_usage_line() {
+        assert!(help_text().contains(
+            "mdhtml audit <file.md.html> [--json]\n"
+        ));
     }
 
     #[test]

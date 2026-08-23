@@ -8,6 +8,14 @@ pub mod html;
 /// One policy violation carrying its frozen diagnostic code (Tech Spec
 /// addendum "Frozen security diagnostic codes") and, when cheaply available,
 /// the 1-based source position of the offending construct.
+///
+/// Cheap-position boundary: links, images, heading `{#id}` overrides,
+/// section/class tokens, asset paths/SVG references (the reference position
+/// in the document, never a position inside SVG asset bytes — a different
+/// frame than the document) and CSS parse failures carry positions.
+/// Front-matter-sourced values (`E-MDHSEC-005` metadata `url`, `-006`
+/// `fonts.url`, `cover`) have no line map in `parse_front_matter` and stay
+/// `None`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Violation {
     pub code: &'static str,
@@ -24,6 +32,16 @@ impl Violation {
             line: None,
             column: None,
         }
+    }
+
+    /// Attach the 1-based source position of the offending construct. Guards
+    /// stay position-agnostic; the caller holding scanner evidence or a parser
+    /// location attaches it. Document-level violations cite the canonical
+    /// source; CSS violations cite the local `.theme.css`.
+    pub fn at(mut self, line: usize, column: usize) -> Self {
+        self.line = Some(line);
+        self.column = Some(column);
+        self
     }
 }
 

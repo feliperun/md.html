@@ -1,0 +1,12 @@
+{
+  "id": "unsafe-css-network",
+  "category": "unsafe",
+  "requirement": "PRD-14",
+  "status": "unsafe",
+  "diagnostic": "E-MDHSEC-009",
+  "source": "---\ntitle: T\ntheme: network.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "network.theme.css": "OnJvb3QgeyBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoImh0dHBzOi8vZXZpbC5leGFtcGxlL3BpeGVsLnBuZyIpOyB9"
+  },
+  "detail": "network url() in a local theme builds only with --unsafe and is marked unsafe"
+}

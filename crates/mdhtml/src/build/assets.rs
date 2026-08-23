@@ -8,9 +8,11 @@ use std::path::Path;
 
 use crate::analysis::{Analysis, Fonts, NormalizedConfig};
 use crate::build::BuildError;
+use crate::build::{column_of, locate_in_source, security_error};
 use crate::frontmatter::Value;
 use crate::scanner::scan_document;
 use crate::security;
+use crate::security::Violation;
 use crate::selection::{Catalog, select_faces};
 
 /// Closed extension → MIME mapping (SPEC §14). Anything else is E-CLI-01.
@@ -42,22 +44,23 @@ pub struct Asset {
 /// `fonts.body`/`fonts.mono` when fonts is a map. Distinct `data-path` values
 /// embed exactly once, in first-reference order. Missing files and
 /// out-of-table extensions fail with E-CLI-01 before any output. Every path
-/// that proceeds to embedding must be extraction-safe (`E-MDHSEC-014`) and
-/// every embedded SVG asset must pass the structural guard (`E-MDHSEC-011`/
-/// `-001`/`-013`), both before any output; the exact original bytes are
-/// embedded.
+/// that proceeds to embedding must be extraction-safe (`E-MDHSEC-014`) in
+/// both modes; every embedded SVG asset must pass the structural guard
+/// (`E-MDHSEC-011`/`-001`/`-013`) unless `unsafe_mode` disables the
+/// content-security guards (ADR 0009) — all before any output; the exact
+/// original bytes are embedded.
 pub fn embed_assets(
+    source: &str,
     body: &str,
+    line_offset: usize,
     analysis: &Analysis,
     source_dir: &Path,
+    unsafe_mode: bool,
 ) -> Result<Vec<Asset>, BuildError> {
     let mut assets = Vec::new();
     for path in collect_asset_paths(body, analysis) {
         if !security::is_safe_relative_path(&path) {
-            return Err(BuildError::new(
-                "E-MDHSEC-014",
-                format!("asset path '{path}' is not a safe relative path"),
-            ));
+            return Err(asset_path_error(source, body, line_offset, &path));
         }
         let mime = mime_for_path(&path)?;
         let bytes = fs::read(source_dir.join(&path)).map_err(|error| {
@@ -66,13 +69,14 @@ pub fn embed_assets(
                 format!("asset '{path}' is unresolvable: {error}"),
             )
         })?;
-        if mime == "image/svg+xml" {
+        if mime == "image/svg+xml" && !unsafe_mode {
             let markup = String::from_utf8_lossy(&bytes);
-            security::html::validate_svg(&markup).map_err(|violation| {
-                BuildError::new(
-                    violation.code,
-                    format!("asset '{path}': {}", violation.message),
-                )
+            security::html::validate_svg(&markup).map_err(|mut violation| {
+                if let Some((line, column)) = reference_position(body, line_offset, &path) {
+                    violation = violation.at(line, column);
+                }
+                violation.message = format!("asset '{path}': {}", violation.message);
+                security_error(violation, source, Some(&path))
             })?;
         }
         assets.push(Asset {
@@ -82,6 +86,35 @@ pub fn embed_assets(
         });
     }
     Ok(assets)
+}
+
+/// The E-MDHSEC-014 error for an unsafe asset path, citing the reference
+/// position of the path in the document (the first scanner image evidence
+/// with that destination) or, for front-matter-sourced paths without a
+/// reference, the located path string in the canonical source.
+fn asset_path_error(source: &str, body: &str, line_offset: usize, path: &str) -> BuildError {
+    let violation = Violation::new(
+        "E-MDHSEC-014",
+        format!("asset path '{path}' is not a safe relative path"),
+    );
+    let violation = match reference_position(body, line_offset, path)
+        .or_else(|| locate_in_source(source, path))
+    {
+        Some((line, column)) => violation.at(line, column),
+        None => violation,
+    };
+    security_error(violation, source, Some(path))
+}
+
+/// The 1-based canonical-source position of the first scanner image evidence
+/// referencing `path`; `None` when the document has no such reference.
+fn reference_position(body: &str, line_offset: usize, path: &str) -> Option<(usize, usize)> {
+    let evidence = scan_document(body);
+    evidence
+        .images
+        .iter()
+        .find(|image| image.destination == path)
+        .map(|image| (image.line + line_offset, column_of(body, image.offset)))
 }
 
 fn collect_asset_paths(body: &str, analysis: &Analysis) -> Vec<String> {

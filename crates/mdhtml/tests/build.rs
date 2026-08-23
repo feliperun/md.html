@@ -89,7 +89,7 @@ fn template_assembles_the_fmt01_skeleton() {
     let source = fs::read_to_string(fixture_path()).expect("read template fixture");
 
     assert!(html.starts_with("<!doctype html>\n"));
-    assert!(html.contains("<html lang=\"en\" data-mdhtml=\"1.0\" data-mdhtml-portable=\"true\">"));
+    assert!(html.contains("<html lang=\"en\" data-mdhtml=\"1.0\" data-mdhtml-portable=\"true\" data-mdhtml-safe=\"true\">"));
     assert!(html.contains("<meta charset=\"utf-8\">"));
     assert!(
         html.contains("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
@@ -226,7 +226,7 @@ fn tokens_render_as_escaped_custom_properties() {
 #[test]
 fn lang_defaults_to_en_and_metadata_values_are_html_escaped() {
     let html = build_source("---\ntitle: A & <title> \"quoted\"\n---\n# Body\n").expect("builds");
-    assert!(html.contains("<html lang=\"en\" data-mdhtml=\"1.0\" data-mdhtml-portable=\"true\">"));
+    assert!(html.contains("<html lang=\"en\" data-mdhtml=\"1.0\" data-mdhtml-portable=\"true\" data-mdhtml-safe=\"true\">"));
     assert!(html.contains("<title>A &amp; &lt;title&gt; &quot;quoted&quot;</title>"));
     assert!(html.contains(
         "<meta property=\"og:title\" content=\"A &amp; &lt;title&gt; &quot;quoted&quot;\">"

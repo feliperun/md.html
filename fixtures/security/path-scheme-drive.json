@@ -4,6 +4,7 @@
   "requirement": "PRD-14",
   "status": "invalid",
   "diagnostic": "E-MDHSEC-014",
+  "location": "4:3",
   "source": "---\ntitle: T\nfigures:\n  C:\\x.png: { align: right }\n---\n\n# Body\n",
   "detail": "drive-letter figures key rejected as a URL-scheme path before any file is read"
 }

@@ -1,0 +1,12 @@
+{
+  "id": "artifact-unsafe-marked",
+  "category": "artifact",
+  "requirement": "PRD-14",
+  "kind": "artifact",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-018",
+  "location": "5:1",
+  "source": "---\ntitle: Unsafe\n---\n\n[click](javascript:alert(1))\n",
+  "unsafe": true,
+  "detail": "an --unsafe build attests data-mdhtml-safe=false and audit reports E-MDHSEC-018"
+}

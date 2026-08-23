@@ -1,0 +1,10 @@
+{
+  "id": "artifact-structure-bad-identity",
+  "category": "artifact",
+  "requirement": "PRD-14",
+  "kind": "artifact",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-017",
+  "html": "<!doctype html>\n<html lang=\"en\" data-mdhtml-portable=\"true\" data-mdhtml-safe=\"true\">\n<head>\n  <meta charset=\"utf-8\">\n</head>\n<body>\n  <div id=\"mdhtml-app\"></div>\n</body>\n</html>\n",
+  "detail": "a document whose root lacks data-mdhtml=\"1.0\" fails the artifact identity check (E-MDHSEC-017)"
+}

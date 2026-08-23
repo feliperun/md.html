@@ -4,6 +4,7 @@
   "requirement": "PRD-14",
   "status": "invalid",
   "diagnostic": "E-MDHSEC-012",
+  "location": "5:1",
   "source": "---\ntitle: T\n---\n\n[click](data:text/html;base64,PHN2Zy8+)\n",
   "detail": "data: destination in a Markdown link href"
 }
