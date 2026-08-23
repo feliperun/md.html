@@ -179,6 +179,7 @@ fn document_assets_fixture_derives_og_image_and_declares_non_portable_csp() {
         )
     );
     assert!(html.contains("data-mdhtml-portable=\"false\""));
+    assert!(html.contains("data-mdhtml-safe=\"true\""));
     assert_eq!(
         csp_of(&html),
         mdhtml::build::assets::relaxed_csp(
@@ -335,6 +336,7 @@ fn fonts_url_relaxes_the_csp_only_for_the_declared_origins() {
     let google = "---\ntitle: NP\nfonts:\n  url: https://fonts.googleapis.com/css2?family=Instrument+Sans\n---\n# Body\n";
     let html = build_source(google).expect("builds");
     assert!(html.contains("data-mdhtml-portable=\"false\""));
+    assert!(html.contains("data-mdhtml-safe=\"true\""));
     assert_eq!(
         csp_of(&html),
         mdhtml::build::assets::relaxed_csp(
@@ -358,6 +360,7 @@ fn default_build_stays_portable_with_the_canonical_csp() {
     let source = "---\ntitle: Portable\n---\n# Body\n";
     let html = build_source(source).expect("builds");
     assert!(html.contains("data-mdhtml-portable=\"true\""));
+    assert!(html.contains("data-mdhtml-safe=\"true\""));
     assert_eq!(
         csp_of(&html),
         mdhtml::build::canonical_csp(&runtime_hash_of(&html))

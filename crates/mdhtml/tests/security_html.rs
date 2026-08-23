@@ -36,6 +36,7 @@ struct SecurityFixture {
     id: String,
     status: String,
     diagnostic: Option<String>,
+    location: Option<String>,
     source: String,
     assets: Vec<(String, Vec<u8>)>,
 }
@@ -218,6 +219,7 @@ fn load_fixture(path: &Path) -> SecurityFixture {
     let status = string_field(&object, "status").expect("fixture status");
     let source = string_field(&object, "source").expect("fixture source");
     let diagnostic = string_field(&object, "diagnostic");
+    let location = string_field(&object, "location");
     let mut assets = Vec::new();
     if let Some(Json::Obj(entries)) = field(&object, "assets") {
         for (name, value) in entries {
@@ -231,6 +233,7 @@ fn load_fixture(path: &Path) -> SecurityFixture {
         id,
         status,
         diagnostic,
+        location,
         source,
         assets,
     }
@@ -291,6 +294,17 @@ fn url_and_html_cases_reject_or_build_with_the_frozen_diagnostics() {
                     "{} must fail with exactly {expected}",
                     fixture.id
                 );
+                if let Some(location) = &fixture.location {
+                    let (line, column) = location
+                        .split_once(':')
+                        .expect("fixture location is LINE:COLUMN");
+                    assert!(
+                        error.to_string().contains(&format!("(line {line}, column {column})")),
+                        "{} must cite line {line}, column {column} in its message: {}",
+                        fixture.id,
+                        error
+                    );
+                }
             }
             "valid" => {
                 result.expect(&format!("{} must build cleanly", fixture.id));
@@ -427,5 +441,46 @@ fn svg_assets_reject_executables_handlers_and_external_references() {
     assert_eq!(
         validate_svg("<svg><image href=\"local.png\"/></svg>"),
         Ok(())
+    );
+}
+
+#[test]
+fn located_violations_render_the_prd14_excerpt_block() {
+    let dir = std::env::temp_dir().join(format!("mdhtml-security-html-{}", std::process::id()));
+    fs::create_dir_all(&dir).expect("create temp dir");
+
+    // One URL violation: the destination starts at line 5, column 1, and the
+    // caret spans the destination substring within the cited source line.
+    let url_source = "---\ntitle: T\n---\n\n[click](javascript:alert(1))\n";
+    let url_error = build(
+        url_source,
+        &dir,
+        &runtime_dist(),
+        &themes_dir(),
+        &fonts_dir(),
+    )
+    .expect_err("unsafe link scheme fails the build");
+    assert_eq!(
+        url_error.to_string(),
+        "mdhtml: E-MDHSEC-012: unsafe URI scheme in destination \"javascript:alert(1)\" \
+         (line 5, column 1)\n    [click](javascript:alert(1))\n            \
+         ^^^^^^^^^^^^^^^^^^^"
+    );
+
+    // One identifier violation: the {#id} override is on line 5, column 1,
+    // and the caret spans the offending token within the cited source line.
+    let id_source = "---\ntitle: T\n---\n\n# Heading {#bad.id}\n";
+    let id_error = build(
+        id_source,
+        &dir,
+        &runtime_dist(),
+        &themes_dir(),
+        &fonts_dir(),
+    )
+    .expect_err("invalid heading id fails the build");
+    assert_eq!(
+        id_error.to_string(),
+        "mdhtml: E-MDHSEC-004: identifier \"bad.id\" must match [A-Za-z0-9_-]+ \
+         (line 5, column 1)\n    # Heading {#bad.id}\n                ^^^^^^"
     );
 }

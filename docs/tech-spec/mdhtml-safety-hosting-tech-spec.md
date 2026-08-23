@@ -462,6 +462,7 @@ reused, and follow the `E-MDHSEC-NNN` shape (the PRD §14 display examples
 | `E-MDHSEC-016` | csp | CSP assembly violation (missing or contradictory policy) |
 | `E-MDHSEC-017` | artifact | structure or mutation violation in a built artifact (audit) |
 | `E-MDHSEC-018` | unsafe | artifact is marked unsafe (audit reports it; hosting rejects it) |
+| `W-MDHSEC-019` | unsafe | `--unsafe` build warning: security guards disabled and artifact marked unsafe (CLI stderr, ADR 0009) |
 
 Guard semantics note: wherever ADR 0006/0008 say a construct is "dropped",
 the implementation rejects it with the corresponding code above — silent

@@ -332,6 +332,47 @@ fn fonts_url_artifact_is_consistently_non_portable() {
 }
 
 #[test]
+fn artifacts_declare_the_safe_attestation_and_unsafe_builds_still_check_clean() {
+    let safe_source = "---\ntitle: Safe\n---\n# Body\n";
+    let safe = build(
+        &safe_source,
+        &fixture_dir(),
+        &runtime_dist(),
+        &themes_dir(),
+        &fonts_dir(),
+    )
+    .expect("safe build");
+    assert!(
+        safe.contains("data-mdhtml-safe=\"true\""),
+        "every safe build attests data-mdhtml-safe=\"true\""
+    );
+    let safe_report = check_artifact(&safe);
+    assert!(!safe_report.has_errors(), "{:?}", safe_report.diagnostics);
+    assert!(safe_report.diagnostics.is_empty(), "{:?}", safe_report.diagnostics);
+
+    let unsafe_source =
+        "---\ntitle: Unsafe\n---\n\n[click](javascript:alert(1))\n";
+    let unsafe_html = mdhtml::build::build_unsafe(
+        &unsafe_source,
+        &fixture_dir(),
+        &runtime_dist(),
+        &themes_dir(),
+        &fonts_dir(),
+    )
+    .expect("unsafe build");
+    assert!(
+        unsafe_html.contains("data-mdhtml-safe=\"false\""),
+        "an unsafe build attests data-mdhtml-safe=\"false\""
+    );
+    let unsafe_report = check_artifact(&unsafe_html);
+    assert!(
+        !unsafe_report.has_errors(),
+        "mdhtml check stays green on an unsafe artifact: {:?}",
+        unsafe_report.diagnostics
+    );
+}
+
+#[test]
 fn artifact_missing_the_source_script_reports_e_fmt_01() {
     let html = "<!doctype html>\n<html lang=\"en\" data-mdhtml=\"1.0\" data-mdhtml-portable=\"true\">\n<head></head>\n<body></body>\n</html>\n";
     let report = check_artifact(html);

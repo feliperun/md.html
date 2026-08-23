@@ -1,0 +1,9 @@
+{
+  "id": "artifact-valid",
+  "category": "artifact",
+  "requirement": "PRD-14",
+  "kind": "artifact",
+  "status": "valid",
+  "source": "---\ntitle: Valid artifact\n---\n\n# Body\n",
+  "detail": "a clean safe build audits SAFE with an empty externalResources list"
+}

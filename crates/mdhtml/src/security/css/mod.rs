@@ -15,10 +15,17 @@
 //! consumed by the parser's encoding detection before the typed AST exists;
 //! it is inert on an already-decoded UTF-8 stylesheet and cannot reach the
 //! output.
+//!
+//! Location boundary: parse failures and `@import`/`@namespace` rules carry
+//! their parser-computed location (the alpha.72 `Error.loc` and
+//! `ImportRule.loc`/`NamespaceRule.loc`, 1-based line/column relative to the
+//! local `.theme.css`) and violations attach it. Visitor-classified
+//! violations without a location field in the typed AST — unknown at-rules,
+//! `url()` and `@font-face` — stay `None`.
 
 use std::convert::Infallible;
 
-use lightningcss::error::ParserError;
+use lightningcss::error::{ErrorLocation, ParserError};
 use lightningcss::rules::CssRule;
 use lightningcss::rules::font_face::{FontFaceProperty, FontFaceRule};
 use lightningcss::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
@@ -39,7 +46,7 @@ pub fn guard_author_css(css: &str) -> Result<String, Violation> {
             ..ParserOptions::default()
         },
     )
-    .map_err(|error| parse_violation(error.kind))?;
+    .map_err(|error| parse_violation(error.kind, error.loc))?;
 
     let mut guard = CssGuard::default();
     guard
@@ -76,9 +83,11 @@ fn contains_style_terminator(css: &str) -> bool {
 /// Map a lightningcss parse failure onto the frozen codes: an out-of-position
 /// `@import`/`@namespace` is reported by the parser as `UnexpectedImportRule`/
 /// `UnexpectedNamespaceRule` and must classify as `E-MDHSEC-008`; every other
-/// failure is a genuinely malformed stylesheet and is `E-MDHSEC-007`.
-fn parse_violation(error: ParserError<'_>) -> Violation {
-    match error {
+/// failure is a genuinely malformed stylesheet and is `E-MDHSEC-007`. The
+/// parse location (`loc`, 0-based line / 1-based column) is attached when
+/// present, relative to the local `.theme.css`.
+fn parse_violation(error: ParserError<'_>, loc: Option<ErrorLocation>) -> Violation {
+    let violation = match error {
         ParserError::UnexpectedImportRule => {
             Violation::new("E-MDHSEC-008", "author CSS must not contain @import")
         }
@@ -86,6 +95,10 @@ fn parse_violation(error: ParserError<'_>) -> Violation {
             Violation::new("E-MDHSEC-008", "author CSS must not contain @namespace")
         }
         _ => Violation::new("E-MDHSEC-007", "author CSS fails to parse (fail closed)"),
+    };
+    match loc {
+        Some(loc) => violation.at(loc.line as usize + 1, loc.column as usize),
+        None => violation,
     }
 }
 
@@ -110,14 +123,14 @@ fn rule_violation(rule: &CssRule) -> Option<Violation> {
         | CssRule::CounterStyle(_)
         | CssRule::NestedDeclarations(_) => None,
         CssRule::FontFace(face) => font_face_violation(face),
-        CssRule::Import(_) => Some(Violation::new(
-            "E-MDHSEC-008",
-            "author CSS must not contain @import",
-        )),
-        CssRule::Namespace(_) => Some(Violation::new(
-            "E-MDHSEC-008",
-            "author CSS must not contain @namespace",
-        )),
+        CssRule::Import(import) => Some(
+            Violation::new("E-MDHSEC-008", "author CSS must not contain @import")
+                .at(import.loc.line as usize + 1, import.loc.column as usize),
+        ),
+        CssRule::Namespace(namespace) => Some(
+            Violation::new("E-MDHSEC-008", "author CSS must not contain @namespace")
+                .at(namespace.loc.line as usize + 1, namespace.loc.column as usize),
+        ),
         CssRule::Unknown(unknown) => Some(Violation::new(
             "E-MDHSEC-008",
             format!("author CSS must not contain the @{} at-rule", unknown.name),

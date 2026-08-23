@@ -22,7 +22,7 @@ fn help_and_version_are_stdout_successes() {
     assert_eq!(String::from_utf8_lossy(&help.stderr), "");
     assert_eq!(
         String::from_utf8_lossy(&help.stdout),
-        "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts]\nmdhtml check <file>\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n"
+        "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\nmdhtml check <file>\nmdhtml audit <file.md.html> [--json]\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n"
     );
 
     let version = run(&["-V"]);
@@ -67,6 +67,9 @@ fn invalid_arguments_are_one_line_stderr_errors() {
         &["build"] as &[&str],
         &["build", "--unknown", "input.md"] as &[&str],
         &["--watch"] as &[&str],
+        &["audit"] as &[&str],
+        &["audit", "a.md.html", "--json", "--json"] as &[&str],
+        &["audit", "a.md.html", "b.md.html"] as &[&str],
     ];
     for args in cases {
         let output = run(&args);

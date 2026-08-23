@@ -17,8 +17,10 @@ pub fn dispatch(command: Command) -> Result<String, BuildError> {
             output,
             watch,
             no_fonts,
-        } => build(input, output, watch, no_fonts),
+            unsafe_mode,
+        } => build(input, output, watch, no_fonts, unsafe_mode),
         Command::Check { file } => check(file),
+        Command::Audit { file, json } => audit(file, json),
         Command::Extract {
             input,
             output,
@@ -34,9 +36,10 @@ fn build(
     output: Option<PathBuf>,
     watch_flag: bool,
     no_fonts: bool,
+    unsafe_mode: bool,
 ) -> Result<String, BuildError> {
     if watch_flag {
-        return watch(input, output, no_fonts);
+        return watch(input, output, no_fonts, unsafe_mode);
     }
     let source = read_source(&input)?;
     let source_dir = parent_dir(&input);
@@ -45,13 +48,26 @@ fn build(
         &source,
         &source_dir,
         no_fonts,
+        unsafe_mode,
         &runtime_dir,
         &themes_dir,
         &fonts_dir,
     )?;
+    if unsafe_mode {
+        warn_unsafe_build();
+    }
     let destination = output.unwrap_or_else(|| append_html(&input));
     write_atomic(&destination, document.as_bytes())?;
     Ok(String::new())
+}
+
+/// W-MDHSEC-019: the one CLI-05 warning an unsafe build prints to stderr,
+/// before the build reports success (ADR 0009).
+fn warn_unsafe_build() {
+    eprintln!(
+        "mdhtml: W-MDHSEC-019: --unsafe disables the security guards; \
+         this artifact is marked unsafe and will fail mdhtml audit"
+    );
 }
 
 fn read_source(input: &Path) -> Result<String, BuildError> {
@@ -83,14 +99,20 @@ fn build_document(
     source: &str,
     source_dir: &Path,
     no_fonts: bool,
+    unsafe_mode: bool,
     runtime_dir: &Path,
     themes_dir: &Path,
     fonts_dir: &Path,
 ) -> Result<String, BuildError> {
-    if no_fonts {
-        build::build_no_fonts(source, source_dir, runtime_dir, themes_dir, fonts_dir)
-    } else {
-        build::build(source, source_dir, runtime_dir, themes_dir, fonts_dir)
+    match (no_fonts, unsafe_mode) {
+        (false, false) => build::build(source, source_dir, runtime_dir, themes_dir, fonts_dir),
+        (true, false) => {
+            build::build_no_fonts(source, source_dir, runtime_dir, themes_dir, fonts_dir)
+        }
+        (false, true) => build::build_unsafe(source, source_dir, runtime_dir, themes_dir, fonts_dir),
+        (true, true) => {
+            build::build_unsafe_no_fonts(source, source_dir, runtime_dir, themes_dir, fonts_dir)
+        }
     }
 }
 
@@ -100,7 +122,12 @@ fn build_document(
 /// partial: every write is temp + rename, so termination by SIGINT/SIGTERM
 /// cannot corrupt it. A failed rebuild reports one CLI-05 line and the last
 /// good destination stays in place.
-fn watch(input: PathBuf, output: Option<PathBuf>, no_fonts: bool) -> Result<String, BuildError> {
+fn watch(
+    input: PathBuf,
+    output: Option<PathBuf>,
+    no_fonts: bool,
+    unsafe_mode: bool,
+) -> Result<String, BuildError> {
     let destination = output.unwrap_or_else(|| append_html(&input));
     let source_dir = parent_dir(&input);
     let (runtime_dir, themes_dir, fonts_dir) = repository_layout();
@@ -115,10 +142,14 @@ fn watch(input: PathBuf, output: Option<PathBuf>, no_fonts: bool) -> Result<Stri
         &initial,
         &source_dir,
         no_fonts,
+        unsafe_mode,
         &runtime_dir,
         &themes_dir,
         &fonts_dir,
     )?;
+    if unsafe_mode {
+        warn_unsafe_build();
+    }
     write_atomic(&destination, document.as_bytes())?;
     loop {
         thread::sleep(WATCH_POLL_INTERVAL);
@@ -147,11 +178,17 @@ fn watch(input: PathBuf, output: Option<PathBuf>, no_fonts: bool) -> Result<Stri
             &source,
             &source_dir,
             no_fonts,
+            unsafe_mode,
             &runtime_dir,
             &themes_dir,
             &fonts_dir,
         )
-        .and_then(|document| write_atomic(&destination, document.as_bytes()).map(|_| ()));
+        .and_then(|document| {
+            if unsafe_mode {
+                warn_unsafe_build();
+            }
+            write_atomic(&destination, document.as_bytes()).map(|_| ())
+        });
         if let Err(error) = rebuilt {
             eprintln!("{error}");
         }
@@ -314,6 +351,52 @@ fn check(input: std::path::PathBuf) -> Result<String, BuildError> {
     } else {
         Ok(String::new())
     }
+}
+
+/// CLI-06: audit a BUILT `.md.html` artifact — never the source — and
+/// print the PRD §13 check lines or the frozen `--json` schema. A failed
+/// audit still prints the full report to stdout, then returns E-CLI-06 so
+/// the process exits 1 with that single stderr line (the exact pattern
+/// `check` uses with E-CLI-02); unreadable, non-UTF-8 or non-`.md.html`
+/// input is E-CLI-05.
+fn audit(input: PathBuf, json: bool) -> Result<String, BuildError> {
+    let bytes = fs::read(&input).map_err(|error| {
+        BuildError::new(
+            "E-CLI-05",
+            format!("input {} is unreadable: {error}", input.display()),
+        )
+    })?;
+    let text = String::from_utf8(bytes).map_err(|_| {
+        BuildError::new(
+            "E-CLI-05",
+            format!("input {} is not valid UTF-8", input.display()),
+        )
+    })?;
+    if !is_mdhtml_artifact(&input) {
+        return Err(BuildError::new(
+            "E-CLI-05",
+            format!("input {} is not a built .md.html artifact", input.display()),
+        ));
+    }
+    let report = crate::audit::audit_artifact(&text);
+    if json {
+        print!("{}", report.render_json());
+    } else {
+        print!("{}", report.render());
+    }
+    if report.safe {
+        Ok(String::new())
+    } else {
+        Err(BuildError::new("E-CLI-06", "artifact failed audit"))
+    }
+}
+
+/// Audit accepts only `.md.html` artifacts (CLI-06), unlike `check` which
+/// also validates `.md` sources.
+fn is_mdhtml_artifact(path: &Path) -> bool {
+    path.file_name()
+        .and_then(|name| name.to_str())
+        .is_some_and(|name| name.to_ascii_lowercase().ends_with(".md.html"))
 }
 
 fn is_artifact(path: &Path) -> bool {

@@ -55,7 +55,7 @@ Example skeleton:
 
 ```html
 <!doctype html>
-<html lang="en" data-mdhtml="1.0" data-mdhtml-portable="true">
+<html lang="en" data-mdhtml="1.0" data-mdhtml-portable="true" data-mdhtml-safe="true">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -665,13 +665,14 @@ and embeds each as an asset block:
 - A missing asset file at build time is diagnostic `E-CLI-01` and fails without
   writing output.
 
-## 15. CLI contract (CLI-01…CLI-05)
+## 15. CLI contract (CLI-01…CLI-06)
 
 Interface:
 
 ```text
-mdhtml build <in.md> [-o out] [--watch] [--no-fonts]
+mdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]
 mdhtml check <file>            # .md or .md.html
+mdhtml audit <file.md.html> [--json]
 mdhtml extract <in.md.html> [-o out.md] [--assets dir]
 mdhtml new <name> [--template resume|memo|spec|recipe|chapter]
 mdhtml themes
@@ -687,6 +688,19 @@ mdhtml themes
   untouched — never a partial or truncated `.md.html`.
 - `</script` input (FMT-02), unresolvable assets, out-of-table MIME, invalid
   front matter, and a missing `title` all fail before any output is written.
+- Safe by default: `--unsafe` is the only escape hatch (ADR 0009) and MUST be
+  spelled explicitly; it is never on by default.
+- `--unsafe` disables exactly the content-security guards (HTML, CSS, URL,
+  resource) and keeps format, toolchain, and asset-integrity validations —
+  the `</script` terminator (E-FMT-02), the extraction-safe asset path
+  predicate (E-MDHSEC-014), front-matter/analysis errors, selection/manifest
+  errors, and the runtime-hash CSP computation all still run.
+- Every artifact carries the attestation on the root element:
+  `data-mdhtml-safe="true"` for safe builds, `data-mdhtml-safe="false"` for
+  `--unsafe` builds. An artifact without the attribute did not come from this
+  toolchain version and audit treats it as unsafe.
+- An unsafe build prints one CLI-05 warning line to stderr (W-MDHSEC-019)
+  before reporting success; official hosting rejects unsafe artifacts.
 
 ### CLI-02 — check
 
@@ -723,6 +737,32 @@ mdhtml themes
 - User-facing errors MUST be short and actionable: one line, no stack traces,
   no internal URLs, no environment-variable names.
 - Message format: `mdhtml: <code>: <message>`.
+- Security violations with a known location append ` (line L, column C)` to
+  `<message>` and may print the indented excerpt and caret line after the
+  one-line form; the first line's format is unchanged.
+
+### CLI-06 — audit
+
+- `audit` inspects a built artifact only — never the source. It re-runs the
+  located guards over the stored source and structurally over the artifact
+  markup; it never rebuilds.
+- Per-category checks: structure/identity (`E-MDHSEC-017`), stored-source
+  integrity (analysis with zero `Error` diagnostics), HTML policy
+  (`E-MDHSEC-001`/`-002`/`-003` as applicable), CSS policy
+  (`E-MDHSEC-007`..`-010`), runtime integrity (`E-MDHSEC-015` hash mismatch,
+  `E-MDHSEC-016` missing/contradictory CSP), external resources, and the
+  `data-mdhtml-safe` attestation (`E-MDHSEC-018` when `"false"` or absent).
+- Human output follows PRD §13: one `✓`/`✗` line per check, closing with
+  `SAFE` or `UNSAFE`; a failed check prints its `✗` line followed by the
+  located diagnostic block(s).
+- `--json` prints the frozen schema in exact field order:
+  `{"safe":bool,"specVersion":"1.0","sourceIntegrity":bool,"html":"pass"|"fail","css":"pass"|"fail","runtime":"pass"|"fail","externalResources":[]}`,
+  where `externalResources` lists the distinct external origins
+  (`scheme://host[:port]`) in document order and `safe` is the conjunction of
+  every category passing plus a true attestation.
+- Exit codes: `0` when safe; `1` when not safe (full report on stdout, then a
+  single `E-CLI-06: artifact failed audit` line on stderr). Unreadable,
+  non-UTF-8, or non-`.md.html` input fails with `E-CLI-05`.
 
 ## 16. Diagnostics
 
@@ -751,6 +791,8 @@ Enumerated codes:
 | `W-COMP-02` | container/component out of convention |
 | `E-CLI-01` | unresolvable asset or out-of-table MIME |
 | `E-CLI-03` | unsafe path, invalid base64, duplicate asset path, existing target file |
+| `E-CLI-06` | artifact failed audit |
+| `W-MDHSEC-019` | `--unsafe` build: security guards disabled; artifact marked unsafe |
 | `W-UI-04` | missing embedded asset (hand-edited artifact) |
 | `I-CLI-02` | portability + byte-budget report |
 

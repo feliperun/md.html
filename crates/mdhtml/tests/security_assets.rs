@@ -36,6 +36,7 @@ struct SecurityFixture {
     id: String,
     status: String,
     diagnostic: Option<String>,
+    location: Option<String>,
     source: String,
     assets: Vec<(String, Vec<u8>)>,
 }
@@ -218,6 +219,7 @@ fn load_fixture(path: &Path) -> SecurityFixture {
     let status = string_field(&object, "status").expect("fixture status");
     let source = string_field(&object, "source").expect("fixture source");
     let diagnostic = string_field(&object, "diagnostic");
+    let location = string_field(&object, "location");
     let mut assets = Vec::new();
     if let Some(Json::Obj(entries)) = field(&object, "assets") {
         for (name, value) in entries {
@@ -231,6 +233,7 @@ fn load_fixture(path: &Path) -> SecurityFixture {
         id,
         status,
         diagnostic,
+        location,
         source,
         assets,
     }
@@ -329,6 +332,17 @@ fn svg_and_path_cases_reject_or_build_with_the_frozen_diagnostics() {
                     "{} must fail with exactly {expected}",
                     fixture.id
                 );
+                if let Some(location) = &fixture.location {
+                    let (line, column) = location
+                        .split_once(':')
+                        .expect("fixture location is LINE:COLUMN");
+                    assert!(
+                        error.to_string().contains(&format!("(line {line}, column {column})")),
+                        "{} must cite line {line}, column {column} in its message: {}",
+                        fixture.id,
+                        error
+                    );
+                }
             }
             "valid" => {
                 let html = result.expect(&format!("{} must build cleanly", fixture.id));
@@ -361,7 +375,9 @@ fn svg_and_path_cases_reject_or_build_with_the_frozen_diagnostics() {
 
 #[test]
 fn unsafe_path_rejection_carries_the_offending_path() {
-    let dir = std::env::temp_dir().join(format!("mdhtml-security-assets-{}", std::process::id()));
+    // A distinct root from the corpus walker above: both tests build the same
+    // case ids and would otherwise race on the shared per-id directories.
+    let dir = std::env::temp_dir().join(format!("mdhtml-security-unsafe-paths-{}", std::process::id()));
     for (id, source, offender) in [
         (
             "path-parent-traversal",
