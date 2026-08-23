@@ -1,4 +1,4 @@
-use super::{ImageEvidence, ImageKind};
+use super::{ImageEvidence, ImageKind, LinkEvidence};
 use std::collections::HashMap;
 
 const ASCII_PUNCTUATION: &[u8] = b"!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
@@ -81,6 +81,20 @@ pub(super) fn decode_escapes(text: &str) -> String {
     decoded
 }
 
+/// The destination text of an inline `(...)` link target: angle-bracket
+/// `<url>` form unwraps and decodes its contents; the bare form takes the
+/// first whitespace-delimited token, ignoring an optional trailing title.
+pub(super) fn decode_inline_destination(raw_dest: &str) -> String {
+    if let Some(rest) = raw_dest.strip_prefix('<') {
+        match rest.find('>') {
+            Some(angle_close) => decode_escapes(&rest[..angle_close]),
+            None => decode_escapes(raw_dest),
+        }
+    } else {
+        decode_escapes(raw_dest.split_whitespace().next().unwrap_or(""))
+    }
+}
+
 pub(super) fn normalize_ref_label(label: &str) -> String {
     let mut result = String::new();
     let mut in_whitespace = false;
@@ -125,6 +139,7 @@ impl<'a, 'm, 'r> InlineScanner<'a, 'm, 'r> {
         &self,
         range: std::ops::Range<usize>,
         images: &mut Vec<ImageEvidence>,
+        links: &mut Vec<LinkEvidence>,
         has_emphasis: &mut bool,
         line_offset_to_num: impl Fn(usize) -> usize,
         line_text_end: impl Fn(usize) -> usize,
@@ -167,6 +182,20 @@ impl<'a, 'm, 'r> InlineScanner<'a, 'm, 'r> {
                     let line = line_offset_to_num(i);
                     images.push(ImageEvidence {
                         kind: ImageKind::Markdown,
+                        destination: dest,
+                        offset: i,
+                        line,
+                    });
+                    i += consumed;
+                    continue;
+                }
+            }
+
+            // Check Markdown link [text](dest), [text][ref], or shortcut [ref]
+            if self.bytes[i] == b'[' {
+                if let Some((dest, consumed)) = self.match_markdown_link(i, line_limit) {
+                    let line = line_offset_to_num(i);
+                    links.push(LinkEvidence {
                         destination: dest,
                         offset: i,
                         line,
@@ -361,6 +390,80 @@ impl<'a, 'm, 'r> InlineScanner<'a, 'm, 'r> {
         }
 
         None
+    }
+
+    fn match_markdown_link(&self, start: usize, limit: usize) -> Option<(String, usize)> {
+        // start is at '['
+        let label_start = start + 1;
+        let label_end = find_bracket_close(self.bytes, label_start, limit)?;
+        if label_end >= limit {
+            return None;
+        }
+        let after_label = label_end + 1;
+
+        if after_label < limit && self.bytes[after_label] == b'(' {
+            return self.match_inline_destination(start, after_label, limit);
+        }
+        if after_label < limit && self.bytes[after_label] == b'[' {
+            return self.match_reference_link(start, after_label, limit, label_start, label_end);
+        }
+        self.match_shortcut_reference(start, label_start, label_end)
+    }
+
+    /// `[label](destination)`, already known to start at `after_label == '('`.
+    fn match_inline_destination(
+        &self,
+        start: usize,
+        after_label: usize,
+        limit: usize,
+    ) -> Option<(String, usize)> {
+        let paren_end = find_parenthesis_close(self.bytes, after_label + 1, limit)?;
+        if paren_end >= limit {
+            return None;
+        }
+        let raw_dest = self.source[after_label + 1..paren_end].trim();
+        let dest = decode_inline_destination(raw_dest);
+        Some((dest, (paren_end + 1) - start))
+    }
+
+    /// `[label][ref]`, already known to start at `after_label == '['`. An
+    /// empty `[ref]` reuses `label` itself (collapsed reference syntax).
+    fn match_reference_link(
+        &self,
+        start: usize,
+        after_label: usize,
+        limit: usize,
+        label_start: usize,
+        label_end: usize,
+    ) -> Option<(String, usize)> {
+        let ref_end = find_bracket_close(self.bytes, after_label + 1, limit)?;
+        if ref_end >= limit {
+            return None;
+        }
+        let ref_label = &self.source[after_label + 1..ref_end];
+        let label_to_use = if ref_label.trim().is_empty() {
+            &self.source[label_start..label_end]
+        } else {
+            ref_label
+        };
+        let dest = self.resolve_reference(label_to_use)?;
+        Some((dest, (ref_end + 1) - start))
+    }
+
+    /// `[label]` used as its own reference key (shortcut reference).
+    fn match_shortcut_reference(
+        &self,
+        start: usize,
+        label_start: usize,
+        label_end: usize,
+    ) -> Option<(String, usize)> {
+        let dest = self.resolve_reference(&self.source[label_start..label_end])?;
+        Some((dest, (label_end + 1) - start))
+    }
+
+    fn resolve_reference(&self, label: &str) -> Option<String> {
+        let key = normalize_ref_label(label);
+        self.references.get(&key).map(|dest| (**dest).to_string())
     }
 
     fn match_emphasis(&self, start: usize, limit: usize) -> Option<usize> {

@@ -6,6 +6,7 @@ pub mod commands;
 pub mod extract;
 pub mod frontmatter;
 pub mod scanner;
+pub mod security;
 pub mod selection;
 
 pub use analysis::{
@@ -14,7 +15,8 @@ pub use analysis::{
 };
 pub use cli::{CliAction, CliError, Command, ParsedTemplate, parse_args};
 pub use scanner::{
-    ContainerEvidence, HeadingEvidence, ImageEvidence, ImageKind, ScanEvidence, scan_document,
+    ContainerEvidence, HeadingEvidence, ImageEvidence, ImageKind, LinkEvidence, ScanEvidence,
+    scan_document,
 };
 
 pub fn run_cli<I, T>(args: I) -> Result<String, build::BuildError>

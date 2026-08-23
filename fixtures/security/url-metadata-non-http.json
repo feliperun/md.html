@@ -1,0 +1,9 @@
+{
+  "id": "url-metadata-non-http",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-005",
+  "source": "---\ntitle: T\nurl: \"javascript:alert(1)\"\n---\n\n# Body\n",
+  "detail": "front-matter url outside absolute http/https"
+}

@@ -9,6 +9,9 @@ use std::path::Path;
 use crate::analysis::{Fonts, NormalizedConfig, Severity, Theme, analyze_document};
 use crate::cli::CliError;
 use crate::frontmatter::Value;
+use crate::scanner::scan_document;
+use crate::security::Violation;
+use crate::security::html::{UrlContext, validate_identifier, validate_url};
 use crate::selection::{self, Manifest};
 
 pub mod assets;
@@ -120,6 +123,8 @@ fn assemble_document(
         .body
         .to_owned();
 
+    guard_document(&analysis, &body)?;
+
     let runtime = embed_runtime(&body, &analysis, &manifest, runtime_dir)?;
     let (tokens_css, theme_css, user_css) = embed_styles(&analysis.config, source_dir, themes_dir)?;
     let fonts_css = assets::embed_fonts(&analysis, &body, &catalog, fonts_dir)?;
@@ -143,6 +148,52 @@ fn assemble_document(
         portable,
         &runtime,
     ))
+}
+
+/// Security guard (ADR 0006/0007): validate every author-controlled URL,
+/// heading id override and section class token against the frozen policy,
+/// failing the build with the first `E-MDHSEC-*` violation.
+fn guard_document(
+    analysis: &crate::analysis::Analysis,
+    body: &str,
+) -> Result<(), BuildError> {
+    let evidence = scan_document(body);
+    for link in &evidence.links {
+        validate_url(&link.destination, UrlContext::Link).map_err(security_error)?;
+    }
+    for image in &evidence.images {
+        validate_url(&image.destination, UrlContext::Image).map_err(security_error)?;
+    }
+    for heading in &evidence.headings {
+        if let Some(id) = heading.explicit_id {
+            validate_identifier(id).map_err(security_error)?;
+        }
+    }
+    if let Value::Mapping(entries) = &analysis.config.sections {
+        for (_, spec) in entries {
+            let Value::Mapping(fields) = spec else {
+                continue;
+            };
+            let Some(Value::String(class)) = fields
+                .iter()
+                .find(|(key, _)| key == "class")
+                .map(|(_, value)| value)
+            else {
+                continue;
+            };
+            for token in class.split_whitespace() {
+                validate_identifier(token).map_err(security_error)?;
+            }
+        }
+    }
+    if let Some(url) = &analysis.config.url {
+        validate_url(url, UrlContext::Metadata).map_err(security_error)?;
+    }
+    Ok(())
+}
+
+fn security_error(violation: Violation) -> BuildError {
+    BuildError::new(violation.code, violation.message)
 }
 
 fn selection_error(error: selection::SelectionError) -> BuildError {

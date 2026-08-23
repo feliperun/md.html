@@ -1,0 +1,9 @@
+{
+  "id": "url-unknown-scheme",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-012",
+  "source": "---\ntitle: T\n---\n\n[click](chrome://settings)\n",
+  "detail": "unknown URI scheme in a Markdown link"
+}
