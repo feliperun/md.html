@@ -433,3 +433,40 @@ Defense in depth:
 
 - Wire observability and budget/abuse alerts. Primary files: hosting config. Exit: publish, storage, egress, rate-limit, and takedown metrics are visible.
 - Run the launch checklist and security sign-off. Primary files: this spec + PRD definitions of done. Exit: PRD §54–57 definitions of done are met and CI is green.
+
+## Addendum — Frozen security diagnostic codes (Phase 1 deliverable)
+
+This addendum freezes the `E-MDHSEC-*` code list (Phase 1, "freeze the
+diagnostic code list"). Codes are additive to the SPEC §16 registry, never
+reused, and follow the `E-MDHSEC-NNN` shape (the PRD §14 display examples
+`MDHSEC001`/`MDHSEC012` map to `E-MDHSEC-001`/`E-MDHSEC-012`). The
+`--json` audit schema is the one in "CLI changes" above, unchanged.
+
+| Code | Category | Meaning |
+|------|----------|---------|
+| `E-MDHSEC-001` | html | executable event handler (`on*` attribute) detected |
+| `E-MDHSEC-002` | html | element outside the renderer's fixed element set |
+| `E-MDHSEC-003` | html | denied attribute (`style`, `srcdoc`, `sandbox`, `allow`, `ping`, URL-bearing fetch attributes) |
+| `E-MDHSEC-004` | html | heading `{#id}` override or section/class token outside the identifier contract |
+| `E-MDHSEC-005` | url | front-matter `url`/`cover` is not an absolute `http`/`https` URL |
+| `E-MDHSEC-006` | url | `fonts.url` origin invalid (not `https`, malformed host, or control characters) |
+| `E-MDHSEC-007` | css | author CSS fails to parse (fail closed) |
+| `E-MDHSEC-008` | css | denied at-rule (`@import`, `@namespace`, unknown at-rules) |
+| `E-MDHSEC-009` | css | network `url()` denied |
+| `E-MDHSEC-010` | css | denied CSS construct (external `@font-face`, hosted-mode `!important`/full-viewport overlay) |
+| `E-MDHSEC-011` | svg | SVG contains script or other executable content |
+| `E-MDHSEC-012` | url | unsafe URI scheme in a link/reference destination |
+| `E-MDHSEC-013` | svg | SVG external reference (external `href`/`xlink:href`) |
+| `E-MDHSEC-014` | path | unsafe asset path (`..`, absolute path, drive letter, backslash escape) |
+| `E-MDHSEC-015` | runtime | runtime manifest integrity or runtime hash mismatch |
+| `E-MDHSEC-016` | csp | CSP assembly violation (missing or contradictory policy) |
+| `E-MDHSEC-017` | artifact | structure or mutation violation in a built artifact (audit) |
+| `E-MDHSEC-018` | unsafe | artifact is marked unsafe (audit reports it; hosting rejects it) |
+
+Guard semantics note: wherever ADR 0006/0008 say a construct is "dropped",
+the implementation rejects it with the corresponding code above — silent
+removal of author content is prohibited by PRD §5 ("reject rather than
+silently mutate"). Deterministic re-serialization applies only to author CSS
+that already passed the policy, as a stable output format, never as a
+mutation of rejected content. The security fixture contract is
+`fixtures/security/README.md`.
