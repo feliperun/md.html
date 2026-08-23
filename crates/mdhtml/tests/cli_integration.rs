@@ -167,6 +167,49 @@ fn canonical_source_of(html: &str) -> &str {
 }
 
 #[test]
+fn two_subprocess_builds_of_the_same_input_are_byte_identical() {
+    let dir = temp_dir("deterministic");
+    let input = dir.join("resume.md");
+    fs::write(&input, template_bytes("resume")).expect("write input");
+    let first = dir.join("first.md.html");
+    let second = dir.join("second.md.html");
+
+    let first_run = run(&[
+        "build",
+        input.to_str().expect("utf8 path"),
+        "-o",
+        first.to_str().expect("utf8 path"),
+    ]);
+    assert!(
+        first_run.status.success(),
+        "{}",
+        String::from_utf8_lossy(&first_run.stderr)
+    );
+    let second_run = run(&[
+        "build",
+        input.to_str().expect("utf8 path"),
+        "-o",
+        second.to_str().expect("utf8 path"),
+    ]);
+    assert!(
+        second_run.status.success(),
+        "{}",
+        String::from_utf8_lossy(&second_run.stderr)
+    );
+
+    let first_bytes = fs::read(&first).expect("read first artifact");
+    let second_bytes = fs::read(&second).expect("read second artifact");
+    assert!(
+        first_bytes.starts_with(b"<!doctype html>\n"),
+        "first artifact is a complete document"
+    );
+    assert_eq!(
+        first_bytes, second_bytes,
+        "two subprocess builds of the same input must be byte-identical"
+    );
+}
+
+#[test]
 fn no_fonts_build_is_equivalent_to_fonts_system() {
     let dir = temp_dir("no-fonts");
     let source = "---\ntitle: Fonts\n---\nBody with *emphasis* and `code`.\n";
