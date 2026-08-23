@@ -1,0 +1,14 @@
+{
+  "name": "mdhtml-hosting",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "mdhtml hosting layer (Publish API, Blob layout, isolated origin) — local and testable; never provisioned or deployed by this repository.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "build:wasm": "node scripts/build-wasm.mjs"
+  }
+}
