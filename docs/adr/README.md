@@ -65,3 +65,4 @@ proposed → active → superseded
 | [0016](0016-isolated-user-content-origin.md) | Isolated user-content origin | proposed |
 | [0017](0017-storage-provider-selection.md) | Storage provider selection | proposed |
 | [0018](0018-abuse-takedown-model.md) | Abuse and takedown model | proposed |
+| [0019](0019-release-binary-size-budget.md) | Release binary size budget | proposed |
