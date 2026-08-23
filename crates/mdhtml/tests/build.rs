@@ -200,7 +200,9 @@ fn local_theme_embeds_user_style_with_the_technical_preset() {
     let source = "---\ntitle: Local theme\ntheme: custom.theme.css\n---\n# Body\n";
     let html = build(source, &dir, &runtime_dist(), &themes_dir(), &fonts_dir()).expect("builds");
 
-    assert!(html.contains("<style id=\"mdhtml-user\">:root{--md-accent:#123456}</style>"));
+    assert!(html.contains(
+        "<style id=\"mdhtml-user\">:root {\n  --md-accent: #123456;\n}\n</style>"
+    ));
     let theme = between(&html, "<style id=\"mdhtml-theme\">", "</style>");
     assert!(
         theme.contains("Instrument Sans"),

@@ -2,6 +2,7 @@
 //! guards over third-party parser engines. A guard never rewrites author
 //! content — a violation fails the build and the artifact is left unwritten.
 
+pub mod css;
 pub mod html;
 
 /// One policy violation carrying its frozen diagnostic code (Tech Spec

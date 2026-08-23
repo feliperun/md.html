@@ -1,0 +1,12 @@
+{
+  "id": "css-namespace",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-008",
+  "source": "---\ntitle: T\ntheme: namespace.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "namespace.theme.css": "QG5hbWVzcGFjZSBzdmcgdXJsKCJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIpOw=="
+  },
+  "detail": "@namespace in a local theme is a denied at-rule"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "css-unknown-at-rule",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-008",
+  "source": "---\ntitle: T\ntheme: unknown.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "unknown.theme.css": "QHVua25vd24tcnVsZSB7IGNvbG9yOiByZWQ7IH0="
+  },
+  "detail": "unknown at-rules are denied, never dropped"
+}

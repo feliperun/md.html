@@ -1,0 +1,11 @@
+{
+  "id": "css-valid-keyframes",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\ntheme: keyframes.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "keyframes.theme.css": "QGtleWZyYW1lcyBwdWxzZSB7IGZyb20geyBvcGFjaXR5OiAxOyB9IHRvIHsgb3BhY2l0eTogMC41OyB9IH0KQGNvdW50ZXItc3R5bGUgdGh1bWJzIHsgc3lzdGVtOiBjeWNsaWM7IHN5bWJvbHM6ICJBIjsgc3VmZml4OiAiICI7IH0="
+  },
+  "detail": "@keyframes and @counter-style pin the at-rule allowlist"
+}

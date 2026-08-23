@@ -11,6 +11,7 @@ use crate::cli::CliError;
 use crate::frontmatter::Value;
 use crate::scanner::scan_document;
 use crate::security::Violation;
+use crate::security::css::guard_author_css;
 use crate::security::html::{UrlContext, validate_identifier, validate_url};
 use crate::selection::{self, Manifest};
 
@@ -255,20 +256,22 @@ fn embed_styles(
                 ));
             }
             let path = source_dir.join(name);
-            fs::read_to_string(&path).map_err(|error| {
+            let css = fs::read_to_string(&path).map_err(|error| {
                 BuildError::new(
                     "E-CLI-01",
                     format!("local theme {name} is unreadable: {error}"),
                 )
-            })?
+            })?;
+            let guarded = guard_author_css(&css).map_err(security_error)?;
+            (!guarded.trim().is_empty()).then_some(guarded)
         }
-        _ => String::new(),
+        _ => None,
     };
 
     Ok((
         render_tokens(&config.tokens),
         format!("{base}{preset_css}"),
-        (!user_css.is_empty()).then_some(user_css),
+        user_css,
     ))
 }
 

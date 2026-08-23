@@ -1,0 +1,11 @@
+{
+  "id": "css-nesting-valid",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\ntheme: nesting.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "nesting.theme.css": "LmNhcmQgeyBjb2xvcjogcmVkOyBAbWVkaWEgcHJpbnQgeyBiYWNrZ3JvdW5kOiB3aGl0ZSB9IH0="
+  },
+  "detail": "CSS nesting of only allowlisted constructs (style rule + @media) stays valid"
+}
