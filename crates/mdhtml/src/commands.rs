@@ -279,9 +279,12 @@ fn template_name(template: ParsedTemplate) -> &'static str {
 /// live in `runtime/dist`, the themes in `themes/` and the font catalog in
 /// `fonts/`, all relative to the repository root (`crates/mdhtml/..`).
 fn repository_layout() -> (PathBuf, PathBuf, PathBuf) {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("..")
-        .join("..");
+    let root = match std::env::var_os("MDHTML_ROOT") {
+        Some(value) if !value.is_empty() => PathBuf::from(value),
+        _ => PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("..")
+            .join(".."),
+    };
     (
         root.join("runtime").join("dist"),
         root.join("themes"),
