@@ -162,19 +162,28 @@ pub fn check_artifact(html: &str) -> CheckReport {
     let fonts_url = stored
         .as_ref()
         .and_then(|stored| stored.fonts_url.as_deref());
-    match (portable, csp, fonts_url) {
-        (true, Some(actual), _) if actual == build::CSP => {}
+    let runtime_text = elements
+        .iter()
+        .find(|element| element.is("script") && attr(element, "id") == Some("mdhtml-runtime"))
+        .and_then(|element| element.text);
+    let expected_csp = runtime_text.map(|text| {
+        let runtime_hash = crate::selection::sha256::digest_base64(text.as_bytes());
+        match fonts_url {
+            Some(url) => build::assets::relaxed_csp(url, &runtime_hash),
+            None => build::canonical_csp(&runtime_hash),
+        }
+    });
+    match (portable, csp, expected_csp.as_deref()) {
+        (_, Some(actual), Some(expected)) if actual == expected => {}
         (true, _, _) => diagnostics.push(Diagnostic::error(
             "E-FMT-03",
             "portable content must carry the canonical CSP exactly",
         )),
-        (false, Some(actual), Some(url)) if actual == relaxed_csp(url) => {}
-        (false, Some(_), Some(_)) => diagnostics.push(Diagnostic::error(
+        (false, Some(_), _) if fonts_url.is_some() => diagnostics.push(Diagnostic::error(
             "E-FMT-03",
             "the CSP must be relaxed only for the declared fonts.url origins",
         )),
-        (false, Some(_), None) => {}
-        (false, None, _) => diagnostics.push(Diagnostic::error(
+        (false, _, _) => diagnostics.push(Diagnostic::error(
             "E-FMT-03",
             "non-portable content must carry a Content-Security-Policy meta",
         )),
@@ -216,12 +225,7 @@ pub fn check_artifact(html: &str) -> CheckReport {
         }
     }
 
-    let runtime = elements
-        .iter()
-        .find(|element| element.is("script") && attr(element, "id") == Some("mdhtml-runtime"))
-        .and_then(|element| element.text)
-        .map(|text| text.len())
-        .unwrap_or(0);
+    let runtime = runtime_text.map(|text| text.len()).unwrap_or(0);
     let fonts = elements
         .iter()
         .find(|element| element.is("style") && attr(element, "id") == Some("mdhtml-fonts"))
@@ -309,10 +313,6 @@ fn fonts_origins(fonts: &Fonts) -> (Vec<String>, Option<String>) {
         origins.push("https://fonts.gstatic.com".to_string());
     }
     (origins, Some(url.clone()))
-}
-
-fn relaxed_csp(url: &str) -> String {
-    build::assets::relaxed_csp(url)
 }
 
 /// Collect external origins from artifact-level subresource tags and style

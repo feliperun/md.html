@@ -5,6 +5,7 @@
 //! and never re-derived from the canonical source.
 
 use crate::build::BuildError;
+use crate::security;
 
 /// A validated, decoded asset block: the declared `data-path`, the declared
 /// `data-type`, and the exact payload bytes (standard padded base64, embedded
@@ -102,7 +103,7 @@ pub fn extract_assets(artifact: &[u8]) -> Result<Vec<ExtractedAsset>, ExtractErr
                 "asset block is missing a data-path",
             ));
         };
-        if !is_safe_relative_path(path) {
+        if !security::is_safe_relative_path(path) {
             return Err(ExtractError::new(
                 "E-CLI-03",
                 format!("asset data-path '{path}' is not a safe relative path"),
@@ -140,37 +141,6 @@ pub fn extract_assets(artifact: &[u8]) -> Result<Vec<ExtractedAsset>, ExtractErr
         });
     }
     Ok(extracted)
-}
-
-/// A safe embedded-asset path: non-empty, relative, no `..` segment, and not
-/// URL-based (scheme or leading `/`).
-fn is_safe_relative_path(path: &str) -> bool {
-    !path.is_empty()
-        && !path.starts_with('/')
-        && !has_scheme(path)
-        && path.split('/').all(|segment| segment != "..")
-}
-
-fn has_scheme(path: &str) -> bool {
-    let mut chars = path.chars();
-    let Some(first) = chars.next() else {
-        return false;
-    };
-    if !first.is_ascii_alphabetic() {
-        return false;
-    }
-    let mut colon = false;
-    for ch in chars {
-        match ch {
-            ':' => {
-                colon = true;
-                break;
-            }
-            'a'..='z' | 'A'..='Z' | '0'..='9' | '+' | '-' | '.' => {}
-            _ => break,
-        }
-    }
-    colon
 }
 
 /// Strict RFC 4648 decoder: standard alphabet with padding, embedded ASCII

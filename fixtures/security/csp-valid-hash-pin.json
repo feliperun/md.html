@@ -1,0 +1,8 @@
+{
+  "id": "csp-valid-hash-pin",
+  "category": "csp",
+  "requirement": "PRD-11",
+  "status": "valid",
+  "source": "---\ntitle: CSP pin\n---\n\n# Body\n",
+  "detail": "portable build carries the runtime hash-only script-src pin with style-src 'unsafe-inline' intact"
+}

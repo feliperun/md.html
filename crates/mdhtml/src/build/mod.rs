@@ -17,9 +17,17 @@ use crate::selection::{self, Manifest};
 
 pub mod assets;
 
-/// The canonical portable CSP (SPEC §5, FMT-03). T12a emits it verbatim.
-pub const CSP: &str = "default-src 'none'; script-src 'unsafe-inline'; \
-style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:";
+/// The canonical portable CSP (SPEC §5, FMT-03, ADR 0010): the frozen
+/// directives with `script-src` pinned to the SHA-256 of the exact runtime
+/// bytes the artifact embeds (`sha256-<BASE64>`). `style-src 'unsafe-inline'`
+/// stays because the sanitizer owns style security (ADR 0008).
+pub fn canonical_csp(runtime_hash: &str) -> String {
+    format!(
+        "default-src 'none'; script-src 'sha256-{runtime_hash}'; \
+         style-src 'unsafe-inline'; img-src data: blob:; font-src data:; \
+         media-src data: blob:"
+    )
+}
 
 const NOSCRIPT: &str = "<noscript><style>#mdhtml-source{display:block;white-space:pre-wrap;font-family:ui-monospace;padding:2rem}</style></noscript>";
 
@@ -131,9 +139,10 @@ fn assemble_document(
     let fonts_css = assets::embed_fonts(&analysis, &body, &catalog, fonts_dir)?;
     let embedded = assets::embed_assets(&body, &analysis, source_dir)?;
     let image = assets::og_image(&analysis.config, source_dir)?;
+    let runtime_hash = crate::selection::sha256::digest_base64(runtime.as_bytes());
     let (csp, portable) = match &analysis.config.fonts {
-        Fonts::Map { url: Some(url), .. } => (assets::relaxed_csp(url), false),
-        _ => (CSP.to_string(), true),
+        Fonts::Map { url: Some(url), .. } => (assets::relaxed_csp(url, &runtime_hash), false),
+        _ => (canonical_csp(&runtime_hash), true),
     };
 
     Ok(assemble(
@@ -190,7 +199,68 @@ fn guard_document(
     if let Some(url) = &analysis.config.url {
         validate_url(url, UrlContext::Metadata).map_err(security_error)?;
     }
+    if let Fonts::Map { url: Some(url), .. } = &analysis.config.fonts {
+        validate_fonts_url(url).map_err(security_error)?;
+    }
     Ok(())
+}
+
+/// Validate `fonts.url` (FMT-03) before it may relax any CSP directive: the
+/// value must be an absolute `https:` URL whose origin is well formed and
+/// free of control characters. Anything else is `E-MDHSEC-006` and fails the
+/// build before the CSP is assembled.
+fn validate_fonts_url(url: &str) -> Result<(), Violation> {
+    if url.chars().any(|ch| ch.is_ascii_control()) {
+        return Err(fonts_url_violation(url, "must not contain control characters"));
+    }
+    let Some(scheme) = scheme_of(url) else {
+        return Err(fonts_url_violation(url, "must be an absolute https URL"));
+    };
+    if !scheme.eq_ignore_ascii_case("https") {
+        return Err(fonts_url_violation(url, "must be an absolute https URL"));
+    }
+    let rest = &url[scheme.len() + 3..];
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or(rest);
+    if !is_well_formed_authority(authority) {
+        return Err(fonts_url_violation(url, "must carry a well-formed https origin"));
+    }
+    Ok(())
+}
+
+fn fonts_url_violation(url: &str, problem: &str) -> Violation {
+    Violation::new("E-MDHSEC-006", format!("fonts.url {url:?} {problem}"))
+}
+
+/// The RFC 3986 scheme of a URL (`ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )`
+/// before the first colon), mirroring the `security::html` splitter.
+fn scheme_of(url: &str) -> Option<&str> {
+    let colon = url.find(':')?;
+    let candidate = &url[..colon];
+    let mut chars = candidate.chars();
+    if !chars.next().is_some_and(|first| first.is_ascii_alphabetic()) {
+        return None;
+    }
+    chars
+        .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '+' | '-' | '.'))
+        .then_some(candidate)
+}
+
+/// Whether `authority` is a well-formed `host[:port]`: a non-empty host of
+/// RFC 3986 host characters and an optional all-digit port. Exotic forms
+/// (bracketed IPv6 literals and the like) fail closed.
+fn is_well_formed_authority(authority: &str) -> bool {
+    let (host, port) = match authority.rsplit_once(':') {
+        Some((host, port)) => (host, Some(port)),
+        None => (authority, None),
+    };
+    let host_ok = !host.is_empty()
+        && host
+            .chars()
+            .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '-' | '.' | '_' | '%'));
+    let port_ok = port.is_none_or(|port| {
+        !port.is_empty() && port.chars().all(|ch| ch.is_ascii_digit())
+    });
+    host_ok && port_ok
 }
 
 fn security_error(violation: Violation) -> BuildError {

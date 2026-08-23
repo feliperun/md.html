@@ -1,0 +1,9 @@
+{
+  "id": "svg-valid-inline",
+  "category": "svg",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n![logo](clean.svg)\n",
+  "assets": { "clean.svg": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMwZjc2NmUiLz48L3N2Zz4=" },
+  "detail": "clean inline SVG asset builds and embeds byte-exact"
+}

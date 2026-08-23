@@ -94,10 +94,10 @@ fn template_assembles_the_fmt01_skeleton() {
     assert!(
         html.contains("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
     );
+    let runtime_hash = mdhtml::selection::sha256::digest_base64(&expected_runtime(&source));
     assert!(html.contains(&format!(
         "<meta http-equiv=\"Content-Security-Policy\" content=\"{}\">",
-        "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; \
-         img-src data: blob:; font-src data:; media-src data: blob:"
+        mdhtml::build::canonical_csp(&runtime_hash)
     )));
     assert!(html.contains("<title>Document template</title>"));
     assert!(html.contains("<meta property=\"og:title\" content=\"Document template\">"));

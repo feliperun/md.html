@@ -53,6 +53,13 @@ fn csp_of(html: &str) -> &str {
     )
 }
 
+/// The SHA-256 base64 of the runtime the built document embeds.
+fn runtime_hash_of(html: &str) -> String {
+    mdhtml::selection::sha256::digest_base64(
+        between(html, "<script id=\"mdhtml-runtime\">", "</script>").as_bytes(),
+    )
+}
+
 /// The ordered (path, mime, payload) of every embedded asset block.
 fn asset_blocks(html: &str) -> Vec<(String, String, String)> {
     let marker = "<script type=\"application/octet-stream\" ";
@@ -174,10 +181,10 @@ fn document_assets_fixture_derives_og_image_and_declares_non_portable_csp() {
     assert!(html.contains("data-mdhtml-portable=\"false\""));
     assert_eq!(
         csp_of(&html),
-        "default-src 'none'; script-src 'unsafe-inline'; \
-         style-src 'unsafe-inline' https://fonts.googleapis.com; \
-         img-src data: blob:; font-src data: https://fonts.gstatic.com; \
-         media-src data: blob:"
+        mdhtml::build::assets::relaxed_csp(
+            "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700",
+            &runtime_hash_of(&html),
+        )
     );
 }
 
@@ -330,10 +337,10 @@ fn fonts_url_relaxes_the_csp_only_for_the_declared_origins() {
     assert!(html.contains("data-mdhtml-portable=\"false\""));
     assert_eq!(
         csp_of(&html),
-        "default-src 'none'; script-src 'unsafe-inline'; \
-         style-src 'unsafe-inline' https://fonts.googleapis.com; \
-         img-src data: blob:; font-src data: https://fonts.gstatic.com; \
-         media-src data: blob:"
+        mdhtml::build::assets::relaxed_csp(
+            "https://fonts.googleapis.com/css2?family=Instrument+Sans",
+            &runtime_hash_of(&html),
+        )
     );
 
     let cdn = "---\ntitle: NP\nfonts:\n  url: https://cdn.example.test/fonts.css\n---\n# Body\n";
@@ -342,7 +349,8 @@ fn fonts_url_relaxes_the_csp_only_for_the_declared_origins() {
     assert!(csp.contains("style-src 'unsafe-inline' https://cdn.example.test"));
     assert!(csp.contains("font-src data: https://cdn.example.test"));
     assert!(!csp.contains("https://cdn.example.test/fonts.css"));
-    assert!(!csp.contains("script-src 'unsafe-inline' https://"));
+    assert!(!csp.contains("script-src 'unsafe-inline'"));
+    assert!(csp.contains(&format!("script-src 'sha256-{}'", runtime_hash_of(&html))));
 }
 
 #[test]
@@ -352,7 +360,6 @@ fn default_build_stays_portable_with_the_canonical_csp() {
     assert!(html.contains("data-mdhtml-portable=\"true\""));
     assert_eq!(
         csp_of(&html),
-        "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; \
-         img-src data: blob:; font-src data:; media-src data: blob:"
+        mdhtml::build::canonical_csp(&runtime_hash_of(&html))
     );
 }

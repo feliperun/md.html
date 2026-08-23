@@ -1,0 +1,9 @@
+{
+  "id": "path-valid-nested",
+  "category": "path",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n![photo](a/b/photo.png)\n",
+  "assets": { "a/b/photo.png": "c3ludGhldGljLXBuZy1ieXRlcw==" },
+  "detail": "nested relative image destination materialized through assets and embedded"
+}

@@ -59,7 +59,7 @@ Example skeleton:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-…'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:">
   <title>Quarterly report</title>
   <style id="mdhtml-tokens">…</style>
   <style id="mdhtml-theme">…</style>
@@ -140,14 +140,14 @@ exactly what `build` stored.
 Canonical (portable) CSP:
 
 ```text
-default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';
+default-src 'none'; script-src 'sha256-…'; style-src 'unsafe-inline';
 img-src data: blob:; font-src data:; media-src data: blob:
 ```
 
 Non-portable CSP example (Google Fonts):
 
 ```text
-default-src 'none'; script-src 'unsafe-inline';
+default-src 'none'; script-src 'sha256-…';
 style-src 'unsafe-inline' https://fonts.googleapis.com;
 img-src data: blob:; font-src data: https://fonts.gstatic.com;
 media-src data: blob:

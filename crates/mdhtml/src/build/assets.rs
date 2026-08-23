@@ -10,6 +10,7 @@ use crate::analysis::{Analysis, Fonts, NormalizedConfig};
 use crate::build::BuildError;
 use crate::frontmatter::Value;
 use crate::scanner::scan_document;
+use crate::security;
 use crate::selection::{Catalog, select_faces};
 
 /// Closed extension → MIME mapping (SPEC §14). Anything else is E-CLI-01.
@@ -40,7 +41,11 @@ pub struct Asset {
 /// image evidence in document order, then `figures:` mapping keys, then
 /// `fonts.body`/`fonts.mono` when fonts is a map. Distinct `data-path` values
 /// embed exactly once, in first-reference order. Missing files and
-/// out-of-table extensions fail with E-CLI-01 before any output.
+/// out-of-table extensions fail with E-CLI-01 before any output. Every path
+/// that proceeds to embedding must be extraction-safe (`E-MDHSEC-014`) and
+/// every embedded SVG asset must pass the structural guard (`E-MDHSEC-011`/
+/// `-001`/`-013`), both before any output; the exact original bytes are
+/// embedded.
 pub fn embed_assets(
     body: &str,
     analysis: &Analysis,
@@ -48,6 +53,12 @@ pub fn embed_assets(
 ) -> Result<Vec<Asset>, BuildError> {
     let mut assets = Vec::new();
     for path in collect_asset_paths(body, analysis) {
+        if !security::is_safe_relative_path(&path) {
+            return Err(BuildError::new(
+                "E-MDHSEC-014",
+                format!("asset path '{path}' is not a safe relative path"),
+            ));
+        }
         let mime = mime_for_path(&path)?;
         let bytes = fs::read(source_dir.join(&path)).map_err(|error| {
             BuildError::new(
@@ -55,6 +66,15 @@ pub fn embed_assets(
                 format!("asset '{path}' is unresolvable: {error}"),
             )
         })?;
+        if mime == "image/svg+xml" {
+            let markup = String::from_utf8_lossy(&bytes);
+            security::html::validate_svg(&markup).map_err(|violation| {
+                BuildError::new(
+                    violation.code,
+                    format!("asset '{path}': {}", violation.message),
+                )
+            })?;
+        }
         assets.push(Asset {
             path,
             mime,
@@ -69,7 +89,7 @@ fn collect_asset_paths(body: &str, analysis: &Analysis) -> Vec<String> {
     let mut seen = std::collections::HashSet::new();
     let evidence = scan_document(body);
     for image in &evidence.images {
-        if is_relative_path(&image.destination) && seen.insert(image.destination.clone()) {
+        if !has_scheme(&image.destination) && seen.insert(image.destination.clone()) {
             paths.push(image.destination.clone());
         }
     }
@@ -95,12 +115,9 @@ fn collect_asset_paths(body: &str, analysis: &Analysis) -> Vec<String> {
     paths
 }
 
-/// Scanner image destinations may be data:/https:/… references; only normal
-/// relative paths are embeddable assets (SPEC §14).
-fn is_relative_path(path: &str) -> bool {
-    !path.is_empty() && !path.starts_with('/') && !has_scheme(path)
-}
-
+/// Scanner image destinations that carry a URL scheme are external references
+/// (the URL guard owns them) and are never embedded; everything else proceeds
+/// to the extraction-safe path check in `embed_assets`.
 fn has_scheme(path: &str) -> bool {
     let mut chars = path.chars();
     let Some(first) = chars.next() else {
@@ -191,6 +208,12 @@ pub fn og_image(
     let (Some(url), Some(cover)) = (&config.url, &config.cover) else {
         return Ok(None);
     };
+    if !security::is_safe_relative_path(cover) {
+        return Err(BuildError::new(
+            "E-MDHSEC-014",
+            format!("cover '{cover}' is not a safe relative path"),
+        ));
+    }
     fs::metadata(source_dir.join(cover)).map_err(|error| {
         BuildError::new(
             "E-CLI-01",
@@ -202,9 +225,10 @@ pub fn og_image(
 
 /// The non-portable CSP (FMT-03): the canonical directives with `style-src`
 /// and `font-src` relaxed only for the declared `fonts.url` origins, following
-/// the SPEC example (Google Fonts stylesheet/font origins). Scripts remain
-/// inline-only; no other network capability is enabled.
-pub fn relaxed_csp(url: &str) -> String {
+/// the SPEC example (Google Fonts stylesheet/font origins). The `script-src`
+/// hash pin of the embedded runtime (ADR 0010) is preserved; no other network
+/// capability is enabled.
+pub fn relaxed_csp(url: &str, runtime_hash: &str) -> String {
     let stylesheet_origin = origin_of(url);
     let font_origin = if stylesheet_origin == "https://fonts.googleapis.com" {
         "https://fonts.gstatic.com".to_string()
@@ -212,7 +236,7 @@ pub fn relaxed_csp(url: &str) -> String {
         stylesheet_origin.clone()
     };
     format!(
-        "default-src 'none'; script-src 'unsafe-inline'; \
+        "default-src 'none'; script-src 'sha256-{runtime_hash}'; \
          style-src 'unsafe-inline' {stylesheet_origin}; img-src data: blob:; \
          font-src data: {font_origin}; media-src data: blob:"
     )
