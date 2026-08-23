@@ -350,6 +350,12 @@ fn url_contexts_apply_their_own_allowlists() {
     assert_eq!(validate_url("guide/next.md", UrlContext::Link), Ok(()));
     assert_eq!(validate_url("#section", UrlContext::Link), Ok(()));
     assert_eq!(validate_url("", UrlContext::Link), Ok(()));
+    assert_eq!(
+        validate_url("//evil.example/x", UrlContext::Link)
+            .expect_err("protocol-relative destination")
+            .code,
+        "E-MDHSEC-012"
+    );
 
     assert_eq!(
         validate_url("data:image/png;base64,AA==", UrlContext::Image),
@@ -441,6 +447,30 @@ fn svg_assets_reject_executables_handlers_and_external_references() {
     assert_eq!(
         validate_svg("<svg><image href=\"local.png\"/></svg>"),
         Ok(())
+    );
+    assert_eq!(
+        validate_svg("<svg><set attributeName=\"onload\" to=\"alert(1)\"/></svg>")
+            .expect_err("SMIL rebinding of an event handler")
+            .code,
+        "E-MDHSEC-011"
+    );
+    assert_eq!(
+        validate_svg("<svg><animate attributeName=\"href\" values=\"javascript:alert(1)\"/></svg>")
+            .expect_err("SMIL animation of href")
+            .code,
+        "E-MDHSEC-011"
+    );
+    assert_eq!(
+        validate_svg("<svg><animateTransform attributeName=\"transform\"/></svg>")
+            .expect_err("animateTransform")
+            .code,
+        "E-MDHSEC-011"
+    );
+    assert_eq!(
+        validate_svg("<svg><animateMotion/>")
+            .expect_err("animateMotion")
+            .code,
+        "E-MDHSEC-011"
     );
 }
 

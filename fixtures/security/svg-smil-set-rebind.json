@@ -1,0 +1,11 @@
+{
+  "id": "svg-smil-set-rebind",
+  "category": "svg",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-011",
+  "location": "5:1",
+  "source": "---\ntitle: T\n---\n\n![logo](evil.svg)\n",
+  "assets": { "evil.svg": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxzZXQgYXR0cmlidXRlTmFtZT0ib25sb2FkIiB0bz0iYWxlcnQoMSkiLz48L3N2Zz4=" },
+  "detail": "SMIL set element rebinding an event handler attribute (attributeName=onload)"
+}

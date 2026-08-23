@@ -26,8 +26,9 @@ pub enum UrlContext {
 /// Validate one URL destination against the context's scheme allowlist
 /// (ADR 0007): `http`, `https`, `mailto`, `tel`, relative, and fragment-only
 /// pass; `javascript`, `vbscript`, `data` in href, `file`, `blob` in href,
-/// and unknown schemes are `E-MDHSEC-012`; metadata URLs outside absolute
-/// `http`/`https` are `E-MDHSEC-005`.
+/// unknown schemes, and protocol-relative `//host` destinations are
+/// `E-MDHSEC-012`; metadata URLs outside absolute `http`/`https` are
+/// `E-MDHSEC-005`.
 pub fn validate_url(destination: &str, context: UrlContext) -> Result<(), Violation> {
     let cleaned = strip_ascii_whitespace_and_controls(destination);
     let allowed = match split_scheme(&cleaned) {
@@ -37,7 +38,10 @@ pub fn validate_url(destination: &str, context: UrlContext) -> Result<(), Violat
             "data" => context == UrlContext::Image,
             _ => false,
         },
-        None => context != UrlContext::Metadata,
+        // Protocol-relative `//host/path` carries no scheme of its own but
+        // resolves against the host's — a UNC path under `file://` on
+        // Windows; a static document has no legitimate use for it.
+        None => context != UrlContext::Metadata && !cleaned.starts_with("//"),
     };
     if allowed {
         return Ok(());
@@ -46,6 +50,13 @@ pub fn validate_url(destination: &str, context: UrlContext) -> Result<(), Violat
         Err(Violation::new(
             "E-MDHSEC-005",
             format!("metadata URL {destination:?} must be absolute http or https"),
+        ))
+    } else if cleaned.starts_with("//") {
+        Err(Violation::new(
+            "E-MDHSEC-012",
+            format!(
+                "protocol-relative destination {destination:?} must declare an explicit scheme"
+            ),
         ))
     } else {
         Err(Violation::new(
@@ -76,6 +87,13 @@ pub fn validate_identifier(token: &str) -> Result<(), Violation> {
 /// Elements that execute code or embed foreign documents inside SVG; any
 /// occurrence is `E-MDHSEC-011`.
 const EXECUTABLE_ELEMENTS: [&str; 4] = ["foreignobject", "iframe", "object", "embed"];
+
+/// SMIL animation elements: `animate`/`set` rebind another element's
+/// attribute at runtime (`attributeName="onload"` or `"href"` with an
+/// attacker-chosen value), and a static document has no use for SMIL at all.
+/// Any occurrence is `E-MDHSEC-011` — rejecting the elements outright is
+/// simpler and safer than validating each `attributeName` value.
+const SMIL_ELEMENTS: [&str; 4] = ["animate", "set", "animatetransform", "animatemotion"];
 
 /// Validate embedded SVG markup structurally (ADR 0006 asset policy):
 /// script or other executable content is `E-MDHSEC-011`, event handlers are
@@ -132,6 +150,13 @@ impl TokenSink for SvgGuard {
             ));
             return TokenSinkResult::Continue;
         }
+        if is_smil_element(&tag.name) {
+            *self.violation.borrow_mut() = Some(Violation::new(
+                "E-MDHSEC-011",
+                "SVG must not contain SMIL animation elements",
+            ));
+            return TokenSinkResult::Continue;
+        }
         if let Some(violation) = tag
             .attrs
             .iter()
@@ -147,6 +172,13 @@ impl TokenSink for SvgGuard {
 /// foreign document (`E-MDHSEC-011`).
 fn is_executable_element(name: &str) -> bool {
     EXECUTABLE_ELEMENTS
+        .iter()
+        .any(|candidate| name.eq_ignore_ascii_case(candidate))
+}
+
+/// Whether `name` is one of the SMIL animation elements (`E-MDHSEC-011`).
+fn is_smil_element(name: &str) -> bool {
+    SMIL_ELEMENTS
         .iter()
         .any(|candidate| name.eq_ignore_ascii_case(candidate))
 }
