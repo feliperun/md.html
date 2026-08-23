@@ -374,3 +374,11 @@ fn every_allowlisted_at_rule_parses_and_approves() {
                @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }";
     guard_author_css(css).expect("the frozen at-rule allowlist approves");
 }
+
+#[test]
+fn style_close_sequence_in_a_string_value_is_rejected() {
+    let payload = "a::after { content: \"</style><img src=x onerror=alert(1)>\" }";
+    let violation = guard_author_css(payload)
+        .expect_err("a string that re-serializes to a literal </style is a context escape");
+    assert_eq!(violation.code, "E-MDHSEC-007");
+}

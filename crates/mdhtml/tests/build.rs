@@ -331,3 +331,18 @@ fn build_command_reports_missing_input_and_title_as_one_line_diagnostics() {
         "mdhtml: E-FMT-05: front matter title is required and must be a nonempty string\n"
     );
 }
+
+#[test]
+fn tokens_neutralize_the_style_close_sequence() {
+    let source = "---\ntitle: Tokens\ntokens:\n  --md-evil: \"</style><img src=x onerror=alert(1)>\"\n---\n# Body\n";
+    let html = build_source(source).expect("token rendering escapes, it does not reject");
+    let tokens = between(&html, "<style id=\"mdhtml-tokens\">", "</style>");
+    assert!(
+        !tokens.contains("</style"),
+        "a token value must not introduce a literal style-close sequence: {tokens}"
+    );
+    assert!(
+        tokens.contains("\\3c /style"),
+        "the < is CSS-escaped so the bytes cannot close the style element: {tokens}"
+    );
+}
