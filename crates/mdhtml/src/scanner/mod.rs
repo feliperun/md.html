@@ -27,6 +27,13 @@ pub struct ImageEvidence {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LinkEvidence {
+    pub destination: String,
+    pub offset: usize,
+    pub line: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContainerEvidence<'a> {
     pub name: &'a str,
     pub argument: Option<&'a str>,
@@ -39,6 +46,7 @@ pub struct ContainerEvidence<'a> {
 pub struct ScanEvidence<'a> {
     pub headings: Vec<HeadingEvidence<'a>>,
     pub images: Vec<ImageEvidence>,
+    pub links: Vec<LinkEvidence>,
     pub containers: Vec<ContainerEvidence<'a>>,
     pub has_emphasis: bool,
     pub has_code: bool,

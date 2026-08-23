@@ -1,0 +1,9 @@
+{
+  "id": "url-vbscript-scheme",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-012",
+  "source": "---\ntitle: T\n---\n\n[click](vbscript:msgbox(1))\n",
+  "detail": "vbscript: destination in a Markdown link"
+}

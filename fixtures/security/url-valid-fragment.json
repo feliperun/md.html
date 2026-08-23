@@ -1,0 +1,8 @@
+{
+  "id": "url-valid-fragment",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[section](#three)\n",
+  "detail": "fragment-only destinations stay allowed"
+}

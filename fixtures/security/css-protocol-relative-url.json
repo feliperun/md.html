@@ -1,0 +1,12 @@
+{
+  "id": "css-protocol-relative-url",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-009",
+  "source": "---\ntitle: T\ntheme: protocol-relative.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "protocol-relative.theme.css": "OnJvb3QgeyBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoLy9ldmlsLmV4YW1wbGUvcGl4ZWwucG5nKTsgfQ=="
+  },
+  "detail": "protocol-relative //host url() is a network reference"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "url-fonts-control-chars",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-006",
+  "source": "---\ntitle: T\nfonts:\n  url: \"https://fonts.example.test/\\tcss2\"\n---\n\n# Body\n",
+  "detail": "fonts.url containing control characters must be rejected before any CSP relaxation"
+}

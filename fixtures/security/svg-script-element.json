@@ -1,0 +1,10 @@
+{
+  "id": "svg-script-element",
+  "category": "svg",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-011",
+  "source": "---\ntitle: T\n---\n\n![logo](evil.svg)\n",
+  "assets": { "evil.svg": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxzY3JpcHQ+YWxlcnQoMSk8L3NjcmlwdD48L3N2Zz4=" },
+  "detail": "asset SVG bytes containing a script element"
+}

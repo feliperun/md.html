@@ -311,8 +311,8 @@ fn artifact_with_wrong_csp_reports_e_fmt_03() {
     let source = "---\ntitle: Tampered\n---\n\n# Body\n";
     let html = build_source(source);
     let tampered = html.replace(
-        "script-src 'unsafe-inline';",
-        "script-src 'unsafe-inline' https://evil.test;",
+        "script-src 'sha256-",
+        "script-src 'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     );
     let report = check_artifact(&tampered);
 
@@ -376,7 +376,7 @@ fn artifact_without_root_identity_reports_e_fmt_01() {
 fn remove_asset_blocks(html: &str) -> String {
     let mut result = String::new();
     let mut rest = html;
-    while let Some(start) = rest.find("application/octet-stream") {
+    while let Some(start) = rest.find("<script type=\"application/octet-stream\"") {
         let line_start = rest[..start]
             .rfind('\n')
             .map(|index| index + 1)

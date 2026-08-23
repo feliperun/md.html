@@ -1,0 +1,12 @@
+{
+  "id": "css-import-out-of-position",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-008",
+  "source": "---\ntitle: T\ntheme: lateimport.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "lateimport.theme.css": "OnJvb3R7LS1tZC1hY2NlbnQ6IzEyMzQ1Nn0KQGltcG9ydCB1cmwoImh0dHBzOi8vZXZpbC5leGFtcGxlL3guY3NzIik7"
+  },
+  "detail": "@import after a body rule still fails as E-MDHSEC-008, not a parse error"
+}

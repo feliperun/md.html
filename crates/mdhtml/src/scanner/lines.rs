@@ -365,14 +365,16 @@ pub(super) fn scan_lines(source: &str) -> ScanEvidence<'_> {
     let (headings, mut containers) = scan_headings_and_containers(&lines, &mask);
     containers.sort_by_key(|c| c.offset);
 
-    // Phase 5: Inline scanning for images and single emphasis
+    // Phase 5: Inline scanning for images, links and single emphasis
     let mut images = Vec::new();
+    let mut links = Vec::new();
     let mut has_emphasis = false;
 
     let inline_scanner = InlineScanner::new(source, &mask, &references);
     inline_scanner.scan_range(
         0..source.len(),
         &mut images,
+        &mut links,
         &mut has_emphasis,
         line_offset_to_num,
         line_text_end,
@@ -381,6 +383,7 @@ pub(super) fn scan_lines(source: &str) -> ScanEvidence<'_> {
     ScanEvidence {
         headings,
         images,
+        links,
         containers,
         has_emphasis,
         has_code,

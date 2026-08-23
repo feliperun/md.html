@@ -94,10 +94,10 @@ fn template_assembles_the_fmt01_skeleton() {
     assert!(
         html.contains("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
     );
+    let runtime_hash = mdhtml::selection::sha256::digest_base64(&expected_runtime(&source));
     assert!(html.contains(&format!(
         "<meta http-equiv=\"Content-Security-Policy\" content=\"{}\">",
-        "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; \
-         img-src data: blob:; font-src data:; media-src data: blob:"
+        mdhtml::build::canonical_csp(&runtime_hash)
     )));
     assert!(html.contains("<title>Document template</title>"));
     assert!(html.contains("<meta property=\"og:title\" content=\"Document template\">"));
@@ -200,7 +200,9 @@ fn local_theme_embeds_user_style_with_the_technical_preset() {
     let source = "---\ntitle: Local theme\ntheme: custom.theme.css\n---\n# Body\n";
     let html = build(source, &dir, &runtime_dist(), &themes_dir(), &fonts_dir()).expect("builds");
 
-    assert!(html.contains("<style id=\"mdhtml-user\">:root{--md-accent:#123456}</style>"));
+    assert!(html.contains(
+        "<style id=\"mdhtml-user\">:root {\n  --md-accent: #123456;\n}\n</style>"
+    ));
     let theme = between(&html, "<style id=\"mdhtml-theme\">", "</style>");
     assert!(
         theme.contains("Instrument Sans"),
@@ -327,5 +329,20 @@ fn build_command_reports_missing_input_and_title_as_one_line_diagnostics() {
     assert_eq!(
         String::from_utf8_lossy(&output.stderr),
         "mdhtml: E-FMT-05: front matter title is required and must be a nonempty string\n"
+    );
+}
+
+#[test]
+fn tokens_neutralize_the_style_close_sequence() {
+    let source = "---\ntitle: Tokens\ntokens:\n  --md-evil: \"</style><img src=x onerror=alert(1)>\"\n---\n# Body\n";
+    let html = build_source(source).expect("token rendering escapes, it does not reject");
+    let tokens = between(&html, "<style id=\"mdhtml-tokens\">", "</style>");
+    assert!(
+        !tokens.contains("</style"),
+        "a token value must not introduce a literal style-close sequence: {tokens}"
+    );
+    assert!(
+        tokens.contains("\\3c /style"),
+        "the < is CSS-escaped so the bytes cannot close the style element: {tokens}"
     );
 }

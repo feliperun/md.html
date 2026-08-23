@@ -1,0 +1,12 @@
+{
+  "id": "css-font-face-no-src",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-010",
+  "source": "---\ntitle: T\ntheme: ghostfont.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "ghostfont.theme.css": "QGZvbnQtZmFjZSB7IGZvbnQtZmFtaWx5OiAiR2hvc3QiOyB9"
+  },
+  "detail": "@font-face without any src is outside the data: src allowlist"
+}

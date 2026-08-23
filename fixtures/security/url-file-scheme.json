@@ -1,0 +1,9 @@
+{
+  "id": "url-file-scheme",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-012",
+  "source": "---\ntitle: T\n---\n\n[click](file:///etc/passwd)\n",
+  "detail": "file: destination in a Markdown link"
+}

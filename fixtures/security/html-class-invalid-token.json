@@ -1,0 +1,9 @@
+{
+  "id": "html-class-invalid-token",
+  "category": "html",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-004",
+  "source": "---\ntitle: T\nsections:\n  intro: { component: hero, class: \"landing featured!\" }\n---\n\n# Intro\nText.\n",
+  "detail": "section-bound class token outside the identifier contract"
+}

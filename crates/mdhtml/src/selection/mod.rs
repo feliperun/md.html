@@ -7,7 +7,7 @@ pub mod fonts;
 pub mod manifest;
 
 mod json;
-mod sha256;
+pub mod sha256;
 
 pub use fonts::{Catalog, Face, Family, Preset, SelectedFace, WghtRange, select_faces};
 pub use manifest::{

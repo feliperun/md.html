@@ -1,0 +1,9 @@
+{
+  "id": "path-parent-traversal",
+  "category": "path",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-014",
+  "source": "---\ntitle: T\n---\n\n![logo](../escape.png)\n",
+  "detail": "parent-traversal image destination rejected before any file is read"
+}

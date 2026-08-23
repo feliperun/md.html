@@ -1,0 +1,9 @@
+{
+  "id": "url-javascript-scheme",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-012",
+  "source": "---\ntitle: T\n---\n\n[click](javascript:alert(1))\n",
+  "detail": "javascript: destination in a Markdown link"
+}

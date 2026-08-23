@@ -1,0 +1,8 @@
+{
+  "id": "url-valid-mailto",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[write](mailto:author@example.com)\n",
+  "detail": "mailto: destinations stay allowed"
+}

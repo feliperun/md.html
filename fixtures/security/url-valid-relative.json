@@ -1,0 +1,9 @@
+{
+  "id": "url-valid-relative",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[guide](guide/next.md)\n\n![logo](logo.svg)\n",
+  "assets": { "logo.svg": "PHN2Zy8+" },
+  "detail": "relative link and image destinations stay allowed"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "css-valid-theme",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "valid",
+  "source": "---\ntitle: T\ntheme: valid.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "valid.theme.css": "OnJvb3QgeyAtLW1kLWFjY2VudDogIzBmNzY2ZTsgfQpAbWVkaWEgKHByZWZlcnMtY29sb3Itc2NoZW1lOiBkYXJrKSB7IDpyb290IHsgLS1tZC1hY2NlbnQ6ICM1ZWVhZDQ7IH0gfQoubWQtaGVybyB7IGJhY2tncm91bmQtaW1hZ2U6IHVybCgiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnk4KyIpOyB9CkBmb250LWZhY2UgeyBmb250LWZhbWlseTogIkxvY2FsIjsgc3JjOiB1cmwoImRhdGE6Zm9udC93b2ZmMjtiYXNlNjQsQUE9PSIpIGZvcm1hdCgid29mZjIiKTsgfQ=="
+  },
+  "detail": "selectors, @media, data: url() and a data: @font-face stay allowed"
+}

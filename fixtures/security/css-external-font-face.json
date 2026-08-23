@@ -1,0 +1,12 @@
+{
+  "id": "css-external-font-face",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-010",
+  "source": "---\ntitle: T\ntheme: external-font-face.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "external-font-face.theme.css": "QGZvbnQtZmFjZSB7IGZvbnQtZmFtaWx5OiAiRXh0ZXJuYWwiOyBzcmM6IHVybCgiaHR0cHM6Ly9ldmlsLmV4YW1wbGUvZm9udC53b2ZmMiIpIGZvcm1hdCgid29mZjIiKTsgfQ=="
+  },
+  "detail": "author @font-face must keep a data: src"
+}

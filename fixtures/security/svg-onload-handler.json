@@ -1,0 +1,10 @@
+{
+  "id": "svg-onload-handler",
+  "category": "svg",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-001",
+  "source": "---\ntitle: T\n---\n\n![logo](evil.svg)\n",
+  "assets": { "evil.svg": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgb25sb2FkPSJhbGVydCgxKSIvPjwvc3ZnPg==" },
+  "detail": "asset SVG bytes with an onload event handler attribute"
+}

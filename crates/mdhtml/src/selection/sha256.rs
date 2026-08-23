@@ -14,6 +14,43 @@ const K: [u32; 64] = [
 
 /// Lowercase hex digest of `bytes`.
 pub fn digest_hex(bytes: &[u8]) -> String {
+    let mut out = String::with_capacity(64);
+    for byte in digest_bytes(bytes) {
+        out.push_str(&format!("{byte:02x}"));
+    }
+    out
+}
+
+/// RFC 4648 standard base64 (with padding) of the SHA-256 digest of `bytes`
+/// — the CSP source form `sha256-<BASE64>` (ADR 0010).
+pub fn digest_base64(bytes: &[u8]) -> String {
+    const ALPHABET: &[u8; 64] =
+        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let digest = digest_bytes(bytes);
+    let mut out = String::with_capacity(44);
+    for chunk in digest.chunks(3) {
+        let b0 = chunk[0];
+        let b1 = chunk.get(1).copied().unwrap_or(0);
+        let b2 = chunk.get(2).copied().unwrap_or(0);
+        let triple = (u32::from(b0) << 16) | (u32::from(b1) << 8) | u32::from(b2);
+        out.push(ALPHABET[(triple >> 18) as usize & 63] as char);
+        out.push(ALPHABET[(triple >> 12) as usize & 63] as char);
+        out.push(if chunk.len() > 1 {
+            ALPHABET[(triple >> 6) as usize & 63] as char
+        } else {
+            '='
+        });
+        out.push(if chunk.len() > 2 {
+            ALPHABET[triple as usize & 63] as char
+        } else {
+            '='
+        });
+    }
+    out
+}
+
+/// The raw 32-byte SHA-256 digest of `bytes` (FIPS 180-4).
+fn digest_bytes(bytes: &[u8]) -> [u8; 32] {
     let mut state = [
         0x6a09e667u32,
         0xbb67ae85,
@@ -40,9 +77,9 @@ pub fn digest_hex(bytes: &[u8]) -> String {
     for block in final_data.chunks_exact(64) {
         compress(&mut state, block);
     }
-    let mut out = String::with_capacity(64);
-    for word in state {
-        out.push_str(&format!("{word:08x}"));
+    let mut out = [0u8; 32];
+    for (index, word) in state.iter().enumerate() {
+        out[index * 4..index * 4 + 4].copy_from_slice(&word.to_be_bytes());
     }
     out
 }
@@ -100,7 +137,7 @@ fn compress(state: &mut [u32; 8], block: &[u8]) {
 
 #[cfg(test)]
 mod tests {
-    use super::digest_hex;
+    use super::{digest_base64, digest_hex};
 
     #[test]
     fn sha256_known_vectors() {
@@ -124,6 +161,18 @@ mod tests {
         assert_eq!(
             digest_hex(&long),
             "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0"
+        );
+    }
+
+    #[test]
+    fn sha256_base64_known_vectors() {
+        assert_eq!(
+            digest_base64(b""),
+            "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+        );
+        assert_eq!(
+            digest_base64(b"abc"),
+            "ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0="
         );
     }
 }

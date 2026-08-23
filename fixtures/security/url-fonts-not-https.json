@@ -1,0 +1,9 @@
+{
+  "id": "url-fonts-not-https",
+  "category": "url",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-006",
+  "source": "---\ntitle: T\nfonts:\n  url: http://fonts.example.test/css2\n---\n\n# Body\n",
+  "detail": "fonts.url outside https must be rejected before any CSP relaxation"
+}

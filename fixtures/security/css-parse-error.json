@@ -1,0 +1,10 @@
+{
+  "id": "css-parse-error",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-007",
+  "source": "---\ntitle: T\ntheme: broken.theme.css\n---\n\n# Body\n",
+  "assets": { "broken.theme.css": "YSB7IGNvbG9yOiByZWQ7IH0gfQ==" },
+  "detail": "stray closing brace makes author CSS fail closed"
+}
