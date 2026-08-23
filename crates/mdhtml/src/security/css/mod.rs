@@ -1,5 +1,7 @@
 //! Author CSS policy guard (ADR 0008): a fail-closed allowlist over
-//! `lightningcss`. Malformed CSS is `E-MDHSEC-007`; denied at-rules are
+//! `lightningcss`. Malformed CSS — including approved CSS that
+//! re-serializes to a literal `</style` context-escape sequence — is
+//! `E-MDHSEC-007`; denied at-rules are
 //! `E-MDHSEC-008`; a `url()` that is not a `data:` URI is `E-MDHSEC-009`;
 //! an author `@font-face` without a `data:` `src` is `E-MDHSEC-010`.
 //! An out-of-position `@import`/`@namespace` surfaces as the parser's typed
@@ -53,7 +55,22 @@ pub fn guard_author_css(css: &str) -> Result<String, Violation> {
             ..PrinterOptions::default()
         })
         .map_err(|_| Violation::new("E-MDHSEC-007", "author CSS fails to re-serialize"))?;
+    if contains_style_terminator(&output.code) {
+        return Err(Violation::new(
+            "E-MDHSEC-007",
+            "author CSS re-serialization must not contain the sequence </style",
+        ));
+    }
     Ok(output.code)
+}
+
+/// Whether the re-serialized stylesheet carries a literal `</style` anywhere
+/// (case-insensitive, mirroring the source-level `</script` guard): the
+/// embedded `<style id="mdhtml-user">` element ends at that byte sequence in
+/// HTML raw text, so cssparser's string writer emitting it unescaped would
+/// let author CSS escape its own style element and inject markup.
+fn contains_style_terminator(css: &str) -> bool {
+    css.to_ascii_lowercase().contains("</style")
 }
 
 /// Map a lightningcss parse failure onto the frozen codes: an out-of-position

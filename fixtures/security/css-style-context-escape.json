@@ -1,0 +1,12 @@
+{
+  "id": "css-style-context-escape",
+  "category": "css",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-007",
+  "source": "---\ntitle: T\ntheme: escape.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "escape.theme.css": "YTo6YWZ0ZXIgeyBjb250ZW50OiAiPC9zdHlsZT48aW1nIHNyYz14IG9uZXJyb3I9YWxlcnQoMSk+IiB9"
+  },
+  "detail": "a content string that re-serializes to a literal </style breaks out of the embedded style element"
+}

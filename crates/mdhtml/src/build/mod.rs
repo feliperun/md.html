@@ -397,6 +397,7 @@ fn escape_css(value: &str) -> String {
             ';' => escaped.push_str("\\;"),
             '{' => escaped.push_str("\\{"),
             '}' => escaped.push_str("\\}"),
+            '<' => escaped.push_str("\\3c "),
             '\n' | '\r' => escaped.push_str("\\a "),
             '\0' => escaped.push_str("\\0 "),
             ch => escaped.push(ch),
