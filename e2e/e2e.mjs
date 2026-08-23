@@ -87,6 +87,12 @@ async function main() {
   try {
     const source = withDiagram(readFileSync(EXAMPLE_SOURCE, "utf8"));
     writeFileSync(join(work, "spec-e2e.md"), source);
+    // The example declares `theme: spec.theme.css` in its front matter; the
+    // build resolves it next to the source, so it must travel with the copy.
+    writeFileSync(
+      join(work, "spec.theme.css"),
+      readFileSync(join(ROOT, "examples", "spec.theme.css")),
+    );
     writeFileSync(join(work, "diagram.svg"), syntheticDiagram());
     runBinary(["build", join(work, "spec-e2e.md"), "-o", join(work, "spec-e2e.md.html")]);
     const documentUrl = pathToFileURL(join(work, "spec-e2e.md.html")).href;

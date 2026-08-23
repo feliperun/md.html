@@ -50,7 +50,9 @@ compila para `wasm32` quando o produto hospedado existir. `playwright` também
 - Sem servidor nem rede — telemetria é não-goal por design; o contrato de
   qualidade é `mdhtml check` verde no CI sobre todos os `examples/`, com
   orçamento de bytes por categoria (conteúdo/runtime/fontes/imagens) e limite
-  de binário (450 KiB) verificado no release.
+  de binário (3 MiB, [ADR 0019](adr/0019-release-binary-size-budget.md) —
+  1.866.064 bytes medidos com o pipeline de segurança completo) verificado
+  no release.
 
 ## Security model
 
