@@ -879,10 +879,11 @@ Fragment rules:
 - `fonts/check.mjs` verifies the catalog schema, WOFF2 magic, exact size/hash,
   notices, absence of an `opsz` declaration, and the selection fixtures
   offline. No normal build or test downloads font bytes.
-- The release CLI binary MUST NOT exceed 600 KiB (614400 bytes); CI enforces
-  the limit and fails the build otherwise. This ceiling is the measured floor
-  for a statically-linked Rust release binary with the standard
-  size-optimized profile, not an arbitrary figure.
+- The release CLI binary MUST NOT exceed 3 MiB (3145728 bytes); CI enforces
+  the limit and fails the build otherwise. The ceiling was raised from the
+  v1.0 600 KiB floor by ADR 0019 to absorb the structural HTML/CSS guards
+  (`html5ever`, `lightningcss` — ADRs 0007/0008); the limit itself stays a
+  hard CI gate, not an arbitrary figure.
 
 ## 19. Product and distribution (PROD-01…DIST-02)
 

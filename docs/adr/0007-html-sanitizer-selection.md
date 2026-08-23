@@ -42,6 +42,26 @@ controls:
 - `{#id}` is restricted to `[A-Za-z0-9_-]`; section/class tokens are
   validated against the existing CSS-identifier contract.
 
+Scheme validation is implemented in-repo (`split_scheme` +
+`strip_ascii_whitespace_and_controls` in
+`crates/mdhtml/src/security/html/`) rather than through the WHATWG `url`
+crate that `docs/research/b-html-security.md` recommended. The guard needs
+only a boolean scheme-allowlist decision on already-parsed, entity-decoded
+attribute values — not full URL resolution (no base URL, host
+normalization, or relative resolution) — and the RFC 3986 scheme grammar
+(`ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )` before the first colon) is a
+small character-class scan, not a regex on a raw attribute string, so the
+research's actual prohibition holds. WHATWG behaviors that affect the
+decision are covered explicitly: scheme matching is ASCII-case-insensitive,
+and ASCII whitespace/controls are stripped before matching so
+`java\tscript:` cannot smuggle through. A second network-spec parser
+dependency (with its own maintenance and advisory surface) would buy
+resolution power the guard never uses. This deviation from the research
+recommendation was independently reviewed against known scheme-smuggling
+bypasses during the Phase 2 PR review; the Tech Spec's `url`-crate parity
+open question is superseded by fixture coverage of the in-repo splitter
+(`fixtures/security/url-*.json`).
+
 ## Options considered
 
 - **`html5ever`** (chosen): mature WHATWG-conformant parser (tokenizer plus
@@ -51,7 +71,11 @@ controls:
 - **`ammonia`** (rejected as engine): mature allowlist sanitizer built on
   html5ever, but it cleans — parse, filter, re-serialize. Re-serialization
   changes bytes, and its historical mutation-XSS advisories live in exactly
-  that path. Retained as the documented future cleaner.
+  that path (unverified, per `docs/research/b-html-security.md` — that node
+  had no network access; exact advisory IDs await the RUSTSEC verification
+  in the Tech Spec's open questions). The rejection rests on the
+  reject-don't-mutate model, not on the advisory history. Retained as the
+  documented future cleaner.
 - **`html5gum`, `lol_html`, `kuchiki`, `gumbo`**: rejected as tokenizer-only,
   rewriting-focused, or unmaintained.
 - **Regex-based sanitizers**: prohibited outright by PRD §8.

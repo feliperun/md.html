@@ -73,9 +73,14 @@ so safety is a property of the artifact, not the hosting provider.**
   shipping a mutated document (PRD §5).
 - **Sanitizer cleaning (ammonia-style strip/rewrite)**: rejected as the
   engine — cleaning re-serializes, which is exactly where its historical
-  mutation-XSS advisories live, and mutated output breaks deterministic,
+  mutation-XSS advisories live (unverified, per
+  `docs/research/b-html-security.md` — that node had no network access;
+  exact advisory IDs await the RUSTSEC verification in the Tech Spec's open
+  questions), and mutated output breaks deterministic,
   byte-stable artifacts. Ammonia stays only as the documented future
   cleaner if a cleaning mode is ever added (research `b-html-security.md`).
+  The decision does not depend on the advisory history: reject-don't-mutate
+  alone rules the cleaning model out.
 - **Silent normalization**: rejected — PRD §5 requires reject rather than
   silently mutate; rewriting risks changing author intent.
 - **Hosting-side-only validation**: rejected — safety must be a property
@@ -101,7 +106,8 @@ so safety is a property of the artifact, not the hosting provider.**
 - The parser crates end ADR 0004's std-only CLI constraint and require a
   superseding ADR, with exact version pinning after `cargo audit`, RUSTSEC
   verification, Sentrux gate, `wasm32` compile check, and binary-size
-  measurement against the 600 KiB release budget.
+  measurement against the release budget (3 MiB since ADR 0019; the 600 KiB
+  ceiling this ADR was written against proved unattainable with html5ever).
 - Safe-by-default ships as an additive security profile over the frozen
   v1.0 contract: documents violating the new policy now fail rather than
   build (e.g., `{#id}` tightening to `[A-Za-z0-9_-]`), new `E-MDHSEC-*`

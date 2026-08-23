@@ -45,7 +45,7 @@ Known gaps that this Tech Spec must close (from research brief A):
 - CLI-03: `extract` restores the source byte-for-byte and must reject unsafe asset paths, collisions, and overwrites.
 - §16 Diagnostics: stable `E-`/`W-`/`I-<REQ-ID>` codes are public contract; implementations may add codes but must not change the enumerated set.
 - §17 Runtime fragment manifest: `core`, `copy`, `toc`, `lightbox` are selected from closed evidence; builds are reproducible.
-- §18 Byte budgets: content/runtime/fonts/images are reported; release CLI binary ≤ 600 KiB; fonts are OFL/Apache, `wght` only, no `opsz`, never re-subsetted.
+- §18 Byte budgets: content/runtime/fonts/images are reported; release CLI binary ≤ 3 MiB (raised from the v1.0 600 KiB ceiling by ADR 0019); fonts are OFL/Apache, `wght` only, no `opsz`, never re-subsetted.
 - ADR 0004: std-only CLI and dependency-free runtime are frozen choices; adding a third-party crate requires a superseding ADR.
 - ADR 0005: the four-fragment runtime lifecycle boundaries are frozen.
 
@@ -346,6 +346,7 @@ Defense in depth:
 
 - Safe-by-default is treated as an **additive security profile over the frozen v1.0 contract**, not a rewrite of it; valid v1.0 documents continue to build where they do not violate the new policy.
 - The existing `script-src 'unsafe-inline'` baseline is superseded by the hash-only policy; `'unsafe-inline'` remains for styles only.
+- **This CSP change is not additive — it is a format revision, v1.1, of the FMT-03 contract.** Artifacts carry no version attribute; the version is realized by the CSP itself (SPEC §5 now lists the hash policy as canonical). The profile is additive for *sources* — every canonical v1.0 `.md` source rebuilds unchanged under v1.1, because the runtime hash is derived, not authored — but a *built artifact* from the v1.0 toolchain (with `script-src 'unsafe-inline'`) does not satisfy the v1.1 contract. `mdhtml check` on such an artifact fails deterministically with `E-FMT-03` (declared CSP ≠ recomputed canonical CSP; the hash is recomputed from the embedded runtime, never trusted from the meta), and `mdhtml audit` fails with `E-MDHSEC-016` (contradictory CSP) — a clear rejection, never a crash or a false pass. Migration is therefore "rebuild the artifact from its canonical source", not "edit the document": byte-exact `extract` guarantees the source is always recoverable from the old artifact.
 - `{#id}` tightening to `[A-Za-z0-9_-]` is a small frozen-surface behavior change and requires a fixture update.
 - No existing `Diagnostic` code changes; new `E-MDHSEC-*` codes are additive.
 - `extract` and byte-exact round-trip invariants are preserved by the reject-don't-mutate design.
@@ -369,9 +370,9 @@ Defense in depth:
 
 ## Open questions
 
-- Verify live crate versions, maintenance, and RUSTSEC status for `html5ever`, `lightningcss`, and the `url` crate before pinning.
-- Measure `wasm32` compatibility and release binary-size impact of both parser dependencies against the 600 KiB budget.
-- Verify `url` crate parsing parity with browser attribute parsing (control characters, backslashes, scheme case).
+- Verify live crate versions, maintenance, and RUSTSEC status for `html5ever` and `lightningcss` before pinning (the `url` crate is not a dependency: ADR 0007 records the in-repo RFC 3986 scheme-splitting decision).
+- Native release binary-size impact is measured and the budget decided (ADR 0019: 3 MiB, dependencies-only measurement 1,882,704 bytes); `wasm32` size and compatibility remain unmeasured.
+- ~~Verify `url` crate parsing parity with browser attribute parsing~~ — superseded by ADR 0007: scheme validation is the in-repo RFC 3986 splitter; its parity is pinned by `fixtures/security/url-*.json` instead.
 - Decide runtime parity for hand-edited documents: source-side policy only for MVP versus an embedded client-side policy walk.
 - Confirm whether any raw-HTML mode exists beyond `--unsafe`, and if so whether it rejects or cleans via ammonia.
 - Confirm audit scope is source/artifact policy only, with browser-based rendered-DOM verification only in E2E.
