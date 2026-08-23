@@ -45,10 +45,10 @@ pub struct Asset {
 /// embed exactly once, in first-reference order. Missing files and
 /// out-of-table extensions fail with E-CLI-01 before any output. Every path
 /// that proceeds to embedding must be extraction-safe (`E-MDHSEC-014`) in
-/// both modes; every embedded SVG asset must pass the structural guard
-/// (`E-MDHSEC-011`/`-001`/`-013`) unless `unsafe_mode` disables the
-/// content-security guards (ADR 0009) — all before any output; the exact
-/// original bytes are embedded.
+/// both modes; every embedded SVG asset must be valid UTF-8 and pass the
+/// structural guard (`E-MDHSEC-011`/`-001`/`-013`) unless `unsafe_mode`
+/// disables the content-security guards (ADR 0009) — all before any output;
+/// the exact original bytes are embedded.
 pub fn embed_assets(
     source: &str,
     body: &str,
@@ -70,14 +70,17 @@ pub fn embed_assets(
             )
         })?;
         if mime == "image/svg+xml" && !unsafe_mode {
-            let markup = String::from_utf8_lossy(&bytes);
-            security::html::validate_svg(&markup).map_err(|mut violation| {
-                if let Some((line, column)) = reference_position(body, line_offset, &path) {
-                    violation = violation.at(line, column);
-                }
-                violation.message = format!("asset '{path}': {}", violation.message);
-                security_error(violation, source, Some(&path))
-            })?;
+            // Validate the exact bytes the browser will decode: a non-UTF-8
+            // encoding (e.g. UTF-16 with BOM) lossy-decodes into mojibake the
+            // guard sees as harmless while the browser reads a coherent XML
+            // document the guard never saw.
+            let markup = std::str::from_utf8(&bytes)
+                .map_err(|_| svg_rejection(source, body, line_offset, &path, Violation::new(
+                    "E-MDHSEC-011",
+                    "SVG asset must be valid UTF-8",
+                )))?;
+            security::html::validate_svg(markup)
+                .map_err(|violation| svg_rejection(source, body, line_offset, &path, violation))?;
         }
         assets.push(Asset {
             path,
@@ -86,6 +89,24 @@ pub fn embed_assets(
         });
     }
     Ok(assets)
+}
+
+/// The guard violation for an SVG asset as a build error: the violation
+/// message is prefixed with the asset path and cites the reference position
+/// of the path in the document (the first scanner image evidence with that
+/// destination).
+fn svg_rejection(
+    source: &str,
+    body: &str,
+    line_offset: usize,
+    path: &str,
+    mut violation: Violation,
+) -> BuildError {
+    if let Some((line, column)) = reference_position(body, line_offset, path) {
+        violation = violation.at(line, column);
+    }
+    violation.message = format!("asset '{path}': {}", violation.message);
+    security_error(violation, source, Some(path))
 }
 
 /// The E-MDHSEC-014 error for an unsafe asset path, citing the reference

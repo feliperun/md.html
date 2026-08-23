@@ -1,0 +1,11 @@
+{
+  "id": "svg-utf16-bom",
+  "category": "svg",
+  "requirement": "PRD-14",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-011",
+  "location": "5:1",
+  "source": "---\ntitle: T\n---\n\n![logo](evil.svg)\n",
+  "assets": { "evil.svg": "//48AHMAdgBnACAAeABtAGwAbgBzAD0AIgBoAHQAdABwADoALwAvAHcAdwB3AC4AdwAzAC4AbwByAGcALwAyADAAMAAwAC8AcwB2AGcAIgA+ADwAcABhAHQAaAAgAGQAPQAiAE0AMAAgADAAIgAvAD4APAAvAHMAdgBnAD4A" },
+  "detail": "UTF-16LE+BOM SVG bytes: innocuous as lossy-decoded mojibake, a coherent XML document to the browser"
+}
