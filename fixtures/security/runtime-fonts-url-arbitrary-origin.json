@@ -1,0 +1,8 @@
+{
+  "id": "runtime-fonts-url-arbitrary-origin",
+  "category": "runtime",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\nfonts:\n  url: https://evil.example/css2?family=X\n---\n\n# H\n",
+  "detail": "a self-authored fonts.url relaxes the artifact's own CSP to exactly that origin — the audit sanctions it and stays SAFE"
+}

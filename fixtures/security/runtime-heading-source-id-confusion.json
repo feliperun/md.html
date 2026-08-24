@@ -1,0 +1,8 @@
+{
+  "id": "runtime-heading-source-id-confusion",
+  "category": "runtime",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n# H {#mdhtml-source}\n",
+  "detail": "a heading id cannot shadow the stored-source script: the runtime selects script elements by tag, and the artifact still audits SAFE"
+}

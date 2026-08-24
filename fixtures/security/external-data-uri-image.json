@@ -1,0 +1,8 @@
+{
+  "id": "external-data-uri-image",
+  "category": "external",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n![x](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==)\n",
+  "detail": "a data: URI image is in the image allowlist, contacts no origin, and audits SAFE"
+}

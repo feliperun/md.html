@@ -41,6 +41,7 @@ struct AdversarialFixture {
     id: String,
     category: String,
     status: String,
+    artifact: bool,
     diagnostic: Option<String>,
     location: Option<String>,
     source: Option<String>,
@@ -244,6 +245,7 @@ fn load_fixture(path: &Path) -> AdversarialFixture {
         id: string_field(&object, "id").expect("fixture id"),
         category: string_field(&object, "category").expect("fixture category"),
         status: string_field(&object, "status").expect("fixture status"),
+        artifact: string_field(&object, "kind").as_deref() == Some("artifact"),
         diagnostic: string_field(&object, "diagnostic"),
         location: string_field(&object, "location"),
         source: string_field(&object, "source"),
@@ -321,7 +323,7 @@ fn adversarial_build_cases_reach_a_deterministic_verdict() {
         .iter()
         .filter(|(_, path)| {
             let fixture = load_fixture(path);
-            fixture.source.is_some()
+            !fixture.artifact && fixture.source.is_some()
         })
         .collect();
     assert!(
@@ -412,10 +414,7 @@ fn adversarial_artifact_cases_audit_to_the_frozen_verdicts() {
     let cases = cases();
     let artifact_cases: Vec<_> = cases
         .iter()
-        .filter(|(_, path)| {
-            let raw = fs::read_to_string(path).expect("fixture is readable");
-            raw.contains("\"kind\": \"artifact\"") || raw.contains("\"kind\":\"artifact\"")
-        })
+        .filter(|(_, path)| load_fixture(path).artifact)
         .collect();
 
     for (category, path) in artifact_cases {

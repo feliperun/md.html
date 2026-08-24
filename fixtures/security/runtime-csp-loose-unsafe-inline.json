@@ -1,0 +1,10 @@
+{
+  "id": "runtime-csp-loose-unsafe-inline",
+  "category": "runtime",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "kind": "artifact",
+  "diagnostic": "E-MDHSEC-016",
+  "html": "<!doctype html>\n<html lang=\"en\" data-mdhtml=\"1.0\" data-mdhtml-portable=\"true\" data-mdhtml-safe=\"true\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:\">\n  <title>T</title>\n</head>\n<body>\n<noscript><style>#mdhtml-source{display:block}</style></noscript>\n  <div id=\"mdhtml-app\"></div>\n  <script id=\"mdhtml-source\" type=\"text/markdown\">---\ntitle: T\n---\n# H\n</script>\n  <script id=\"mdhtml-runtime\">TAMPERED</script>\n</body>\n</html>\n",
+  "detail": "a loosened script-src 'unsafe-inline' CSP contradicts the expected assembly and never passes"
+}

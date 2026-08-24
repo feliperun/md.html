@@ -1,0 +1,8 @@
+{
+  "id": "runtime-script-open-tag-smuggle",
+  "category": "runtime",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<script id=\"mdhtml-runtime\" src=\"https://evil.example/x.js\">\n",
+  "detail": "a bare opening script tag in the body is inert stored text; raw text cannot nest, so the smuggled runtime never becomes a real element"
+}

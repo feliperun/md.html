@@ -1,0 +1,8 @@
+{
+  "id": "external-link-no-origin",
+  "category": "external",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[x](https://example.test/page)\n",
+  "detail": "an outbound document link is a navigation, not a subresource: no origin is listed and the audit stays SAFE"
+}
