@@ -302,21 +302,31 @@ fn invalid_keys_catalog_reports_every_schema_problem() {
     assert!(messages.iter().any(|m| m.contains("format")));
     assert!(messages.iter().any(|m| m.contains("presets are invalid")));
     assert!(messages.iter().any(|m| m.contains("families are invalid")));
-    assert!(messages
-        .iter()
-        .any(|m| m.contains("instrument-sans: name is invalid")));
-    assert!(messages
-        .iter()
-        .any(|m| m.contains("instrument-sans: source is invalid")));
-    assert!(messages
-        .iter()
-        .any(|m| m.contains("instrument-sans: faces are not closed")));
-    assert!(messages
-        .iter()
-        .any(|m| m.contains("instrument-sans/normal: face keys are not closed")));
-    assert!(messages
-        .iter()
-        .any(|m| m.contains("instrument-sans/normal: axes are invalid")));
+    assert!(
+        messages
+            .iter()
+            .any(|m| m.contains("instrument-sans: name is invalid"))
+    );
+    assert!(
+        messages
+            .iter()
+            .any(|m| m.contains("instrument-sans: source is invalid"))
+    );
+    assert!(
+        messages
+            .iter()
+            .any(|m| m.contains("instrument-sans: faces are not closed"))
+    );
+    assert!(
+        messages
+            .iter()
+            .any(|m| m.contains("instrument-sans/normal: face keys are not closed"))
+    );
+    assert!(
+        messages
+            .iter()
+            .any(|m| m.contains("instrument-sans/normal: axes are invalid"))
+    );
     assert!(messages.iter().any(|m| m.contains("catalog declares opsz")));
     assert_eq!(
         error.problems.len(),
@@ -345,12 +355,16 @@ fn invalid_face_catalog_reports_size_hash_and_missing_license_files() {
     );
 
     let messages = problem_messages(&error);
-    assert!(messages
-        .iter()
-        .any(|m| m.contains("newsreader/normal: size mismatch")));
-    assert!(messages
-        .iter()
-        .any(|m| m.contains("instrument-sans/normal: sha256 mismatch")));
+    assert!(
+        messages
+            .iter()
+            .any(|m| m.contains("newsreader/normal: size mismatch"))
+    );
+    assert!(
+        messages
+            .iter()
+            .any(|m| m.contains("instrument-sans/normal: sha256 mismatch"))
+    );
     assert!(
         messages
             .iter()

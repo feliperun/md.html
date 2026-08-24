@@ -454,7 +454,13 @@ fn mask_code_blocks(lines: &[Line<'_>], mask: &mut [bool]) -> bool {
     has_code
 }
 
-fn mask_code_span(line: &Line<'_>, bytes: &[u8], mask: &mut [bool], idx: usize, run: usize) -> Option<usize> {
+fn mask_code_span(
+    line: &Line<'_>,
+    bytes: &[u8],
+    mask: &mut [bool],
+    idx: usize,
+    run: usize,
+) -> Option<usize> {
     // Find closing run of equal length
     let mut c_idx = idx + run;
     while c_idx < line.end {

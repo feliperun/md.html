@@ -348,10 +348,13 @@ fn artifacts_declare_the_safe_attestation_and_unsafe_builds_still_check_clean() 
     );
     let safe_report = check_artifact(&safe);
     assert!(!safe_report.has_errors(), "{:?}", safe_report.diagnostics);
-    assert!(safe_report.diagnostics.is_empty(), "{:?}", safe_report.diagnostics);
+    assert!(
+        safe_report.diagnostics.is_empty(),
+        "{:?}",
+        safe_report.diagnostics
+    );
 
-    let unsafe_source =
-        "---\ntitle: Unsafe\n---\n\n[click](javascript:alert(1))\n";
+    let unsafe_source = "---\ntitle: Unsafe\n---\n\n[click](javascript:alert(1))\n";
     let unsafe_html = mdhtml::build::build_unsafe(
         &unsafe_source,
         &fixture_dir(),

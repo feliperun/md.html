@@ -67,7 +67,10 @@ impl<'a> JsonParser<'a> {
     }
 
     fn whitespace(&mut self) {
-        while matches!(self.input.get(self.index), Some(b' ' | b'\t' | b'\n' | b'\r')) {
+        while matches!(
+            self.input.get(self.index),
+            Some(b' ' | b'\t' | b'\n' | b'\r')
+        ) {
             self.index += 1;
         }
     }
@@ -337,7 +340,9 @@ fn svg_and_path_cases_reject_or_build_with_the_frozen_diagnostics() {
                         .split_once(':')
                         .expect("fixture location is LINE:COLUMN");
                     assert!(
-                        error.to_string().contains(&format!("(line {line}, column {column})")),
+                        error
+                            .to_string()
+                            .contains(&format!("(line {line}, column {column})")),
                         "{} must cite line {line}, column {column} in its message: {}",
                         fixture.id,
                         error
@@ -377,7 +382,10 @@ fn svg_and_path_cases_reject_or_build_with_the_frozen_diagnostics() {
 fn unsafe_path_rejection_carries_the_offending_path() {
     // A distinct root from the corpus walker above: both tests build the same
     // case ids and would otherwise race on the shared per-id directories.
-    let dir = std::env::temp_dir().join(format!("mdhtml-security-unsafe-paths-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!(
+        "mdhtml-security-unsafe-paths-{}",
+        std::process::id()
+    ));
     for (id, source, offender) in [
         (
             "path-parent-traversal",

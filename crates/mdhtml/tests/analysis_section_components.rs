@@ -1,4 +1,4 @@
-use mdhtml::analysis::{analyze_document, Diagnostic, Severity};
+use mdhtml::analysis::{Diagnostic, Severity, analyze_document};
 use std::fs;
 use std::path::{Path, PathBuf};
 

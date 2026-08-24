@@ -458,9 +458,7 @@ fn parse_fragment_sha256(
     problems: &mut Vec<SelectionProblem>,
 ) -> Option<String> {
     match object_get(fragment_object, "sha256") {
-        Some(JsonValue::String(value)) if is_hex_64(value) => {
-            Some(value.to_ascii_lowercase())
-        }
+        Some(JsonValue::String(value)) if is_hex_64(value) => Some(value.to_ascii_lowercase()),
         Some(JsonValue::String(_)) => {
             problems.push(SelectionProblem::error(
                 "E-MANIFEST-02",

@@ -1,4 +1,4 @@
-use mdhtml::frontmatter::{parse_front_matter, Value};
+use mdhtml::frontmatter::{Value, parse_front_matter};
 use std::fs;
 use std::path::{Path, PathBuf};
 

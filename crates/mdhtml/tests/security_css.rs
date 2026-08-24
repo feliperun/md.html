@@ -300,7 +300,9 @@ fn css_cases_reject_or_build_with_the_frozen_diagnostics() {
                         .split_once(':')
                         .expect("fixture location is LINE:COLUMN");
                     assert!(
-                        error.to_string().contains(&format!("(line {line}, column {column})")),
+                        error
+                            .to_string()
+                            .contains(&format!("(line {line}, column {column})")),
                         "{} must cite line {line}, column {column} in its message: {}",
                         fixture.id,
                         error

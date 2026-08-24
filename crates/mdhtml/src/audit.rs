@@ -199,9 +199,10 @@ pub fn audit_artifact(html: &str) -> AuditReport {
     let identity = root.is_some_and(|element| check::attr(element, "data-mdhtml") == Some("1.0"));
     let source_ok = source_scripts.len() == 1
         && markdown_scripts.len() == 1
-        && source_scripts[0].attrs.iter().any(|(name, value)| {
-            name.eq_ignore_ascii_case("type") && *value == "text/markdown"
-        });
+        && source_scripts[0]
+            .attrs
+            .iter()
+            .any(|(name, value)| name.eq_ignore_ascii_case("type") && *value == "text/markdown");
     let runtime_present = runtime_scripts.len() == 1;
 
     let mut identity_diagnostics = Vec::new();
@@ -260,7 +261,9 @@ pub fn audit_artifact(html: &str) -> AuditReport {
     let (markup_pass, markup_diagnostics) = scan_markup(&elements);
     let (css_pass, css_diagnostics) = css_check(&elements, &sanctioned);
 
-    let fonts_url = stored.as_ref().and_then(|stored| stored.fonts_url.as_deref());
+    let fonts_url = stored
+        .as_ref()
+        .and_then(|stored| stored.fonts_url.as_deref());
     let (hash_pass, hash_diagnostics) = runtime_check(&elements, fonts_url);
     let runtime_pass = runtime_present && hash_pass;
     runtime_diagnostics.extend(hash_diagnostics);
@@ -274,9 +277,8 @@ pub fn audit_artifact(html: &str) -> AuditReport {
         )]
     };
 
-    let attestation_ok = root
-        .and_then(|element| check::attr(element, "data-mdhtml-safe"))
-        == Some("true");
+    let attestation_ok =
+        root.and_then(|element| check::attr(element, "data-mdhtml-safe")) == Some("true");
     let attestation = if attestation_ok {
         None
     } else {
@@ -378,7 +380,12 @@ const EMITTED_ELEMENTS: [&str; 10] = [
 /// (E-MDHSEC-001) and take precedence.
 fn allowed_attributes(name: &str) -> &'static [&'static str] {
     match name {
-        "html" => &["lang", "data-mdhtml", "data-mdhtml-portable", "data-mdhtml-safe"],
+        "html" => &[
+            "lang",
+            "data-mdhtml",
+            "data-mdhtml-portable",
+            "data-mdhtml-safe",
+        ],
         "meta" => &["charset", "name", "content", "property", "http-equiv"],
         "link" => &["rel", "href"],
         "style" | "div" => &["id"],
@@ -520,9 +527,9 @@ fn runtime_check(
     elements: &[check::Element<'_>],
     fonts_url: Option<&str>,
 ) -> (bool, Vec<AuditDiagnostic>) {
-    let runtime = elements
-        .iter()
-        .find(|element| element.is("script") && check::attr(element, "id") == Some("mdhtml-runtime"));
+    let runtime = elements.iter().find(|element| {
+        element.is("script") && check::attr(element, "id") == Some("mdhtml-runtime")
+    });
     let csp = elements
         .iter()
         .filter(|element| element.is("meta"))

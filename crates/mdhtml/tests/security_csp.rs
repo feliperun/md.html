@@ -66,7 +66,10 @@ impl<'a> JsonParser<'a> {
     }
 
     fn whitespace(&mut self) {
-        while matches!(self.input.get(self.index), Some(b' ' | b'\t' | b'\n' | b'\r')) {
+        while matches!(
+            self.input.get(self.index),
+            Some(b' ' | b'\t' | b'\n' | b'\r')
+        ) {
             self.index += 1;
         }
     }

@@ -94,7 +94,15 @@ pub fn build(
     themes_dir: &Path,
     fonts_dir: &Path,
 ) -> Result<String, BuildError> {
-    assemble_document(source, source_dir, runtime_dir, themes_dir, fonts_dir, false, false)
+    assemble_document(
+        source,
+        source_dir,
+        runtime_dir,
+        themes_dir,
+        fonts_dir,
+        false,
+        false,
+    )
 }
 
 /// CLI-04: build with `--no-fonts`. Font embedding is skipped and the
@@ -107,7 +115,15 @@ pub fn build_no_fonts(
     themes_dir: &Path,
     fonts_dir: &Path,
 ) -> Result<String, BuildError> {
-    assemble_document(source, source_dir, runtime_dir, themes_dir, fonts_dir, true, false)
+    assemble_document(
+        source,
+        source_dir,
+        runtime_dir,
+        themes_dir,
+        fonts_dir,
+        true,
+        false,
+    )
 }
 
 /// ADR 0009: the explicit `--unsafe` profile. Content-security guards (HTML,
@@ -121,7 +137,15 @@ pub fn build_unsafe(
     themes_dir: &Path,
     fonts_dir: &Path,
 ) -> Result<String, BuildError> {
-    assemble_document(source, source_dir, runtime_dir, themes_dir, fonts_dir, false, true)
+    assemble_document(
+        source,
+        source_dir,
+        runtime_dir,
+        themes_dir,
+        fonts_dir,
+        false,
+        true,
+    )
 }
 
 /// ADR 0009: the `--unsafe` profile combined with `--no-fonts`; font
@@ -133,7 +157,15 @@ pub fn build_unsafe_no_fonts(
     themes_dir: &Path,
     fonts_dir: &Path,
 ) -> Result<String, BuildError> {
-    assemble_document(source, source_dir, runtime_dir, themes_dir, fonts_dir, true, true)
+    assemble_document(
+        source,
+        source_dir,
+        runtime_dir,
+        themes_dir,
+        fonts_dir,
+        true,
+        true,
+    )
 }
 
 fn assemble_document(
@@ -181,12 +213,8 @@ fn assemble_document(
     }
 
     let runtime = embed_runtime(&body, &analysis, &manifest, runtime_dir)?;
-    let (tokens_css, theme_css, user_css) = embed_styles(
-        &analysis.config,
-        source_dir,
-        themes_dir,
-        unsafe_mode,
-    )?;
+    let (tokens_css, theme_css, user_css) =
+        embed_styles(&analysis.config, source_dir, themes_dir, unsafe_mode)?;
     let fonts_css = assets::embed_fonts(&analysis, &body, &catalog, fonts_dir)?;
     let embedded = assets::embed_assets(
         source,
@@ -260,9 +288,8 @@ pub(crate) fn guard_document(
     }
     guard_section_classes(&analysis.config.sections, source)?;
     if let Some(url) = &analysis.config.url {
-        validate_url(url, UrlContext::Metadata).map_err(|violation| {
-            security_error(violation, source, None)
-        })?;
+        validate_url(url, UrlContext::Metadata)
+            .map_err(|violation| security_error(violation, source, None))?;
     }
     if let Fonts::Map { url: Some(url), .. } = &analysis.config.fonts {
         validate_fonts_url(url).map_err(|violation| security_error(violation, source, None))?;
@@ -381,7 +408,10 @@ fn class_token_error(source: &str, class: &str, token: &str, violation: Violatio
 /// build before the CSP is assembled.
 fn validate_fonts_url(url: &str) -> Result<(), Violation> {
     if url.chars().any(|ch| ch.is_ascii_control()) {
-        return Err(fonts_url_violation(url, "must not contain control characters"));
+        return Err(fonts_url_violation(
+            url,
+            "must not contain control characters",
+        ));
     }
     let Some(scheme) = scheme_of(url) else {
         return Err(fonts_url_violation(url, "must be an absolute https URL"));
@@ -392,7 +422,10 @@ fn validate_fonts_url(url: &str) -> Result<(), Violation> {
     let rest = &url[scheme.len() + 3..];
     let authority = rest.split(['/', '?', '#']).next().unwrap_or(rest);
     if !is_well_formed_authority(authority) {
-        return Err(fonts_url_violation(url, "must carry a well-formed https origin"));
+        return Err(fonts_url_violation(
+            url,
+            "must carry a well-formed https origin",
+        ));
     }
     Ok(())
 }
@@ -407,7 +440,10 @@ fn scheme_of(url: &str) -> Option<&str> {
     let colon = url.find(':')?;
     let candidate = &url[..colon];
     let mut chars = candidate.chars();
-    if !chars.next().is_some_and(|first| first.is_ascii_alphabetic()) {
+    if !chars
+        .next()
+        .is_some_and(|first| first.is_ascii_alphabetic())
+    {
         return None;
     }
     chars
@@ -427,9 +463,8 @@ fn is_well_formed_authority(authority: &str) -> bool {
         && host
             .chars()
             .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '-' | '.' | '_' | '%'));
-    let port_ok = port.is_none_or(|port| {
-        !port.is_empty() && port.chars().all(|ch| ch.is_ascii_digit())
-    });
+    let port_ok =
+        port.is_none_or(|port| !port.is_empty() && port.chars().all(|ch| ch.is_ascii_digit()));
     host_ok && port_ok
 }
 
@@ -445,7 +480,10 @@ pub(crate) fn security_error(
     excerpt_source: &str,
     construct: Option<&str>,
 ) -> BuildError {
-    BuildError::new(violation.code, render_security_message(&violation, excerpt_source, construct))
+    BuildError::new(
+        violation.code,
+        render_security_message(&violation, excerpt_source, construct),
+    )
 }
 
 /// Append the location suffix and, when the cited line and construct can be
@@ -482,7 +520,10 @@ fn render_excerpt(
     let (caret_index, caret_span) = match construct {
         Some(construct) => {
             let byte_index = line_text.find(construct)?;
-            (line_text[..byte_index].chars().count(), construct.chars().count())
+            (
+                line_text[..byte_index].chars().count(),
+                construct.chars().count(),
+            )
         }
         None => {
             let caret_index = column.checked_sub(1)?;

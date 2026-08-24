@@ -1,0 +1,5 @@
+---
+title: Valid artifact
+---
+
+# Body

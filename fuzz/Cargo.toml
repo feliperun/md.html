@@ -1,0 +1,55 @@
+[package]
+name = "mdhtml-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+mdhtml = { path = "../crates/mdhtml" }
+
+[workspace]
+members = ["."]
+
+# Speed up fuzzing: no debug symbols, no stack unwinding machinery in the
+# instrumented build (libFuzzer reports the crashing input, not the backtrace).
+[profile.dev]
+debug = 0
+panic = "abort"
+
+[profile.release]
+debug = 0
+panic = "abort"
+
+[[bin]]
+name = "fuzz_parser"
+path = "fuzz_targets/parser.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_html_validator"
+path = "fuzz_targets/html_validator.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_css_validator"
+path = "fuzz_targets/css_validator.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_extract_roundtrip"
+path = "fuzz_targets/extract_roundtrip.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "fuzz_build_audit"
+path = "fuzz_targets/build_audit.rs"
+test = false
+doc = false

@@ -42,14 +42,21 @@ fn publish_uploads_source_and_assets_and_returns_the_server_url() {
             "{head}"
         );
 
-        assert!(body.contains("title: Publish test"), "source bytes ride in the body");
+        assert!(
+            body.contains("title: Publish test"),
+            "source bytes ride in the body"
+        );
         assert!(body.contains("photo-bytes"), "asset bytes ride in the body");
         assert!(
-            body.contains("Content-Disposition: form-data; name=\"source\"; filename=\"document.md\""),
+            body.contains(
+                "Content-Disposition: form-data; name=\"source\"; filename=\"document.md\""
+            ),
             "{body}"
         );
         assert!(
-            body.contains("Content-Disposition: form-data; name=\"asset\"; filename=\"images/photo.png\""),
+            body.contains(
+                "Content-Disposition: form-data; name=\"asset\"; filename=\"images/photo.png\""
+            ),
             "{body}"
         );
 
@@ -60,7 +67,9 @@ fn publish_uploads_source_and_assets_and_returns_the_server_url() {
             "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{json}",
             json.len()
         );
-        stream.write_all(response.as_bytes()).expect("write response");
+        stream
+            .write_all(response.as_bytes())
+            .expect("write response");
     });
 
     let base_url = format!("http://127.0.0.1:{port}");

@@ -134,7 +134,10 @@ fn new_command_rejects_unknown_templates_as_one_line_cli05() {
         String::from_utf8_lossy(&output.stderr),
         "mdhtml: E-CLI-05: invalid template novel\n"
     );
-    assert!(!target.exists(), "no file is written for an unknown template");
+    assert!(
+        !target.exists(),
+        "no file is written for an unknown template"
+    );
 }
 
 #[test]
@@ -213,8 +216,7 @@ fn two_subprocess_builds_of_the_same_input_are_byte_identical() {
 fn no_fonts_build_is_equivalent_to_fonts_system() {
     let dir = temp_dir("no-fonts");
     let source = "---\ntitle: Fonts\n---\nBody with *emphasis* and `code`.\n";
-    let system_source =
-        "---\ntitle: Fonts\nfonts: system\n---\nBody with *emphasis* and `code`.\n";
+    let system_source = "---\ntitle: Fonts\nfonts: system\n---\nBody with *emphasis* and `code`.\n";
 
     let no_fonts = build_into(&dir, "flag.md", source, &["--no-fonts"]);
     assert!(
@@ -311,8 +313,7 @@ fn unsafe_build_requires_the_flag_and_attests_and_warns() {
     assert_eq!(without.status.code(), Some(1));
     assert_eq!(String::from_utf8_lossy(&without.stdout), "");
     assert!(
-        String::from_utf8_lossy(&without.stderr)
-            .starts_with("mdhtml: E-MDHSEC-012: "),
+        String::from_utf8_lossy(&without.stderr).starts_with("mdhtml: E-MDHSEC-012: "),
         "{}",
         String::from_utf8_lossy(&without.stderr)
     );
@@ -423,7 +424,11 @@ fn watch_rebuilds_once_per_change_and_stops_cleanly_on_sigint() {
     let first = fs::read_to_string(&output).expect("read first build");
     assert!(first.starts_with("<!doctype html>\n"));
 
-    fs::write(&input, "---\ntitle: Note\n---\n# Note\n\nAdded paragraph.\n").expect("change input");
+    fs::write(
+        &input,
+        "---\ntitle: Note\n---\n# Note\n\nAdded paragraph.\n",
+    )
+    .expect("change input");
     wait_for(
         || fs::read_to_string(&output).ok().as_deref() != Some(first.as_str()),
         Duration::from_secs(5),
@@ -431,10 +436,17 @@ fn watch_rebuilds_once_per_change_and_stops_cleanly_on_sigint() {
     );
     let second = fs::read_to_string(&output).expect("read second build");
     assert!(second.contains("Added paragraph."));
-    assert_eq!(second.matches("<!doctype html>").count(), 1, "no duplication");
+    assert_eq!(
+        second.matches("<!doctype html>").count(),
+        1,
+        "no duplication"
+    );
 
-    fs::write(&input, "---\ntitle: Note\n---\n# Note\n\nSecond paragraph.\n")
-        .expect("change input again");
+    fs::write(
+        &input,
+        "---\ntitle: Note\n---\n# Note\n\nSecond paragraph.\n",
+    )
+    .expect("change input again");
     wait_for(
         || fs::read_to_string(&output).ok().as_deref() != Some(second.as_str()),
         Duration::from_secs(5),
@@ -443,7 +455,11 @@ fn watch_rebuilds_once_per_change_and_stops_cleanly_on_sigint() {
     let third = fs::read_to_string(&output).expect("read third build");
     assert!(third.contains("Second paragraph."));
     assert!(!third.contains("Added paragraph."));
-    assert_eq!(third.matches("<!doctype html>").count(), 1, "no duplication");
+    assert_eq!(
+        third.matches("<!doctype html>").count(),
+        1,
+        "no duplication"
+    );
 
     signal(&child, "INT");
     let status = child.wait().expect("watch process exits");
@@ -464,7 +480,11 @@ fn watch_rerun_is_idempotent_and_never_duplicates() {
     fs::write(&input, "---\ntitle: Note\n---\n# Note\n").expect("write input");
 
     let mut first_run = spawn_watch(&input, &output);
-    wait_for(|| output.exists(), Duration::from_secs(5), "first run initial build");
+    wait_for(
+        || output.exists(),
+        Duration::from_secs(5),
+        "first run initial build",
+    );
     signal(&first_run, "TERM");
     let _ = first_run.wait();
 
@@ -479,7 +499,13 @@ fn watch_rerun_is_idempotent_and_never_duplicates() {
 
     let entries: Vec<String> = fs::read_dir(&dir)
         .expect("list watch dir")
-        .map(|entry| entry.expect("entry").file_name().to_string_lossy().into_owned())
+        .map(|entry| {
+            entry
+                .expect("entry")
+                .file_name()
+                .to_string_lossy()
+                .into_owned()
+        })
         .collect();
     let stray: Vec<&String> = entries
         .iter()
@@ -553,11 +579,7 @@ fn audit_json_matches_the_frozen_schema_in_exact_field_order() {
         String::from_utf8_lossy(&built.stderr)
     );
 
-    let audited = run(&[
-        "audit",
-        artifact.to_str().expect("utf8 path"),
-        "--json",
-    ]);
+    let audited = run(&["audit", artifact.to_str().expect("utf8 path"), "--json"]);
     assert!(
         audited.status.success(),
         "{}",
@@ -600,7 +622,10 @@ fn audit_of_an_unsafe_built_artifact_exits_one_and_prints_the_report_to_stdout()
         "mdhtml: E-CLI-06: artifact failed audit\n"
     );
     let stdout = String::from_utf8_lossy(&audited.stdout);
-    assert!(stdout.contains("✗ HTML security policy passed\n"), "{stdout}");
+    assert!(
+        stdout.contains("✗ HTML security policy passed\n"),
+        "{stdout}"
+    );
     assert!(
         stdout.contains("mdhtml: E-MDHSEC-018: artifact is marked unsafe\n"),
         "{stdout}"
@@ -618,15 +643,20 @@ fn audit_of_a_non_artifact_file_exits_one_with_the_cli05_one_liner() {
     assert_eq!(audited.status.code(), Some(1));
     assert_eq!(String::from_utf8_lossy(&audited.stdout), "");
     let stderr = String::from_utf8_lossy(&audited.stderr);
-    assert!(
-        stderr.starts_with("mdhtml: E-CLI-05: input "),
-        "{stderr}"
-    );
+    assert!(stderr.starts_with("mdhtml: E-CLI-05: input "), "{stderr}");
     assert_eq!(stderr.matches('\n').count(), 1);
 
-    let missing = run(&["audit", dir.join("nope.md.html").to_str().expect("utf8 path")]);
+    let missing = run(&[
+        "audit",
+        dir.join("nope.md.html").to_str().expect("utf8 path"),
+    ]);
     assert_eq!(missing.status.code(), Some(1));
     assert_eq!(String::from_utf8_lossy(&missing.stdout), "");
-    assert_eq!(String::from_utf8_lossy(&missing.stderr).matches('\n').count(), 1);
+    assert_eq!(
+        String::from_utf8_lossy(&missing.stderr)
+            .matches('\n')
+            .count(),
+        1
+    );
     assert!(String::from_utf8_lossy(&missing.stderr).starts_with("mdhtml: E-CLI-05: "));
 }
