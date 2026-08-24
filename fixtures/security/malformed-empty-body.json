@@ -1,0 +1,8 @@
+{
+  "id": "malformed-empty-body",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n",
+  "detail": "front matter with no body builds an empty document"
+}

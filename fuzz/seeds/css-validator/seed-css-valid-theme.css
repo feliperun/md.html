@@ -1,0 +1,4 @@
+:root { --md-accent: #0f766e; }
+@media (prefers-color-scheme: dark) { :root { --md-accent: #5eead4; } }
+.md-hero { background-image: url("data:image/svg+xml;base64,PHN2Zy8+"); }
+@font-face { font-family: "Local"; src: url("data:font/woff2;base64,AA==") format("woff2"); }

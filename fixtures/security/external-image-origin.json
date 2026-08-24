@@ -1,0 +1,10 @@
+{
+  "id": "external-image-origin",
+  "category": "external",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "source": "---\ntitle: T\n---\n\n![x](https://cdn.example.test/a.png)\n",
+  "detail": "an external image origin the CSP does not sanction: the build succeeds but the artifact audits UNSAFE and cannot be hosted",
+  "kind": "artifact",
+  "diagnostic": "E-MDHSEC-017"
+}

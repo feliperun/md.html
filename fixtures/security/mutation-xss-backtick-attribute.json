@@ -1,0 +1,8 @@
+{
+  "id": "mutation-xss-backtick-attribute",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<img onerror=`alert(1)`>\n",
+  "detail": "IE-era backtick attribute quoting: never parsed as markup"
+}

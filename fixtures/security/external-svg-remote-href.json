@@ -1,0 +1,12 @@
+{
+  "id": "external-svg-remote-href",
+  "category": "external",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-013",
+  "source": "---\ntitle: T\n---\n\n![logo](remote.svg)\n",
+  "assets": {
+    "remote.svg": "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxpbWFnZSBocmVmPSJodHRwczovL2V2aWwuZXhhbXBsZS94LnBuZyIvPjwvc3ZnPg=="
+  },
+  "detail": "SVG asset referencing a remote image href: an external fetch inside an embedded asset"
+}

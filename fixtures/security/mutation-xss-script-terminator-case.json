@@ -1,0 +1,9 @@
+{
+  "id": "mutation-xss-script-terminator-case",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-FMT-02",
+  "source": "---\ntitle: T\n---\n\n<ScRiPt>alert(1)</sCrIpT>\n",
+  "detail": "case-folded </script cannot smuggle past the raw-text terminator guard"
+}

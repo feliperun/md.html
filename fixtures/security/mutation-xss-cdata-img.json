@@ -1,0 +1,11 @@
+{
+  "id": "mutation-xss-cdata-img",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<![CDATA[<img src=1.svg onerror=alert(1)>]]>\n",
+  "assets": {
+    "1.svg": "PHN2Zy8+"
+  },
+  "detail": "stray CDATA wrapper: payload text escapes"
+}

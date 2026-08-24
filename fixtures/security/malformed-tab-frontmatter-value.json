@@ -1,0 +1,8 @@
+{
+  "id": "malformed-tab-frontmatter-value",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\ncover:\ta.svg\n---\n\n# H\n",
+  "detail": "tab after the front-matter colon still parses a scalar"
+}

@@ -6,11 +6,7 @@
 //! `CARGO_MANIFEST_DIR/../..`. This is the single source of truth used by both
 //! `commands` (build/check/audit/extract) and `publish`.
 
-pub(crate) fn repository_layout() -> (
-    std::path::PathBuf,
-    std::path::PathBuf,
-    std::path::PathBuf,
-) {
+pub(crate) fn repository_layout() -> (std::path::PathBuf, std::path::PathBuf, std::path::PathBuf) {
     let root = match std::env::var_os("MDHTML_ROOT") {
         Some(value) if !value.is_empty() => std::path::PathBuf::from(value),
         _ => std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))

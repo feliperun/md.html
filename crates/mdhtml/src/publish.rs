@@ -130,10 +130,8 @@ fn push_part(
 ) {
     payload.extend_from_slice(format!("--{boundary}\r\n").as_bytes());
     payload.extend_from_slice(
-        format!(
-            "Content-Disposition: form-data; name=\"{name}\"; filename=\"{filename}\"\r\n"
-        )
-        .as_bytes(),
+        format!("Content-Disposition: form-data; name=\"{name}\"; filename=\"{filename}\"\r\n")
+            .as_bytes(),
     );
     payload.extend_from_slice(format!("Content-Type: {content_type}\r\n\r\n").as_bytes());
     payload.extend_from_slice(bytes);
@@ -170,9 +168,9 @@ fn http_post(endpoint: &str, boundary: &str, payload: &[u8]) -> Result<(u16, Str
         .and_then(|()| stream.shutdown(Shutdown::Write))
         .map_err(|error| BuildError::new("E-CLI-05", format!("publish request failed: {error}")))?;
     let mut response = Vec::new();
-    stream
-        .read_to_end(&mut response)
-        .map_err(|error| BuildError::new("E-CLI-05", format!("publish response failed: {error}")))?;
+    stream.read_to_end(&mut response).map_err(|error| {
+        BuildError::new("E-CLI-05", format!("publish response failed: {error}"))
+    })?;
     let text = String::from_utf8_lossy(&response);
     let (head, body) = match text.split_once("\r\n\r\n") {
         Some((head, body)) => (head, body),

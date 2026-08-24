@@ -1,0 +1,8 @@
+{
+  "id": "html-details-ontoggle",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<details open ontoggle=alert(1)></details>\n",
+  "detail": "details/ontoggle toggle-fire handler: inert text"
+}

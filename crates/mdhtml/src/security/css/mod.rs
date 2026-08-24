@@ -128,8 +128,10 @@ fn rule_violation(rule: &CssRule) -> Option<Violation> {
                 .at(import.loc.line as usize + 1, import.loc.column as usize),
         ),
         CssRule::Namespace(namespace) => Some(
-            Violation::new("E-MDHSEC-008", "author CSS must not contain @namespace")
-                .at(namespace.loc.line as usize + 1, namespace.loc.column as usize),
+            Violation::new("E-MDHSEC-008", "author CSS must not contain @namespace").at(
+                namespace.loc.line as usize + 1,
+                namespace.loc.column as usize,
+            ),
         ),
         CssRule::Unknown(unknown) => Some(Violation::new(
             "E-MDHSEC-008",

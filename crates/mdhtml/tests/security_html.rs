@@ -67,7 +67,10 @@ impl<'a> JsonParser<'a> {
     }
 
     fn whitespace(&mut self) {
-        while matches!(self.input.get(self.index), Some(b' ' | b'\t' | b'\n' | b'\r')) {
+        while matches!(
+            self.input.get(self.index),
+            Some(b' ' | b'\t' | b'\n' | b'\r')
+        ) {
             self.index += 1;
         }
     }
@@ -299,7 +302,9 @@ fn url_and_html_cases_reject_or_build_with_the_frozen_diagnostics() {
                         .split_once(':')
                         .expect("fixture location is LINE:COLUMN");
                     assert!(
-                        error.to_string().contains(&format!("(line {line}, column {column})")),
+                        error
+                            .to_string()
+                            .contains(&format!("(line {line}, column {column})")),
                         "{} must cite line {line}, column {column} in its message: {}",
                         fixture.id,
                         error
@@ -343,10 +348,7 @@ fn url_contexts_apply_their_own_allowlists() {
         validate_url("mailto:author@example.com", UrlContext::Link),
         Ok(())
     );
-    assert_eq!(
-        validate_url("tel:+15551234567", UrlContext::Link),
-        Ok(())
-    );
+    assert_eq!(validate_url("tel:+15551234567", UrlContext::Link), Ok(()));
     assert_eq!(validate_url("guide/next.md", UrlContext::Link), Ok(()));
     assert_eq!(validate_url("#section", UrlContext::Link), Ok(()));
     assert_eq!(validate_url("", UrlContext::Link), Ok(()));
@@ -397,11 +399,15 @@ fn identifiers_must_match_the_heading_and_class_contract() {
     assert_eq!(validate_identifier("abc-1_2"), Ok(()));
     assert_eq!(validate_identifier("results"), Ok(()));
     assert_eq!(
-        validate_identifier("bad.id").expect_err("dot outside the contract").code,
+        validate_identifier("bad.id")
+            .expect_err("dot outside the contract")
+            .code,
         "E-MDHSEC-004"
     );
     assert_eq!(
-        validate_identifier("has space").expect_err("space outside the contract").code,
+        validate_identifier("has space")
+            .expect_err("space outside the contract")
+            .code,
         "E-MDHSEC-004"
     );
     assert_eq!(
@@ -440,10 +446,7 @@ fn svg_assets_reject_executables_handlers_and_external_references() {
             .code,
         "E-MDHSEC-013"
     );
-    assert_eq!(
-        validate_svg("<svg><image href=\"#icon\"/></svg>"),
-        Ok(())
-    );
+    assert_eq!(validate_svg("<svg><image href=\"#icon\"/></svg>"), Ok(()));
     assert_eq!(
         validate_svg("<svg><image href=\"local.png\"/></svg>"),
         Ok(())

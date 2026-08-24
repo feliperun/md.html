@@ -1,0 +1,8 @@
+{
+  "id": "malformed-numeric-char-refs",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n&#x1F600; &#0; &#x110000; &#xZZ;\n",
+  "detail": "HTML numeric character references stay literal text (never decoded into markup)"
+}

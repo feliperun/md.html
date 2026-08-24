@@ -220,7 +220,10 @@ fn split_scheme(destination: &str) -> Option<&str> {
     let colon = destination.find(':')?;
     let candidate = &destination[..colon];
     let mut chars = candidate.chars();
-    if !chars.next().is_some_and(|first| first.is_ascii_alphabetic()) {
+    if !chars
+        .next()
+        .is_some_and(|first| first.is_ascii_alphabetic())
+    {
         return None;
     }
     chars

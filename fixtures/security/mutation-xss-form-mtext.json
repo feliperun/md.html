@@ -1,0 +1,8 @@
+{
+  "id": "mutation-xss-form-mtext",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<form><math><mtext></form><form><mglyph><style></math><img src onerror=alert(1)>\n",
+  "detail": "form/math/mtext mXSS (foreign-content reparse): no fragment parses as markup at render"
+}

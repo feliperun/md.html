@@ -116,7 +116,9 @@ fn build_document(
         (true, false) => {
             build::build_no_fonts(source, source_dir, runtime_dir, themes_dir, fonts_dir)
         }
-        (false, true) => build::build_unsafe(source, source_dir, runtime_dir, themes_dir, fonts_dir),
+        (false, true) => {
+            build::build_unsafe(source, source_dir, runtime_dir, themes_dir, fonts_dir)
+        }
         (true, true) => {
             build::build_unsafe_no_fonts(source, source_dir, runtime_dir, themes_dir, fonts_dir)
         }
@@ -220,10 +222,7 @@ fn new(name: OsString, template: Option<ParsedTemplate>) -> Result<String, Build
             fs::create_dir_all(parent).map_err(|error| {
                 BuildError::new(
                     "E-CLI-05",
-                    format!(
-                        "output {} is not writable: {error}",
-                        destination.display()
-                    ),
+                    format!("output {} is not writable: {error}", destination.display()),
                 )
             })?;
         }

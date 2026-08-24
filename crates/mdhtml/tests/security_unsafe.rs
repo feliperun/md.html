@@ -69,7 +69,10 @@ impl<'a> JsonParser<'a> {
     }
 
     fn whitespace(&mut self) {
-        while matches!(self.input.get(self.index), Some(b' ' | b'\t' | b'\n' | b'\r')) {
+        while matches!(
+            self.input.get(self.index),
+            Some(b' ' | b'\t' | b'\n' | b'\r')
+        ) {
             self.index += 1;
         }
     }
@@ -333,7 +336,9 @@ fn unsafe_cases_reject_safely_and_build_with_the_flag_and_still_extract() {
                 .split_once(':')
                 .expect("fixture location is LINE:COLUMN");
             assert!(
-                error.to_string().contains(&format!("(line {line}, column {column})")),
+                error
+                    .to_string()
+                    .contains(&format!("(line {line}, column {column})")),
                 "{} must cite line {line}, column {column} in its message: {}",
                 fixture.id,
                 error
@@ -354,10 +359,11 @@ fn unsafe_cases_reject_safely_and_build_with_the_flag_and_still_extract() {
             fixture.id
         );
 
-        let restored = extract_source(html.as_bytes())
-            .expect(&format!("{} must still extract", fixture.id));
+        let restored =
+            extract_source(html.as_bytes()).expect(&format!("{} must still extract", fixture.id));
         assert_eq!(
-            restored, fixture.source.as_bytes(),
+            restored,
+            fixture.source.as_bytes(),
             "{} extracts the canonical source byte-for-byte",
             fixture.id
         );

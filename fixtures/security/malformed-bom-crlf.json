@@ -1,0 +1,9 @@
+{
+  "id": "malformed-bom-crlf",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-FMT-05",
+  "source": "﻿---\r\ntitle: T\r\n---\r\n\r\n# Head\r\n",
+  "detail": "BOM defeats front-matter detection and the build fails closed"
+}

@@ -314,7 +314,11 @@ fn parse_publish_option(
             if url.is_some() {
                 return duplicate("--url");
             }
-            *url = Some(option_value(args, index, token)?.to_string_lossy().into_owned());
+            *url = Some(
+                option_value(args, index, token)?
+                    .to_string_lossy()
+                    .into_owned(),
+            );
             Ok(())
         }
         _ => unknown_option(token),
@@ -576,9 +580,10 @@ mod tests {
 
     #[test]
     fn help_lists_the_unsafe_flag_on_the_build_usage_line() {
-        assert!(help_text().contains(
-            "mdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\n"
-        ));
+        assert!(
+            help_text()
+                .contains("mdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\n")
+        );
     }
 
     #[test]
@@ -615,16 +620,16 @@ mod tests {
             "mdhtml: E-CLI-05: duplicate option --json"
         );
         assert_eq!(
-            parse_args(args(&["audit"])).expect_err("missing positional").to_string(),
+            parse_args(args(&["audit"]))
+                .expect_err("missing positional")
+                .to_string(),
             "mdhtml: E-CLI-05: audit requires <file.md.html>"
         );
     }
 
     #[test]
     fn help_lists_the_audit_usage_line() {
-        assert!(help_text().contains(
-            "mdhtml audit <file.md.html> [--json]\n"
-        ));
+        assert!(help_text().contains("mdhtml audit <file.md.html> [--json]\n"));
     }
 
     #[test]
@@ -637,7 +642,12 @@ mod tests {
             }))
         );
         assert_eq!(
-            parse_args(args(&["publish", "doc.md", "--url", "http://127.0.0.1:8080"])),
+            parse_args(args(&[
+                "publish",
+                "doc.md",
+                "--url",
+                "http://127.0.0.1:8080"
+            ])),
             Ok(CliAction::Command(Command::Publish {
                 source: PathBuf::from("doc.md"),
                 url: Some("http://127.0.0.1:8080".to_string()),

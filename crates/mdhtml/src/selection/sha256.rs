@@ -24,8 +24,7 @@ pub fn digest_hex(bytes: &[u8]) -> String {
 /// RFC 4648 standard base64 (with padding) of the SHA-256 digest of `bytes`
 /// — the CSP source form `sha256-<BASE64>` (ADR 0010).
 pub fn digest_base64(bytes: &[u8]) -> String {
-    const ALPHABET: &[u8; 64] =
-        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let digest = digest_bytes(bytes);
     let mut out = String::with_capacity(44);
     for chunk in digest.chunks(3) {

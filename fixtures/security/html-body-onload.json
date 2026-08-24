@@ -1,0 +1,8 @@
+{
+  "id": "html-body-onload",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<body onload=alert(1)>\n",
+  "detail": "body onload: the document body is toolchain-owned; author copies are inert text"
+}

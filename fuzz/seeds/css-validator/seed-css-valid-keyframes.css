@@ -1,0 +1,2 @@
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+@counter-style thumbs { system: cyclic; symbols: "A"; suffix: " "; }

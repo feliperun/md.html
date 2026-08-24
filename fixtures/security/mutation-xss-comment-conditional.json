@@ -1,0 +1,9 @@
+{
+  "id": "mutation-xss-comment-conditional",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-FMT-02",
+  "source": "---\ntitle: T\n---\n\n<!--[if IE]><script>alert(1)</script><![endif]-->\n",
+  "detail": "downlevel-revealed conditional comment cannot smuggle a script element"
+}

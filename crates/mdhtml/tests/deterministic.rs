@@ -64,14 +64,26 @@ fn temp_dir(name: &str) -> PathBuf {
 /// Build the same source twice in-process and assert the artifacts are
 /// byte-identical; returns the first artifact for further assertions.
 fn build_twice(source: &str, source_dir: &Path, builder: Builder) -> String {
-    let first = builder(source, source_dir, &runtime_dist(), &themes_dir(), &fonts_dir())
-        .unwrap_or_else(|error| panic!("first build failed: {error}"));
+    let first = builder(
+        source,
+        source_dir,
+        &runtime_dist(),
+        &themes_dir(),
+        &fonts_dir(),
+    )
+    .unwrap_or_else(|error| panic!("first build failed: {error}"));
     assert!(
         first.starts_with("<!doctype html>\n"),
         "artifact must be a complete document"
     );
-    let second = builder(source, source_dir, &runtime_dist(), &themes_dir(), &fonts_dir())
-        .unwrap_or_else(|error| panic!("second build failed: {error}"));
+    let second = builder(
+        source,
+        source_dir,
+        &runtime_dist(),
+        &themes_dir(),
+        &fonts_dir(),
+    )
+    .unwrap_or_else(|error| panic!("second build failed: {error}"));
     assert_eq!(
         first.as_bytes(),
         second.as_bytes(),
@@ -215,7 +227,8 @@ fn feature_matrix_builds_are_byte_identical() {
     let tokens_source =
         fs::read_to_string(fixtures_dir().join("document-template.md")).expect("read fixture");
     let sections_source = fs::read_to_string(examples_dir().join("spec.md")).expect("read example");
-    let no_fonts_source = fs::read_to_string(templates_dir().join("spec.md")).expect("read template");
+    let no_fonts_source =
+        fs::read_to_string(templates_dir().join("spec.md")).expect("read template");
     let fonts_url_source = "---\ntitle: NP\nfonts:\n  url: https://fonts.googleapis.com/css2?family=Instrument+Sans\n---\n# Body\n";
 
     let cases: Vec<(&str, String, PathBuf, Builder, Option<&str>)> = vec![
@@ -254,7 +267,13 @@ fn feature_matrix_builds_are_byte_identical() {
             build,
             Some("application/octet-stream"),
         ),
-        ("tokens", tokens_source, fixtures_dir(), build, Some("--md-accent")),
+        (
+            "tokens",
+            tokens_source,
+            fixtures_dir(),
+            build,
+            Some("--md-accent"),
+        ),
         (
             "sections-containers",
             sections_source,

@@ -1,0 +1,8 @@
+{
+  "id": "mutation-xss-entity-encoded-scheme",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[x](javascript&#58;alert(1))\n",
+  "detail": "HTML-entity-encoded scheme: renderer escapes & so href stays the literal non-URI string"
+}

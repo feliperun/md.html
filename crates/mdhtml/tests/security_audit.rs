@@ -71,7 +71,10 @@ impl<'a> JsonParser<'a> {
     }
 
     fn whitespace(&mut self) {
-        while matches!(self.input.get(self.index), Some(b' ' | b'\t' | b'\n' | b'\r')) {
+        while matches!(
+            self.input.get(self.index),
+            Some(b' ' | b'\t' | b'\n' | b'\r')
+        ) {
             self.index += 1;
         }
     }
@@ -256,9 +259,7 @@ fn cases() -> Vec<PathBuf> {
         .filter(|path| {
             path.file_name()
                 .and_then(|name| name.to_str())
-                .is_some_and(|name| {
-                    name.starts_with("artifact-") && name.ends_with(".json")
-                })
+                .is_some_and(|name| name.starts_with("artifact-") && name.ends_with(".json"))
         })
         .collect::<Vec<_>>();
     paths.sort();
@@ -300,13 +301,7 @@ fn artifact_fixtures_build_or_write_and_audit_to_the_frozen_verdicts() {
                     fs::write(dir.join(name), bytes).expect("write materialized asset");
                 }
                 let built = if fixture.unsafe_build {
-                    build_unsafe(
-                        source,
-                        &dir,
-                        &runtime_dist(),
-                        &themes_dir(),
-                        &fonts_dir(),
-                    )
+                    build_unsafe(source, &dir, &runtime_dist(), &themes_dir(), &fonts_dir())
                 } else {
                     build(source, &dir, &runtime_dist(), &themes_dir(), &fonts_dir())
                 };
@@ -325,7 +320,11 @@ fn artifact_fixtures_build_or_write_and_audit_to_the_frozen_verdicts() {
             "valid" => {
                 assert!(report.safe, "{} must audit SAFE", fixture.id);
                 assert!(report.render().ends_with("SAFE\n"), "{}", report.render());
-                assert!(report.render_json().contains("\"safe\":true"), "{}", fixture.id);
+                assert!(
+                    report.render_json().contains("\"safe\":true"),
+                    "{}",
+                    fixture.id
+                );
             }
             "invalid" => {
                 assert!(!report.safe, "{} must audit UNSAFE", fixture.id);
@@ -339,13 +338,19 @@ fn artifact_fixtures_build_or_write_and_audit_to_the_frozen_verdicts() {
                     fixture.id,
                     report.render()
                 );
-                assert!(report.render_json().contains("\"safe\":false"), "{}", fixture.id);
+                assert!(
+                    report.render_json().contains("\"safe\":false"),
+                    "{}",
+                    fixture.id
+                );
                 if let Some(location) = &fixture.location {
                     let (line, column) = location
                         .split_once(':')
                         .expect("fixture location is LINE:COLUMN");
                     assert!(
-                        report.render().contains(&format!("(line {line}, column {column})")),
+                        report
+                            .render()
+                            .contains(&format!("(line {line}, column {column})")),
                         "{} must cite line {line}, column {column}: {}",
                         fixture.id,
                         report.render()
@@ -359,8 +364,7 @@ fn artifact_fixtures_build_or_write_and_audit_to_the_frozen_verdicts() {
 
 fn build_clean(source: &str) -> String {
     let dir = temp_dir();
-    build(source, &dir, &runtime_dist(), &themes_dir(), &fonts_dir())
-        .expect("clean build")
+    build(source, &dir, &runtime_dist(), &themes_dir(), &fonts_dir()).expect("clean build")
 }
 
 fn replace_in_source(html: &str, from: &str, to: &str) -> String {
@@ -487,7 +491,11 @@ fn a_clean_artifact_audits_safe_with_every_verdict_green() {
     assert!(report.runtime_pass());
     assert!(report.external_resources_pass());
     assert!(report.origins.is_empty());
-    assert!(report.render().starts_with("✓ valid mdhtml v1.0\n✓ canonical source present\n"));
+    assert!(
+        report
+            .render()
+            .starts_with("✓ valid mdhtml v1.0\n✓ canonical source present\n")
+    );
     assert!(report.render().ends_with("SAFE\n"));
     assert_eq!(
         report.render_json(),
@@ -507,20 +515,23 @@ fn a_fonts_url_artifact_reports_the_sanctioned_origins_and_stays_safe() {
         report.origins,
         ["https://fonts.googleapis.com", "https://fonts.gstatic.com"]
     );
-    assert!(
-        report
-            .render_json()
-            .contains("\"externalResources\":[\"https://fonts.googleapis.com\",\"https://fonts.gstatic.com\"]")
-    );
+    assert!(report.render_json().contains(
+        "\"externalResources\":[\"https://fonts.googleapis.com\",\"https://fonts.gstatic.com\"]"
+    ));
 }
 
 #[test]
 fn an_external_image_origin_is_not_sanctioned_and_fails_external_resources() {
-    let html = build_clean("---\ntitle: External image\n---\n\n![x](https://cdn.example.test/a.png)\n");
+    let html =
+        build_clean("---\ntitle: External image\n---\n\n![x](https://cdn.example.test/a.png)\n");
     let report = audit_artifact(&html);
 
     assert!(!report.safe);
     assert!(!report.external_resources_pass());
     assert_eq!(report.origins, ["https://cdn.example.test"]);
-    assert!(report.render_json().contains("\"externalResources\":[\"https://cdn.example.test\"]"));
+    assert!(
+        report
+            .render_json()
+            .contains("\"externalResources\":[\"https://cdn.example.test\"]")
+    );
 }

@@ -1,0 +1,8 @@
+{
+  "id": "malformed-unclosed-tag-eof",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<div class=\"x",
+  "detail": "tag cut off at EOF degrades to escaped text"
+}

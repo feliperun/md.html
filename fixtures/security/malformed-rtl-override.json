@@ -1,0 +1,8 @@
+{
+  "id": "malformed-rtl-override",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[ok](https://example.test) but ev‮il looks legit\n",
+  "detail": "RTL override (Trojan Source) is inert display text; no bidi reordering of markup"
+}

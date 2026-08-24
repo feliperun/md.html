@@ -25,7 +25,8 @@ One case per file, named `fixtures/security/<category>-<name>.json`:
 
 - `id` is unique and matches the file name (`<category>-<name>`).
 - `category` is one of `html`, `url`, `css`, `svg`, `path`, `runtime`, `csp`,
-  `artifact`, `unsafe`.
+  `artifact`, `unsafe`, or the Phase 6 adversarial categories `mutation-xss`,
+  `malformed`, `external` (PRD §15).
 - `status` is `invalid` (the build must reject with exactly `diagnostic` and
   write no output), `valid` (the build must succeed and stay portable), or
   `unsafe` (build-level pair: without the flag the build must reject with
@@ -33,8 +34,11 @@ One case per file, named `fixtures/security/<category>-<name>.json`:
   carry `data-mdhtml-safe="false"` on the root element, and still pass
   `extract`).
 - `diagnostic` is required for `invalid` and `unsafe` cases and must be one
-  of the frozen `E-MDHSEC-*` codes in the Tech Spec addendum; omitted for
-  `valid` cases.
+  of the frozen `E-MDHSEC-*` codes in the Tech Spec addendum — except the
+  format guards the adversarial corpus pins as the reason the input cannot
+  execute (`E-FMT-02` stored-source terminator for `mutation-xss` breakouts,
+  `E-FMT-05` front-matter rejection for `malformed` inputs that fail closed);
+  omitted for `valid` cases.
 - `location` is optional and only meaningful for `invalid` and `unsafe`
   cases: a string
   `"LINE:COLUMN"` (1-based) asserted exactly when present. For document-level
@@ -66,6 +70,17 @@ extracts (see the status contract above).
   case is a contract change, not a test failure to silence.
 - Every guard rejection landed by a fix must add its regression fixture here
   in the same commit (ADR 0006, consequences).
+
+### Phase 6 adversarial categories
+
+`mutation-xss`, `malformed`, `runtime` and `external` cases are walked by
+`crates/mdhtml/tests/security_adversarial.rs` with the build-level contract
+above plus two additions: `valid` cases must also audit SAFE and round-trip
+`extract(build(source)) == source`, and `kind: "artifact"` cases audit
+exactly as the `artifact` category does. `mutation-xss` cases with status
+`valid` are additionally rendered by `runtime/test/security-mutation-xss.test.mjs`,
+which asserts at the renderer — the layer where mutation XSS actually lands —
+that the payload never survives as a real element.
 
 ### Artifact cases (`mdhtml audit`)
 
