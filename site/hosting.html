@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mdhtml hosting</title>
+<meta name="description" content="Publish a single self-contained mdhtml document and get a short public URL — free, anonymous, and immutable.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1f2937;
+    --muted: #667085;
+    --surface: #f8fafc;
+    --border: #dbe2ea;
+    --accent: #0f766e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); }
+  .wrap { width: min(calc(100% - 3rem), 46rem); margin-inline: auto; }
+  header { padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+  header .brand { color: var(--muted); font-size: 0.92rem; }
+  main { padding: 3rem 0 4rem; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.15; margin: 0 0 0.5rem; }
+  h2 { margin: 2.5rem 0 0.6rem; }
+  p.lede { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.5rem; }
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.9rem 1.1rem;
+    overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 0.92rem;
+  }
+  code { font-family: ui-monospace, "SF Mono", monospace; }
+  .note {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0.5rem;
+    padding: 0.9rem 1.1rem;
+    margin-top: 2.5rem;
+  }
+  footer { border-top: 1px solid var(--border); padding: 1.5rem 0; color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <span class="brand">mdhtml</span>
+  </div>
+</header>
+<main class="wrap">
+  <h1>mdhtml hosting</h1>
+  <p class="lede">Publish an mdhtml document and get a short, public URL. Free,
+    anonymous, and immutable.</p>
+
+  <h2>What mdhtml is</h2>
+  <p>mdhtml is one self-contained document for humans and machines. You write
+    Markdown; the toolchain ships a single <code>.md.html</code> file that
+    carries the rendered document, the runtime, fonts, styles, assets, and the
+    canonical Markdown source byte for byte. It opens from disk with no server,
+    no network, and no build step for the reader.</p>
+
+  <h2>How to create one</h2>
+  <p>Write a Markdown file, then build it into a self-contained document:</p>
+  <pre><code>mdhtml build document.md</code></pre>
+  <p>This produces <code>document.md.html</code>.</p>
+
+  <h2>How to publish</h2>
+  <p>Publish the built document to get a short public URL:</p>
+  <pre><code>mdhtml publish document.md</code></pre>
+  <p>The service builds, security-audits, and publishes the document for you.
+    Hosted documents are served from an isolated origin with strict security
+    headers.</p>
+
+  <h2>How to inspect</h2>
+  <p>Audit a built document before publishing or sharing it:</p>
+  <pre><code>mdhtml audit document.md.html</code></pre>
+  <p>The audit reports a security verdict and diagnostics, so what you publish
+    is what you verified.</p>
+
+  <h2>Examples</h2>
+  <p>See what a finished mdhtml document looks like:
+    <a href="https://feliperun.github.io/md.html/examples/spec.html">Meridian API specification</a>.
+    More examples live under <code>examples/</code> in the repository.</p>
+
+  <h2>Open source</h2>
+  <p>mdhtml is open source under the MIT license:
+    <a href="https://github.com/feliperun/md.html">github.com/feliperun/md.html</a>.</p>
+
+  <h2>Donation</h2>
+  <p>mdhtml hosting is free. If it saves you time, you can help keep it
+    running — <a href="#">support link placeholder</a>.</p>
+
+  <div class="note">
+    <p><strong>Public by default.</strong> Published documents are anonymous,
+    immutable, and public; an unguessable URL implies no secrecy. Abuse removal
+    follows the report-driven takedown and hash-deny-list model: reported
+    documents are reviewed and taken down, and the source hash is deny-listed so
+    the same document cannot be republished. See
+    <a href="docs/adr/0018-abuse-takedown-model.md">docs/adr/0018-abuse-takedown-model.md</a>.</p>
+  </div>
+</main>
+<footer>
+  <div class="wrap">mdhtml — one portable Markdown document.</div>
+</footer>
+</body>
+</html>

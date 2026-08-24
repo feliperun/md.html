@@ -26,9 +26,16 @@ pub fn dispatch(command: Command) -> Result<String, BuildError> {
             output,
             assets,
         } => extract(input, output, assets),
+        Command::Publish { source, url } => publish(&source, url.as_deref()),
         Command::New { name, template } => new(name, template),
         Command::Themes => themes(),
     }
+}
+
+/// Phase 5: build + audit locally, then upload the source plus referenced
+/// assets to the Publish API and return the server-issued public URL.
+fn publish(source: &Path, base_url: Option<&str>) -> Result<String, BuildError> {
+    crate::publish::publish(source, base_url)
 }
 
 fn build(
@@ -43,7 +50,7 @@ fn build(
     }
     let source = read_source(&input)?;
     let source_dir = parent_dir(&input);
-    let (runtime_dir, themes_dir, fonts_dir) = repository_layout();
+    let (runtime_dir, themes_dir, fonts_dir) = crate::repo::repository_layout();
     let document = build_document(
         &source,
         &source_dir,
@@ -130,7 +137,7 @@ fn watch(
 ) -> Result<String, BuildError> {
     let destination = output.unwrap_or_else(|| append_html(&input));
     let source_dir = parent_dir(&input);
-    let (runtime_dir, themes_dir, fonts_dir) = repository_layout();
+    let (runtime_dir, themes_dir, fonts_dir) = crate::repo::repository_layout();
     let mut last = read_bytes(&input)?;
     let initial = String::from_utf8(last.clone()).map_err(|_| {
         BuildError::new(
@@ -275,23 +282,6 @@ fn template_name(template: ParsedTemplate) -> &'static str {
     }
 }
 
-/// Resolve the development repository layout: the committed runtime fragments
-/// live in `runtime/dist`, the themes in `themes/` and the font catalog in
-/// `fonts/`, all relative to the repository root (`crates/mdhtml/..`).
-fn repository_layout() -> (PathBuf, PathBuf, PathBuf) {
-    let root = match std::env::var_os("MDHTML_ROOT") {
-        Some(value) if !value.is_empty() => PathBuf::from(value),
-        _ => PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("..")
-            .join(".."),
-    };
-    (
-        root.join("runtime").join("dist"),
-        root.join("themes"),
-        root.join("fonts"),
-    )
-}
-
 fn append_html(input: &Path) -> PathBuf {
     let mut value = input.as_os_str().to_os_string();
     value.push(".html");
@@ -345,7 +335,7 @@ fn check(input: std::path::PathBuf) -> Result<String, BuildError> {
     let report = if is_artifact(&input) {
         crate::check::check_artifact(&text)
     } else {
-        let (runtime_dir, _themes_dir, fonts_dir) = repository_layout();
+        let (runtime_dir, _themes_dir, fonts_dir) = crate::repo::repository_layout();
         crate::check::check_source(&text, &runtime_dir, &fonts_dir)
     };
     print!("{}", report.render());
