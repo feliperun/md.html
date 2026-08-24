@@ -1,0 +1,11 @@
+{
+  "id": "mutation-xss-svg-style-title",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<svg><p><style><g title=\"</style><img src=1.svg onerror=alert(1)>\">\n",
+  "assets": {
+    "1.svg": "PHN2Zy8+"
+  },
+  "detail": "svg/style namespace-confusion mXSS: style payload text never re-parses as markup"
+}

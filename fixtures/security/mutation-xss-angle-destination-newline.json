@@ -1,0 +1,8 @@
+{
+  "id": "mutation-xss-angle-destination-newline",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[x](<jav\nascript:alert(1)>)\n",
+  "detail": "angle destination with embedded newline: Rust and JS agree it is not a link (degrades to text)"
+}

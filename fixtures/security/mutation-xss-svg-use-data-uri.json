@@ -1,0 +1,8 @@
+{
+  "id": "mutation-xss-svg-use-data-uri",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<svg><use href=\"data:image/svg+xml;base64,PHN2ZyBpZD0ieCI+PGltYWdlIGhyZWY9IjEiIG9uZXJyb3I9ImFsZXJ0KDEpIi8+PC9zdmc+#x\"/></svg>\n",
+  "detail": "svg use with data: URI payload: inert text at render"
+}

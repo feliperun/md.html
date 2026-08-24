@@ -1,0 +1,8 @@
+{
+  "id": "mutation-xss-double-encoded-scheme",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[x](javascript&amp;#58;alert(1))\n",
+  "detail": "double-encoded scheme stays literal after attribute escaping"
+}

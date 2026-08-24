@@ -1,0 +1,11 @@
+{
+  "id": "mutation-xss-svg-desc-cdata",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<svg><desc><![CDATA[</desc><img src=1.svg onerror=alert(1)>]]></svg>\n",
+  "assets": {
+    "1.svg": "PHN2Zy8+"
+  },
+  "detail": "svg/desc CDATA mXSS: CDATA section degrades to escaped text"
+}

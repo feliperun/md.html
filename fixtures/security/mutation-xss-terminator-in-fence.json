@@ -1,0 +1,9 @@
+{
+  "id": "mutation-xss-terminator-in-fence",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-FMT-02",
+  "source": "---\ntitle: T\n---\n\n```\n<x></script>\n```\n",
+  "detail": "even an inert fenced-code copy of </script fails high: stored-source breakout is impossible"
+}

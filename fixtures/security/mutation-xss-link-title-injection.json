@@ -1,0 +1,11 @@
+{
+  "id": "mutation-xss-link-title-injection",
+  "category": "mutation-xss",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[x](https://example.test '\"><img src=1.svg onerror=alert(1)>')\n",
+  "assets": {
+    "1.svg": "PHN2Zy8+"
+  },
+  "detail": "quote-break attempt in a link title: title escapes as attribute text"
+}
