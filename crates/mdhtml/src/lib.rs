@@ -6,6 +6,8 @@ pub mod cli;
 pub mod commands;
 pub mod extract;
 pub mod frontmatter;
+pub mod publish;
+mod repo;
 pub mod scanner;
 pub mod security;
 pub mod selection;

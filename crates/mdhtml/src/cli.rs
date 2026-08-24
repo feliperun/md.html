@@ -2,7 +2,7 @@ use std::ffi::{OsStr, OsString};
 use std::fmt;
 use std::path::PathBuf;
 
-const HELP: &str = "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\nmdhtml check <file>\nmdhtml audit <file.md.html> [--json]\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n";
+const HELP: &str = "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\nmdhtml check <file>\nmdhtml audit <file.md.html> [--json]\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml publish <source> [--url <base-url>]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n";
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum CliAction {
@@ -31,6 +31,10 @@ pub enum Command {
         input: PathBuf,
         output: Option<PathBuf>,
         assets: Option<PathBuf>,
+    },
+    Publish {
+        source: PathBuf,
+        url: Option<String>,
     },
     New {
         name: OsString,
@@ -100,16 +104,23 @@ where
         )));
     }
 
-    match first.to_str() {
-        Some("build") => parse_build(&args[1..]).map(CliAction::Command),
-        Some("check") => parse_check(&args[1..]).map(CliAction::Command),
-        Some("audit") => parse_audit(&args[1..]).map(CliAction::Command),
-        Some("extract") => parse_extract(&args[1..]).map(CliAction::Command),
-        Some("new") => parse_new(&args[1..]).map(CliAction::Command),
-        Some("themes") => parse_themes(&args[1..]).map(CliAction::Command),
+    dispatch_subcommand(first, &args[1..])
+}
+
+/// The subcommand table: each known name parses its own remaining args; an
+/// unrecognized name is `E-CLI-05`.
+fn dispatch_subcommand(name: &OsStr, rest: &[OsString]) -> Result<CliAction, CliError> {
+    match name.to_str() {
+        Some("build") => parse_build(rest).map(CliAction::Command),
+        Some("check") => parse_check(rest).map(CliAction::Command),
+        Some("audit") => parse_audit(rest).map(CliAction::Command),
+        Some("extract") => parse_extract(rest).map(CliAction::Command),
+        Some("publish") => parse_publish(rest).map(CliAction::Command),
+        Some("new") => parse_new(rest).map(CliAction::Command),
+        Some("themes") => parse_themes(rest).map(CliAction::Command),
         _ => Err(CliError::new(format!(
             "unknown subcommand {}; use --help for usage",
-            display(first)
+            display(name)
         ))),
     }
 }
@@ -261,6 +272,53 @@ fn parse_extract(args: &[OsString]) -> Result<Command, CliError> {
         output,
         assets,
     })
+}
+
+/// One positional `<source>` and the optional `--url` base; duplicates and
+/// unknown options are rejected like every other parser (E-CLI-05).
+fn parse_publish(args: &[OsString]) -> Result<Command, CliError> {
+    let mut source = None;
+    let mut url = None;
+    let mut options = true;
+    let mut index = 0;
+
+    while index < args.len() {
+        let token = &args[index];
+        if options && token == "--" {
+            options = false;
+            index += 1;
+            continue;
+        }
+        if options && is_dash_prefixed(token) {
+            parse_publish_option(token, &mut url, args, &mut index)?;
+        } else {
+            set_input(&mut source, token)?;
+        }
+        index += 1;
+    }
+
+    let source = source.ok_or_else(|| missing_positional("publish", "<source>"))?;
+    Ok(Command::Publish { source, url })
+}
+
+/// The one dash-prefixed `publish` option: `--url` consumes the following
+/// token as the publish endpoint's base URL.
+fn parse_publish_option(
+    token: &OsStr,
+    url: &mut Option<String>,
+    args: &[OsString],
+    index: &mut usize,
+) -> Result<(), CliError> {
+    match token.to_str() {
+        Some("--url") => {
+            if url.is_some() {
+                return duplicate("--url");
+            }
+            *url = Some(option_value(args, index, token)?.to_string_lossy().into_owned());
+            Ok(())
+        }
+        _ => unknown_option(token),
+    }
 }
 
 fn parse_new(args: &[OsString]) -> Result<Command, CliError> {
@@ -567,6 +625,48 @@ mod tests {
         assert!(help_text().contains(
             "mdhtml audit <file.md.html> [--json]\n"
         ));
+    }
+
+    #[test]
+    fn parses_publish_source_and_url() {
+        assert_eq!(
+            parse_args(args(&["publish", "doc.md"])),
+            Ok(CliAction::Command(Command::Publish {
+                source: PathBuf::from("doc.md"),
+                url: None,
+            }))
+        );
+        assert_eq!(
+            parse_args(args(&["publish", "doc.md", "--url", "http://127.0.0.1:8080"])),
+            Ok(CliAction::Command(Command::Publish {
+                source: PathBuf::from("doc.md"),
+                url: Some("http://127.0.0.1:8080".to_string()),
+            }))
+        );
+    }
+
+    #[test]
+    fn publish_rejects_duplicate_url_missing_source_and_extra_positional() {
+        assert_eq!(
+            parse_args(args(&[
+                "publish", "a.md", "--url", "http://a", "--url", "http://b"
+            ]))
+            .expect_err("duplicate --url")
+            .to_string(),
+            "mdhtml: E-CLI-05: duplicate option --url"
+        );
+        assert_eq!(
+            parse_args(args(&["publish"]))
+                .expect_err("missing source")
+                .to_string(),
+            "mdhtml: E-CLI-05: publish requires <source>"
+        );
+        assert!(parse_args(args(&["publish", "a.md", "b.md"])).is_err());
+    }
+
+    #[test]
+    fn help_lists_the_publish_usage_line() {
+        assert!(help_text().contains("mdhtml publish <source> [--url <base-url>]\n"));
     }
 
     #[test]

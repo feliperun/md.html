@@ -22,7 +22,7 @@ fn help_and_version_are_stdout_successes() {
     assert_eq!(String::from_utf8_lossy(&help.stderr), "");
     assert_eq!(
         String::from_utf8_lossy(&help.stdout),
-        "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\nmdhtml check <file>\nmdhtml audit <file.md.html> [--json]\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n"
+        "Usage: mdhtml <command>\n\nmdhtml build <in.md> [-o out] [--watch] [--no-fonts] [--unsafe]\nmdhtml check <file>\nmdhtml audit <file.md.html> [--json]\nmdhtml extract <in.md.html> [-o out.md] [--assets dir]\nmdhtml publish <source> [--url <base-url>]\nmdhtml new <name> [--template resume|memo|spec|recipe|chapter]\nmdhtml themes\n"
     );
 
     let version = run(&["-V"]);
