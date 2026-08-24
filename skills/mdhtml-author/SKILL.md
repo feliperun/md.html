@@ -1,6 +1,6 @@
 ---
 name: mdhtml-author
-description: Author mdhtml 1.0 documents: scaffold with `mdhtml new` from the canonical templates, write the accepted front matter subset and Markdown conventions, shape content with `:::` containers and section components, extract or hand-edit built documents, and close with `mdhtml build` then `mdhtml check`. Use when creating, editing, or reviewing a Markdown document that must build into a portable self-contained `.md.html` file.
+description: Author mdhtml 1.0 documents: scaffold with `mdhtml new` from the canonical templates, write the accepted front matter subset and Markdown conventions, shape content with `:::` containers and section components, extract or hand-edit built documents, close with `mdhtml build` then `mdhtml check`, audit with `mdhtml audit`, and publish the result with `mdhtml publish`. Use when creating, editing, reviewing, or publishing a Markdown document that must build into a portable self-contained `.md.html` file.
 ---
 
 # mdhtml authoring
@@ -83,6 +83,18 @@ format.
    reports the portability verdict and the byte budget; when the edit needs
    re-embedding, apply it to the extracted source and rebuild.
 
+7. **Audit, then publish.** When the document is meant to be shared, run:
+
+   ```bash
+   mdhtml audit doc.md.html
+   mdhtml publish doc.md
+   ```
+
+   `mdhtml publish` accepts `--url <base-url>`, or the `MDHTML_PUBLISH_URL`
+   environment variable, to target a local or mock endpoint. Fix every
+   diagnostic before publishing and return the resulting public URL to the
+   user. See references/publishing.md for the full loop and error mapping.
+
 ## Rules
 
 - Reference the committed templates and examples by path; never inline their
@@ -92,3 +104,15 @@ format.
   rendering.
 - No personal or production-derived data: the templates and examples are
   synthetic, and so must be anything derived from them.
+
+## Security rules
+
+- Never bypass a security diagnostic to complete publication.
+- Fix the source while preserving author intent.
+- Never invoke `--unsafe` unless the human explicitly requested it.
+- Never encode or obfuscate prohibited constructs.
+- Treat security errors as constraints, not obstacles to circumvent.
+- Prefer embedded/local assets when external resources violate policy.
+
+Publishing is safe-by-default: a document that fails `mdhtml audit` is never
+published, and `--unsafe` artifacts cannot be published at all.

@@ -138,7 +138,7 @@ fn reference_position(body: &str, line_offset: usize, path: &str) -> Option<(usi
         .map(|image| (image.line + line_offset, column_of(body, image.offset)))
 }
 
-fn collect_asset_paths(body: &str, analysis: &Analysis) -> Vec<String> {
+pub fn collect_asset_paths(body: &str, analysis: &Analysis) -> Vec<String> {
     let mut paths = Vec::new();
     let mut seen = std::collections::HashSet::new();
     let evidence = scan_document(body);
