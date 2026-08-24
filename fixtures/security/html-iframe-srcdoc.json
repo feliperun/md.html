@@ -1,0 +1,8 @@
+{
+  "id": "html-iframe-srcdoc",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<iframe srcdoc=\"<b>hi</b>\"></iframe>\n",
+  "detail": "srcdoc embeds a foreign document; inert text here, never an emitted element"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "html-svg-animate-values",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<svg><animate attributeName=\"href\" values=\"javascript:alert(1)\"/></svg>\n",
+  "detail": "SMIL animate hijacking href: inert text"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "html-img-javascript-src",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "invalid",
+  "diagnostic": "E-MDHSEC-012",
+  "location": "5:1",
+  "source": "---\ntitle: T\n---\n\n<img src=\"javascript:alert(1).png\">\n",
+  "detail": "raw HTML img with a javascript: destination is caught by the URL guard, not passed as text"
+}

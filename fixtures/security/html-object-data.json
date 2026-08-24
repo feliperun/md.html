@@ -1,0 +1,8 @@
+{
+  "id": "html-object-data",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<object data=\"https://evil.example/x.svg\"></object>\n",
+  "detail": "object data remote document: degrades to text"
+}

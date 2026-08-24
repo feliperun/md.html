@@ -1,0 +1,8 @@
+{
+  "id": "html-link-stylesheet",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<link rel=\"stylesheet\" href=\"https://evil.example/x.css\">\n",
+  "detail": "link stylesheet fetch: inert text outside head"
+}

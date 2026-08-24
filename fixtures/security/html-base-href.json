@@ -1,0 +1,8 @@
+{
+  "id": "html-base-href",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<base href=\"https://evil.example/\">\n",
+  "detail": "base href rebinding: inert text outside head"
+}

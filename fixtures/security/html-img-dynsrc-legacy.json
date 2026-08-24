@@ -1,0 +1,8 @@
+{
+  "id": "html-img-dynsrc-legacy",
+  "category": "html",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n<img dynsrc=\"javascript:alert(1)\">\n",
+  "detail": "legacy IE dynsrc/lowsrc attributes: not in any modern parsing path, inert text"
+}

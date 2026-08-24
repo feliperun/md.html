@@ -1,8 +1,9 @@
-// Phase 6 mXSS corpus walk: every `fixtures/security/mutation-xss-*.json`
-// case with status "valid" renders its markdown body through the runtime
+// Phase 6 adversarial render walk: every `fixtures/security/mutation-xss-*`
+// and valid `html-*` case renders its markdown body through the runtime
 // renderer — the layer where mutation XSS actually lands — and asserts the
 // payload markup never survives as a real element. The build verdicts for the
-// same files are asserted by crates/mdhtml/tests/security_adversarial.rs.
+// same files are asserted by crates/mdhtml/tests/security_adversarial.rs and
+// security_html.rs.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -19,10 +20,13 @@ const FORBIDDEN_ELEMENTS =
 const EXECUTABLE_HREF = /<a\s[^>]*href="javascript:/i;
 
 const dir = fileURLToPath(new URL("../../fixtures/security/", import.meta.url));
-const names = readdirSync(dir).filter((name) => /^mutation-xss-.*\.json$/.test(name)).sort();
+const names = readdirSync(dir)
+  .filter((name) => /^(mutation-xss|html)-.*\.json$/.test(name))
+  .sort();
 
 test("the mutation-xss corpus is present", () => {
-  assert.ok(names.length >= 15, `expected at least 15 fixtures, found ${names.length}`);
+  const mutations = names.filter((name) => name.startsWith("mutation-xss-"));
+  assert.ok(mutations.length >= 15, `expected at least 15 fixtures, found ${mutations.length}`);
 });
 
 for (const name of names) {
@@ -32,7 +36,7 @@ for (const name of names) {
   test(`${fixture.id}: payload never survives rendering as markup`, () => {
     const parsed = parseFrontMatter(fixture.source);
     const rendered = renderMarkdown(parsed.body);
-    assert.match(fixture.id, /^mutation-xss-/, "id matches its file name");
+    assert.match(fixture.id, /^(mutation-xss|html)-/, "id matches its file prefix");
     assert.ok(
       !FORBIDDEN_ELEMENTS.test(rendered.html),
       `${fixture.id} rendered executable markup: ${rendered.html}`,
