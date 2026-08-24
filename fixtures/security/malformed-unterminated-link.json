@@ -1,0 +1,8 @@
+{
+  "id": "malformed-unterminated-link",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\n[x](https://example.test\n",
+  "detail": "unterminated link degrades to literal text"
+}

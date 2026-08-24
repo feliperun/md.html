@@ -35,9 +35,10 @@ One case per file, named `fixtures/security/<category>-<name>.json`:
   `extract`).
 - `diagnostic` is required for `invalid` and `unsafe` cases and must be one
   of the frozen `E-MDHSEC-*` codes in the Tech Spec addendum — except the
-  `E-FMT-02` stored-source terminator, which `mutation-xss` breakout cases
-  pin as the guard that makes the breakout impossible; omitted for `valid`
-  cases.
+  format guards the adversarial corpus pins as the reason the input cannot
+  execute (`E-FMT-02` stored-source terminator for `mutation-xss` breakouts,
+  `E-FMT-05` front-matter rejection for `malformed` inputs that fail closed);
+  omitted for `valid` cases.
 - `location` is optional and only meaningful for `invalid` and `unsafe`
   cases: a string
   `"LINE:COLUMN"` (1-based) asserted exactly when present. For document-level

@@ -1,0 +1,8 @@
+{
+  "id": "malformed-control-chars",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\ntex\u0001\u0002t here\n",
+  "detail": "raw C0 control characters in text are inert"
+}

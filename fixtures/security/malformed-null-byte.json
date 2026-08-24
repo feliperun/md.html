@@ -1,0 +1,8 @@
+{
+  "id": "malformed-null-byte",
+  "category": "malformed",
+  "requirement": "PRD-15",
+  "status": "valid",
+  "source": "---\ntitle: T\n---\n\ntext\u0000here\n",
+  "detail": "NUL byte inside body text stays inert escaped text"
+}
