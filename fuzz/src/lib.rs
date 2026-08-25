@@ -24,12 +24,14 @@ pub fn fonts_dir() -> &'static Path {
     DIR.get_or_init(|| repo_root().join("fonts"))
 }
 
-/// A scratch directory for the source under test (build resolves relative
-/// theme/asset paths against it).
+/// A repository-local scratch directory for the source under test (build
+/// resolves relative theme/asset paths against it).
 pub fn source_dir() -> &'static Path {
     static DIR: OnceLock<PathBuf> = OnceLock::new();
     DIR.get_or_init(|| {
-        let dir = std::env::temp_dir().join(format!("mdhtml-fuzz-{}", std::process::id()));
+        let dir = repo_root()
+            .join(".runs/fuzz-work")
+            .join(format!("mdhtml-fuzz-{}", std::process::id()));
         let _ = std::fs::create_dir_all(&dir);
         dir
     })

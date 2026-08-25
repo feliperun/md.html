@@ -34,6 +34,31 @@ jobs:
       - name: Rust tests
         run: cargo test --workspace
 
+      - uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install cargo-fuzz
+        run: cargo +nightly install cargo-fuzz --version 0.13.2 --locked
+
+      - name: Bounded fuzz targets
+        run: |
+          set -euo pipefail
+          rm -rf .runs/fuzz-project
+          mkdir -p .runs/fuzz-project .runs/fuzz-artifacts .runs/cargo-target .runs/crates
+          cp fuzz/Cargo.toml fuzz/Cargo.lock .runs/fuzz-project/
+          cp -R fuzz/src fuzz/fuzz_targets .runs/fuzz-project/
+          ln -sfn "$PWD/crates/mdhtml" .runs/crates/mdhtml
+          ln -sfn "$PWD/runtime" .runs/runtime
+          ln -sfn "$PWD/themes" .runs/themes
+          ln -sfn "$PWD/fonts" .runs/fonts
+          for spec in fuzz_parser:parser fuzz_html_validator:html-validator fuzz_css_validator:css-validator fuzz_extract_roundtrip:extract-roundtrip fuzz_build_audit:build-audit; do
+            target=${spec%%:*}
+            seed=${spec##*:}
+            mkdir -p ".runs/fuzz-project/corpus/$seed" ".runs/fuzz-artifacts/$seed"
+            cp -R "fuzz/seeds/$seed/." ".runs/fuzz-project/corpus/$seed/"
+            cargo +nightly fuzz run --fuzz-dir .runs/fuzz-project --target-dir .runs/cargo-target "$target" -- -runs=256 -max_total_time=20 -artifact_prefix="$PWD/.runs/fuzz-artifacts/$seed/"
+          done
+          test -z "$(git status --porcelain --untracked-files=all -- fuzz/seeds)"
+
       - name: Example build/check/round-trip
         run: ./scripts/check-examples.sh
 
