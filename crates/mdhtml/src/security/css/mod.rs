@@ -68,7 +68,30 @@ pub fn guard_author_css(css: &str) -> Result<String, Violation> {
             "author CSS re-serialization must not contain the sequence </style",
         ));
     }
-    Ok(output.code)
+    let output_code = output.code;
+    let second_pass = {
+        let second_stylesheet = StyleSheet::parse(
+            &output_code,
+            ParserOptions {
+                error_recovery: false,
+                ..ParserOptions::default()
+            },
+        )
+        .map_err(|_| Violation::new("E-MDHSEC-007", "author CSS fails to re-serialize"))?;
+        second_stylesheet
+            .to_css(PrinterOptions {
+                minify: false,
+                ..PrinterOptions::default()
+            })
+            .map_err(|_| Violation::new("E-MDHSEC-007", "author CSS fails to re-serialize"))?
+    };
+    if second_pass.code != output_code {
+        return Err(Violation::new(
+            "E-MDHSEC-007",
+            "author CSS re-serialization must be byte-idempotent",
+        ));
+    }
+    Ok(output_code)
 }
 
 /// Whether the re-serialized stylesheet carries a literal `</style` anywhere

@@ -330,6 +330,18 @@ fn approved_theme_reserializes_to_identical_bytes() {
 }
 
 #[test]
+fn css_malformed_declaration_is_rejected_or_idempotent() {
+    let input = ".a { color:";
+    match guard_author_css(input) {
+        Err(violation) => assert_eq!(violation.code, "E-MDHSEC-007"),
+        Ok(approved) => assert_eq!(
+            guard_author_css(&approved).expect("approved CSS must re-guard clean"),
+            approved,
+        ),
+    }
+}
+
+#[test]
 fn approved_theme_embeds_byte_stable_user_style_across_builds() {
     let dir = std::env::temp_dir().join(format!("mdhtml-security-css-{}", std::process::id()));
     fs::create_dir_all(&dir).expect("create temp dir");
